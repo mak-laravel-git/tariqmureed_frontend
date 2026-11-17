@@ -1,0 +1,419 @@
+/**
+ * API contract between this Next.js frontend and the Laravel backend.
+ *
+ * Every endpoint returns a Laravel API Resource payload, optionally wrapped in
+ * { "data": ... }. Dates are ISO 8601 strings (with offset) and image fields are
+ * absolute URLs (or paths below /public for bundled assets).
+ */
+
+export interface TeamColors {
+  /** CSS colour at the start of the 145deg badge gradient. */
+  from: string;
+  /** CSS colour at the end of the gradient. */
+  to: string;
+}
+
+export interface TeamSummary {
+  id: number | string;
+  slug: string;
+  name: string;
+  /** 2-3 letter code shown inside the circular badge, e.g. "MI". */
+  shortName: string;
+  colors: TeamColors;
+}
+
+export interface TeamProfile extends TeamSummary {
+  membership: string;
+  captain: string;
+  coach: string;
+  homeGround: string;
+  titles: string;
+}
+
+export interface CompetitionRef {
+  slug: string;
+  name: string;
+  /** Format tag shown next to the competition name, e.g. "T20", "ODI". */
+  format: string;
+  /** Group heading on fixture lists, e.g. "International" or "Domestic". */
+  category?: string | null;
+}
+
+export type MatchState = "live" | "break" | "upcoming" | "result";
+
+export interface MatchSide {
+  team: TeamSummary;
+  /** "148/3" - present once the side has batted. */
+  score?: string | null;
+  /** "15.2" - overs bowled when the score was recorded. */
+  overs?: string | null;
+  /** Free text shown instead of a score, e.g. "Yet to bat". */
+  note?: string | null;
+  /** Scheduled start time label (HH:mm) used for upcoming fixtures. */
+  startTime?: string | null;
+  /** True for the side currently batting (renders the live dot). */
+  isBatting?: boolean;
+}
+
+export interface Match {
+  id: number | string;
+  slug: string;
+  competition: CompetitionRef;
+  state: MatchState;
+  home: MatchSide;
+  away: MatchSide;
+  /** Headline under the scoreboard, e.g. "MI need 44 runs in 28 balls". */
+  summary?: string | null;
+  summaryTone?: "live" | "default";
+  venue?: string | null;
+  startsAt: string;
+  /** "Match 12" label used on fixture lists. */
+  stage?: string | null;
+  city?: string | null;
+  /** Status line under a fixture card, e.g. "Bangladesh chose to bat · Updated now". */
+  statusText?: string | null;
+  /** True when the match is scheduled for the current day (computed by the API). */
+  isToday?: boolean;
+}
+
+export type MatchdayView = "live" | "upcoming" | "result" | "yesterday" | "today" | "tomorrow" | "week";
+
+export interface MatchGroup {
+  competition: CompetitionRef;
+  matches: Match[];
+}
+
+export interface Matchday {
+  /** ISO date the page is anchored to (usually "today"). */
+  date: string;
+  /** Competitions available in the filter drop-down. */
+  competitions: CompetitionRef[];
+  groups: MatchGroup[];
+}
+
+export interface MatchSummaryStats {
+  matchesToday: number;
+  liveNow: number;
+  competitionsTracked: number;
+  dataProvider: string;
+}
+
+export interface TickerItem {
+  id: number | string;
+  text: string;
+  href?: string | null;
+}
+
+export interface Author {
+  slug: string;
+  name: string;
+}
+
+export interface Article {
+  id: number | string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  image: string;
+  imageAlt?: string;
+  /** Category chip text, e.g. "BPL 2026", "International". */
+  category: string;
+  author: Author;
+  publishedAt: string;
+  readMinutes: number;
+  caption?: string | null;
+  /** Photo credit shown after the caption, e.g. "TMN Sports / Action Images". */
+  credit?: string | null;
+}
+
+export interface FeaturedStories {
+  lead: Article;
+  side: Article[];
+}
+
+export interface StatHighlight {
+  value: string;
+  label: string;
+  context: string;
+}
+
+export interface TrendingPlayer {
+  id: number | string;
+  slug: string;
+  name: string;
+  image: string;
+  role: string;
+  team: string;
+  country: string;
+  rankLabel: string;
+  matches: number;
+  runs: number;
+  average: number;
+}
+
+export interface TeamFixtures {
+  team: TeamProfile;
+  matches: Match[];
+}
+
+export interface Video {
+  id: number | string;
+  slug: string;
+  title: string;
+  description?: string | null;
+  thumbnail: string;
+  category: string;
+  duration: string;
+  publishedAt: string;
+  views: string;
+}
+
+export interface Tournament {
+  id: number | string;
+  slug: string;
+  name: string;
+  image: string;
+  format: string;
+  location: string;
+  status: string;
+  description: string;
+  dateRange: string;
+  matchCount: number;
+}
+
+export interface BattingRow {
+  playerName: string;
+  team: string;
+  matches: number;
+  runs: number;
+  highScore: string;
+  average: number;
+  strikeRate: number;
+  hundreds: number;
+}
+
+export interface BattingLeaders {
+  seasonLabel: string;
+  note: string;
+  rows: BattingRow[];
+}
+
+export interface Writer {
+  id: number | string;
+  slug: string;
+  name: string;
+  title: string;
+  bio: string;
+  avatar: string;
+  articleCount: number;
+  since: number;
+}
+
+export interface NewsCategory {
+  slug: string;
+  name: string;
+}
+
+export interface NewsPage {
+  featured: Article | null;
+  articles: Article[];
+  categories: NewsCategory[];
+  /** Total articles matching the filter, used to decide whether "Load more" is shown. */
+  total: number;
+}
+
+export interface ArticleBlock {
+  type: "lead" | "paragraph" | "heading" | "quote";
+  text: string;
+}
+
+export interface ArticleDetail extends Article {
+  subtitle?: string | null;
+  /** Trail shown after "News /", e.g. ["International", "Match analysis"]. */
+  breadcrumb: string[];
+  blocks: ArticleBlock[];
+  tags: string[];
+  related: Article[];
+}
+
+export interface ScorecardRow {
+  batter: string;
+  dismissal: string;
+  runs: number;
+  balls: number;
+  fours: number;
+  sixes: number;
+  strikeRate: string;
+}
+
+export interface Innings {
+  team: string;
+  rows: ScorecardRow[];
+}
+
+export interface CommentaryEntry {
+  over: string;
+  /** "1", "4", "6", "W" or "•" for a dot ball. */
+  outcome: string;
+  text: string;
+}
+
+export interface SquadList {
+  team: TeamSummary;
+  players: string[];
+}
+
+export interface MatchStatRow {
+  label: string;
+  home: string | null;
+  away: string | null;
+}
+
+export interface MatchDetail extends Match {
+  title: string;
+  /** "12th Match · Gaddafi Stadium, Lahore" */
+  subtitle: string;
+  /** "Bangladesh chose to bat first" */
+  tossNote?: string | null;
+  updatedAt: string;
+  overview: {
+    currentRunRate?: string | null;
+    projectedScore?: string | null;
+    partnership?: string | null;
+    atCrease: { name: string; runs: number; balls: number }[];
+  };
+  innings: Innings[];
+  commentary: CommentaryEntry[];
+  squads: SquadList[];
+  stats: MatchStatRow[];
+  relatedNews: Article[];
+}
+
+/** Card on the Series & Tournaments and Teams directories. */
+export interface DirectoryItem {
+  slug: string;
+  name: string;
+  /** Two or three letters inside the circular badge. */
+  badge: string;
+  colors: TeamColors;
+  /** "In progress" | "Upcoming" | "Completed" */
+  status: string;
+  description: string;
+  /** Filter group the item belongs to ("current", "international", ...). */
+  group: string;
+}
+
+export interface Directory {
+  groups: { slug: string; name: string }[];
+  items: DirectoryItem[];
+}
+
+export interface PointsRow {
+  position: number;
+  team: string;
+  played: number;
+  won: number;
+  points: number;
+  netRunRate: string;
+}
+
+export interface TournamentDetail {
+  slug: string;
+  name: string;
+  /** Short mark inside the yellow circle, e.g. "BPL". */
+  abbreviation: string;
+  status: string;
+  /** "2 January — 7 February 2026 · Bangladesh" */
+  dateline: string;
+  overview: string;
+  upcoming: Match[];
+  matches: Match[];
+  pointsTable: PointsRow[];
+  teams: string[];
+  stats: MatchStatRow[];
+  news: Article[];
+}
+
+export interface FeaturedPlayerRef {
+  slug: string;
+  name: string;
+  role: string;
+  image: string;
+}
+
+export interface TeamPage {
+  slug: string;
+  name: string;
+  badge: string;
+  colors: TeamColors;
+  kind: string;
+  membership: string;
+  nickname: string;
+  ranks: { label: string; value: string }[];
+  players: FeaturedPlayerRef[];
+}
+
+export interface PlayerPage {
+  slug: string;
+  name: string;
+  image: string;
+  teamAndRole: string;
+  facts: { label: string; value: string }[];
+  career: { format: string; matches: number; runs: string; average: string; hundreds: number; highScore: string }[];
+  news: Article[];
+}
+
+export interface StatTable {
+  /** Filter selections currently applied. */
+  filters: { format: string; season: string; team: string };
+  options: { formats: string[]; seasons: string[]; teams: string[] };
+  /** "ODI · 2026" */
+  eyebrow: string;
+  title: string;
+  rows: { rank: number; player: string; team: string; matches: number; runs: number; average: string; strikeRate: string }[];
+}
+
+export interface VideosPage {
+  categories: string[];
+  featured: Video | null;
+  videos: Video[];
+  total: number;
+}
+
+export interface LegalPage {
+  slug: string;
+  title: string;
+  description: string;
+  sections: { heading: string; paragraphs: string[] }[];
+  contact: { email: string; address: string };
+}
+
+export type SearchType = "all" | "news" | "matches" | "teams" | "players" | "videos";
+
+export interface SearchResult {
+  id: string;
+  type: Exclude<SearchType, "all">;
+  href: string;
+  title: string;
+  /** Eyebrow above the title: story category, competition, "Team", "Player", ... */
+  label: string;
+  /** Photo for stories, players and videos. Teams and matches use crests instead. */
+  image?: string | null;
+  imageAlt?: string;
+  /** Team crests (one for a team, two for a match). */
+  teams?: Pick<TeamSummary, "name" | "shortName" | "colors">[];
+  /** Publication time for stories and videos. */
+  publishedAt?: string | null;
+  /** Free text under the title, e.g. "By TMN Desk" or "ODI Series · Tue 13 Nov". */
+  meta?: string | null;
+  /** Clip length for videos. */
+  duration?: string | null;
+}
+
+export interface SearchResults {
+  query: string;
+  type: SearchType;
+  /** Results matching the query and type, before the page limit is applied. */
+  total: number;
+  results: SearchResult[];
+}

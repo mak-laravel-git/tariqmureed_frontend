@@ -1,0 +1,167 @@
+/**
+ * Admin API contract (Laravel). Every endpoint lives under {API_URL}/admin and requires
+ * "Authorization: Bearer <token>" from POST /auth/login. Responses use the usual
+ * { "data": ... } envelope.
+ */
+
+export type ResourceKey =
+  | "content"
+  | "categories"
+  | "series"
+  | "advertisements"
+  | "staff"
+  | "authors"
+  | "activity";
+
+export type StatusTab = "all" | "active" | "pending" | "archived";
+
+/** Row shown in every admin table; the three text columns are re-labelled per module. */
+export interface AdminRecord {
+  id: string;
+  /** Name / title */
+  title: string;
+  /** Category / email */
+  subtitle: string;
+  /** Owner / scope */
+  owner: string;
+  status: string;
+  /** Human readable "last updated" ("Today, 10:42", "Yesterday", "24 Jun"). */
+  updatedAt: string;
+  notes?: string | null;
+  /** Article editor only. */
+  summary?: string | null;
+  body?: string | null;
+  tags?: string | null;
+  publishAt?: string | null;
+}
+
+export interface RecordInput {
+  title: string;
+  subtitle: string;
+  owner: string;
+  status: string;
+  notes?: string;
+  summary?: string;
+  body?: string;
+  tags?: string;
+  publishAt?: string;
+}
+
+export interface RecordList {
+  records: AdminRecord[];
+  total: number;
+}
+
+export interface HistoryEntry {
+  title: string;
+  meta: string;
+}
+
+export interface AdminUser {
+  id: string | number;
+  name: string;
+  email: string;
+  initials: string;
+  role: string;
+  jobTitle: string;
+  bio: string;
+}
+
+export interface DashboardStat {
+  label: string;
+  value: string;
+  hint: string;
+  icon: "article" | "globe" | "draft" | "clock" | "folder" | "users" | "image" | "user";
+}
+
+export interface ActivityEntry {
+  actor: string;
+  initials: string;
+  action: string;
+  target: string;
+  relative: string;
+  absolute: string;
+}
+
+export interface SystemStatusRow {
+  name: string;
+  detail: string;
+  status: "Connected" | "Degraded" | "Offline";
+  icon: "plug" | "storage" | "globe" | "card";
+}
+
+export interface Dashboard {
+  stats: DashboardStat[];
+  activity: ActivityEntry[];
+  system: SystemStatusRow[];
+}
+
+export interface AdminNotification {
+  id: string;
+  title: string;
+  body: string;
+  relative: string;
+}
+
+export interface MediaAsset {
+  id: string;
+  title: string;
+  /** "JPG · 1.2 MB" */
+  meta: string;
+  /** Absolute or /public URL; gradient placeholder is used when empty. */
+  url?: string | null;
+}
+
+export interface SyncJob {
+  id: string;
+  name: string;
+  detail: string;
+  status: "Success" | "Failed" | "Running";
+}
+
+export interface IntegrationStatus {
+  provider: string;
+  connection: string;
+  lastSync: string;
+  recordsUpdated: string;
+  openErrors: string;
+  jobs: SyncJob[];
+}
+
+export interface SiteSettings {
+  websiteName: string;
+  contactEmail: string;
+  description: string;
+  defaultStatus: string;
+  timezone: string;
+  requireApproval: boolean;
+  notifyEditors: boolean;
+}
+
+export interface PermissionModule {
+  key: string;
+  label: string;
+  /** Restricted modules only allow "view". */
+  restricted: boolean;
+  granted: Record<string, boolean>;
+}
+
+export interface RoleSummary {
+  slug: string;
+  name: string;
+  description: string;
+  system: boolean;
+}
+
+export interface PermissionMatrix {
+  roles: RoleSummary[];
+  selected: string;
+  actions: string[];
+  modules: PermissionModule[];
+  updatedAt: string;
+}
+
+export interface FormState {
+  status: "idle" | "success" | "error";
+  message: string;
+}

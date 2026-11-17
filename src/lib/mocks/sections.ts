@@ -1,0 +1,337 @@
+import type {
+  Directory,
+  DirectoryItem,
+  LegalPage,
+  PlayerPage,
+  StatTable,
+  TeamPage,
+  TournamentDetail,
+  Video,
+  VideosPage,
+} from "@/lib/api/types";
+
+import { mockTrendingPlayers } from "./content";
+import { buildMockMatchday } from "./matchday";
+import { buildMockNewsPage } from "./news";
+
+const GREEN = { from: "rgb(0, 130, 86)", to: "rgb(0, 100, 66)" };
+const NAVY = { from: "rgb(30, 52, 160)", to: "rgb(24, 40, 130)" };
+
+function slugify(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+function item(name: string, badge: string, group: string, status: string, description: string, colors = GREEN): DirectoryItem {
+  return { slug: slugify(name), name, badge, colors, status, description, group };
+}
+
+const SERIES_DESCRIPTION = "Fixtures, results, table and statistics";
+
+export const mockSeriesDirectory: Directory = {
+  groups: [
+    { slug: "current", name: "Current" },
+    { slug: "upcoming", name: "Upcoming" },
+    { slug: "completed", name: "Completed" },
+  ],
+  items: [
+    item("ICC Champions Trophy", "TMN", "current", "In progress", SERIES_DESCRIPTION),
+    item("Bangladesh Premier League", "TMN", "current", "In progress", SERIES_DESCRIPTION, NAVY),
+    item("Asia Cup", "TMN", "current", "Upcoming", SERIES_DESCRIPTION),
+    item("The Ashes", "TMN", "current", "Upcoming", SERIES_DESCRIPTION, NAVY),
+    item("ICC World Cup", "TMN", "current", "Upcoming", SERIES_DESCRIPTION),
+    item("Indian Premier League", "TMN", "current", "Upcoming", SERIES_DESCRIPTION, NAVY),
+    item("Asia Cup", "TMN", "upcoming", "Upcoming", SERIES_DESCRIPTION),
+    item("The Ashes", "TMN", "upcoming", "Upcoming", SERIES_DESCRIPTION, NAVY),
+    item("ICC World Cup", "TMN", "upcoming", "Upcoming", SERIES_DESCRIPTION),
+    item("Indian Premier League", "TMN", "upcoming", "Upcoming", SERIES_DESCRIPTION, NAVY),
+    item("T20 World Cup", "TMN", "completed", "Completed", SERIES_DESCRIPTION),
+    item("Pakistan Super League", "TMN", "completed", "Completed", SERIES_DESCRIPTION, NAVY),
+  ],
+};
+
+const TEAM_DESCRIPTION = "International cricket team";
+
+export const mockTeamsDirectory: Directory = {
+  groups: [
+    { slug: "international", name: "International" },
+    { slug: "domestic", name: "Domestic" },
+    { slug: "women", name: "Women" },
+  ],
+  items: [
+    item("Bangladesh", "BAN", "international", "In progress", TEAM_DESCRIPTION),
+    item("Sri Lanka", "SL", "international", "In progress", TEAM_DESCRIPTION, NAVY),
+    item("Pakistan", "PAK", "international", "Upcoming", TEAM_DESCRIPTION),
+    item("India", "IND", "international", "Upcoming", TEAM_DESCRIPTION, NAVY),
+    item("South Africa", "SA", "international", "Upcoming", TEAM_DESCRIPTION),
+    item("Australia", "AUS", "international", "Upcoming", TEAM_DESCRIPTION, NAVY),
+    item("Rangpur Riders", "RR", "domestic", "In progress", "Domestic cricket team", NAVY),
+    item("Fortune Barishal", "FB", "domestic", "In progress", "Domestic cricket team"),
+    item("Dhaka Capitals", "DC", "domestic", "Upcoming", "Domestic cricket team", NAVY),
+    item("Bangladesh Women", "BAN", "women", "Upcoming", "Women's international team"),
+    item("India Women", "IND", "women", "Upcoming", "Women's international team", NAVY),
+  ],
+};
+
+export function buildMockTournament(slug: string): TournamentDetail | null {
+  const entry = mockSeriesDirectory.items.find((candidate) => candidate.slug === slug);
+
+  if (!entry) {
+    return null;
+  }
+
+  const fixtures = buildMockMatchday("today").groups.flatMap((group) => group.matches);
+  const isBpl = slug === "bangladesh-premier-league";
+
+  return {
+    slug,
+    name: entry.name,
+    abbreviation: isBpl ? "BPL" : entry.name.split(" ").map((word) => word[0]).join("").slice(0, 3).toUpperCase(),
+    status: entry.status,
+    dateline: isBpl ? "2 January — 7 February 2026 · Bangladesh" : "Dates to be announced",
+    overview: isBpl
+      ? "Seven teams compete across three venues for Bangladesh cricket's biggest domestic prize. Follow every fixture, result and table update on TMN Sports."
+      : `Follow every fixture, result and table update from ${entry.name} on TMN Sports.`,
+    upcoming: fixtures.slice(0, 2),
+    matches: fixtures.slice(0, 3),
+    pointsTable: [
+      { position: 1, team: "Rangpur Riders", played: 8, won: 6, points: 12, netRunRate: "+1.284" },
+      { position: 2, team: "Fortune Barishal", played: 8, won: 5, points: 10, netRunRate: "+0.732" },
+      { position: 3, team: "Dhaka Capitals", played: 8, won: 4, points: 8, netRunRate: "+0.214" },
+      { position: 4, team: "Chattogram Kings", played: 8, won: 3, points: 6, netRunRate: "-0.158" },
+    ],
+    teams: ["Rangpur Riders", "Fortune Barishal", "Dhaka Capitals"],
+    stats: [
+      { label: "Boundaries", home: "29", away: null },
+      { label: "Dot ball percentage", home: "47%", away: null },
+      { label: "Highest partnership", home: "84", away: null },
+    ],
+    news: buildMockNewsPage(undefined, 3).articles,
+  };
+}
+
+export function buildMockTeamPage(slug: string): TeamPage | null {
+  const entry = mockTeamsDirectory.items.find((candidate) => candidate.slug === slug);
+
+  if (!entry) {
+    return null;
+  }
+
+  const bangladesh = slug === "bangladesh";
+
+  return {
+    slug,
+    name: entry.name,
+    badge: entry.badge,
+    colors: entry.colors,
+    kind: entry.group === "international" ? "International team" : entry.group === "women" ? "Women's team" : "Domestic team",
+    membership: entry.group === "international" ? "Full member · ICC" : "Affiliated side",
+    nickname: bangladesh ? "The Tigers" : entry.name,
+    ranks: bangladesh
+      ? [
+          { label: "Test rank", value: "13" },
+          { label: "ODI rank", value: "9" },
+          { label: "T20I rank", value: "10" },
+          { label: "Founded", value: "1986" },
+        ]
+      : [
+          { label: "Test rank", value: "—" },
+          { label: "ODI rank", value: "—" },
+          { label: "T20I rank", value: "—" },
+          { label: "Founded", value: "—" },
+        ],
+    players: bangladesh
+      ? [
+          { slug: "najmul-hossain-shanto", name: "Najmul Hossain", role: "Batter", image: "/images/stadiums/galle-pavilion.jpg" },
+          { slug: "mehidy-hasan", name: "Mehidy Hasan", role: "All-rounder", image: "/images/stadiums/kajaria-floodlight.jpg" },
+          { slug: "taskin-ahmed", name: "Taskin Ahmed", role: "Bowler", image: "/images/stadiums/kajaria-dusk.jpg" },
+        ]
+      : [],
+  };
+}
+
+export function buildMockPlayerPage(slug: string): PlayerPage | null {
+  const trending = mockTrendingPlayers.find((player) => player.slug === slug);
+
+  if (trending) {
+    return {
+      slug,
+      name: trending.name,
+      image: trending.image,
+      teamAndRole: `${trending.country} · ${trending.role}`,
+      facts: [{ label: "Team", value: trending.team }],
+      career: [
+        {
+          format: trending.rankLabel.split(" ")[0] || "ODI",
+          matches: trending.matches,
+          runs: trending.runs.toLocaleString("en-US"),
+          average: trending.average.toFixed(2),
+          hundreds: 0,
+          highScore: "—",
+        },
+      ],
+      news: buildMockNewsPage(undefined, 3).articles,
+    };
+  }
+
+  if (slug !== "najmul-hossain-shanto") {
+    return null;
+  }
+
+  return {
+    slug,
+    name: "Najmul Hossain Shanto",
+    image: "/images/players/najmul-hossain-shanto.jpg",
+    teamAndRole: "Bangladesh · Batter",
+    facts: [
+      { label: "Born", value: "25 Aug 1998" },
+      { label: "Batting", value: "Left hand" },
+    ],
+    career: [
+      { format: "Test", matches: 37, runs: "2,134", average: "34.41", hundreds: 5, highScore: "163" },
+      { format: "ODI", matches: 52, runs: "1,742", average: "39.59", hundreds: 3, highScore: "117" },
+      { format: "T20I", matches: 48, runs: "1,021", average: "26.18", hundreds: 0, highScore: "71*" },
+    ],
+    news: buildMockNewsPage(undefined, 3).articles,
+  };
+}
+
+const LEADERS = [
+  { rank: 1, player: "N. Shanto", team: "Bangladesh", matches: 14, runs: 842, average: "56.13", strikeRate: "94.40" },
+  { rank: 2, player: "B. Azam", team: "Pakistan", matches: 15, runs: 798, average: "49.87", strikeRate: "91.28" },
+  { rank: 3, player: "K. Mendis", team: "Sri Lanka", matches: 13, runs: 712, average: "47.46", strikeRate: "98.17" },
+  { rank: 4, player: "S. Gill", team: "India", matches: 12, runs: 689, average: "53.00", strikeRate: "101.40" },
+];
+
+export function buildMockStatTable(
+  title: string,
+  filters: { format?: string; season?: string; team?: string },
+): StatTable {
+  const format = filters.format ?? "ODI";
+  const season = filters.season ?? "2026 season";
+  const team = filters.team ?? "All teams";
+
+  return {
+    filters: { format, season, team },
+    options: {
+      formats: ["ODI", "Test", "T20I"],
+      seasons: ["2026 season", "2025 season", "2024 season"],
+      teams: ["All teams", "Bangladesh", "Pakistan", "Sri Lanka", "India"],
+    },
+    eyebrow: `${format} · ${season.split(" ")[0]}`,
+    title,
+    rows: LEADERS.filter((row) => team === "All teams" || row.team === team),
+  };
+}
+
+function video(id: number, title: string, category: string, minutesAgo: number, image: string, duration: string): Video {
+  return {
+    id,
+    slug: slugify(title),
+    title,
+    description: null,
+    thumbnail: `/images/stadiums/${image}`,
+    category,
+    duration,
+    publishedAt: new Date(Date.now() - minutesAgo * 60_000).toISOString(),
+    views: "—",
+  };
+}
+
+export function buildMockVideosPage(category: string | undefined, limit: number): VideosPage {
+  const featured = video(1, "Inside the match: every angle from a dramatic final over", "Highlights", 120, "kajaria-dusk.jpg", "8:42");
+
+  const base = [
+    video(2, "A new era begins: the tactical shifts shaping modern international cricket", "Analysis", 18, "kajaria-crowd.jpg", "6:10"),
+    video(3, "Bangladesh name a balanced squad for the upcoming ODI series", "Interviews", 42, "galle-pavilion.jpg", "4:55"),
+    video(4, "Five breakthrough players ready to own the global stage", "Features", 60, "kajaria-floodlight.jpg", "9:20"),
+    video(5, "Inside the venues that will host this summer's biggest contests", "Features", 120, "kajaria-dusk.jpg", "7:05"),
+  ];
+  const all = [...base, ...base.map((entry) => ({ ...entry, id: Number(entry.id) + 10, slug: `${entry.slug}-2` }))];
+  const matching = all.filter((entry) => !category || entry.category.toLowerCase() === category.toLowerCase());
+
+  return {
+    categories: ["Highlights", "Interviews", "Analysis", "Features"],
+    featured: !category || category.toLowerCase() === "highlights" ? featured : null,
+    videos: matching.slice(0, limit),
+    total: matching.length,
+  };
+}
+
+const CONTACT = {
+  email: "newsroom@tmnsports.example",
+  address: "TMN Media House, 14 Press Avenue, Colombo 00300",
+};
+
+export function buildMockLegalPage(slug: string): LegalPage | null {
+  if (slug === "privacy-policy") {
+    return {
+      slug,
+      title: "Privacy Policy",
+      description: "What TMN Sports collects, why we collect it, and the choices available to readers.",
+      contact: CONTACT,
+      sections: [
+        {
+          heading: "What we collect",
+          paragraphs: [
+            "We collect the information needed to operate the website: technical logs such as the pages requested, aggregated analytics, and — if you subscribe to the newsletter — your email address.",
+            "We do not require registration to read editorial content, follow live scores or verify a press card.",
+          ],
+        },
+        {
+          heading: "Newsletter",
+          paragraphs: [
+            "Email addresses supplied to the TMN Daily newsletter are used only to send that newsletter. You can unsubscribe from any email. We do not sell or rent subscriber lists.",
+          ],
+        },
+        {
+          heading: "Press card verification",
+          paragraphs: [
+            "Verification queries are logged with the submitted code, the result and a timestamp for security and audit purposes. These records do not contain private identity data and are deleted on a rolling schedule.",
+          ],
+        },
+        {
+          heading: "Your choices",
+          paragraphs: [
+            "You may request details of, or deletion of, any personal data we hold about you by contacting the newsroom. Data is retained only for as long as needed for the purpose it was collected.",
+          ],
+        },
+      ],
+    };
+  }
+
+  if (slug === "terms-of-use") {
+    return {
+      slug,
+      title: "Terms of Use",
+      description: "The terms that apply when you use the TMN Sports public website.",
+      contact: CONTACT,
+      sections: [
+        {
+          heading: "Use of the site",
+          paragraphs: [
+            "TMN Sports content is provided for personal, non-commercial use. You may share links and short quotations with attribution. Reproduction of full articles, data tables or video without permission is not permitted.",
+            "Automated scraping of live score data or statistics feeds is prohibited without a written agreement.",
+          ],
+        },
+        {
+          heading: "Accuracy",
+          paragraphs: [
+            "Live scores, fixtures and statistics are supplied by third-party data providers and may be delayed, incomplete or corrected after publication. TMN Sports is not liable for decisions taken in reliance on provisional match data.",
+          ],
+        },
+        {
+          heading: "Advertising",
+          paragraphs: [
+            "Advertising placements are clearly labelled. TMN Sports is not responsible for the content of external sites reached through advertisements.",
+          ],
+        },
+        {
+          heading: "Changes",
+          paragraphs: ["We may update these terms as the service develops. The current version always applies."],
+        },
+      ],
+    };
+  }
+
+  return null;
+}

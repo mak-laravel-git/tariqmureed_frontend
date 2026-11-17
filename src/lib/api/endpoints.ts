@@ -1,0 +1,452 @@
+import "server-only";
+
+import { cacheLife, cacheTag } from "next/cache";
+
+import {
+  buildMockArticles,
+  buildMockVideos,
+  mockBattingLeaders,
+  mockStatHighlights,
+  mockTournaments,
+  mockTrendingPlayers,
+  mockWriters,
+} from "@/lib/mocks/content";
+import {
+  mockAllMatches,
+  mockIndiaFixtures,
+  mockLiveMatches,
+  mockResultMatches,
+  mockSeriesChips,
+  mockTicker,
+  mockUpcomingMatches,
+} from "@/lib/mocks/matches";
+import { buildMockMatchday } from "@/lib/mocks/matchday";
+import { buildMockMatchDetail } from "@/lib/mocks/matchdetail";
+import { buildMockArticleDetail, buildMockNewsPage } from "@/lib/mocks/news";
+import { buildMockSearch } from "@/lib/mocks/search";
+import {
+  buildMockLegalPage,
+  buildMockPlayerPage,
+  buildMockStatTable,
+  buildMockTeamPage,
+  buildMockTournament,
+  buildMockVideosPage,
+  mockSeriesDirectory,
+  mockTeamsDirectory,
+} from "@/lib/mocks/sections";
+import { emptyTeamProfile, mockTeamList, mockTeamProfiles } from "@/lib/mocks/teams";
+
+import { apiGet } from "./client";
+import type {
+  Article,
+  Directory,
+  LegalPage,
+  PlayerPage,
+  SearchResults,
+  SearchType,
+  StatTable,
+  TeamPage,
+  TournamentDetail,
+  VideosPage,
+  ArticleDetail,
+  BattingLeaders,
+  CompetitionRef,
+  FeaturedStories,
+  Match,
+  MatchDetail,
+  Matchday,
+  MatchdayView,
+  MatchState,
+  MatchSummaryStats,
+  NewsPage,
+  StatHighlight,
+  TeamFixtures,
+  TeamSummary,
+  TickerItem,
+  Tournament,
+  TrendingPlayer,
+  Video,
+  Writer,
+} from "./types";
+
+/**
+ * One function per Laravel endpoint. Each is cached with Next.js Cache Components
+ * ("use cache"); revalidate on demand with revalidateTag(<tag>) from a webhook or
+ * route handler when the Laravel backend publishes new content.
+ *
+ *   GET /ticker                    -> getTicker
+ *   GET /competitions?featured=1   -> getFeaturedSeries
+ *   GET /matches?state=            -> getMatches
+ *   GET /matches/{slug}            -> getMatchDetail
+ *   GET /matches/summary           -> getMatchSummary
+ *   GET /articles/featured         -> getFeaturedStories
+ *   GET /articles?per_page=        -> getLatestNews
+ *   GET /news?category=&limit=     -> getNewsPage
+ *   GET /articles/{slug}           -> getArticle
+ *   GET /matchday?view=&competition= -> getMatchday
+ *   GET /articles/top-headlines    -> getTopHeadlines
+ *   GET /articles/most-read        -> getMostRead
+ *   GET /stats/highlights          -> getStatHighlights
+ *   GET /stats/batting-leaders     -> getBattingLeaders
+ *   GET /players/trending          -> getTrendingPlayers
+ *   GET /teams                     -> getTeams
+ *   GET /teams/{slug}/fixtures     -> getTeamFixtures
+ *   GET /videos/highlights         -> getVideoHighlights
+ *   GET /competitions/spotlight    -> getTournamentSpotlight
+ *   GET /writers                   -> getWriters
+ *   GET /search?q=&type=&limit=    -> getSearchResults
+ */
+
+export async function getTicker(): Promise<TickerItem[]> {
+  "use cache";
+  // "minutes" (not "seconds") so the ticker stays part of the prerendered shell;
+  // breaking news still refreshes immediately through revalidateTag("ticker").
+  cacheLife("minutes");
+  cacheTag("ticker");
+
+  return apiGet<TickerItem[]>("ticker", { fallback: () => mockTicker });
+}
+
+export async function getFeaturedSeries(): Promise<CompetitionRef[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("competitions");
+
+  return apiGet<CompetitionRef[]>("competitions", {
+    query: { featured: 1 },
+    fallback: () => mockSeriesChips,
+  });
+}
+
+/** Matches filtered by state. "live" includes innings breaks. */
+export async function getMatches(state: MatchState | "all", limit?: number): Promise<Match[]> {
+  "use cache";
+  cacheLife("seconds");
+  cacheTag("matches");
+
+  return apiGet<Match[]>("matches", {
+    query: { state: state === "all" ? null : state, limit },
+    fallback: () => {
+      const pool: Match[] =
+        state === "live"
+          ? mockLiveMatches
+          : state === "upcoming"
+            ? mockUpcomingMatches
+            : state === "result"
+              ? mockResultMatches
+              : mockAllMatches;
+
+      return limit ? pool.slice(0, limit) : pool;
+    },
+  });
+}
+
+/**
+ * Fixtures grouped by competition for the Live Scores and Schedule pages.
+ * GET /matchday?view=live|upcoming|result|yesterday|today|tomorrow|week&competition=<slug>
+ */
+export async function getMatchday(view: MatchdayView, competition?: string): Promise<Matchday> {
+  "use cache";
+  cacheLife("seconds");
+  cacheTag("matches");
+
+  return apiGet<Matchday>("matchday", {
+    query: { view, competition },
+    fallback: () => {
+      const day = buildMockMatchday(view);
+
+      return competition
+        ? { ...day, groups: day.groups.filter((entry) => entry.competition.slug === competition) }
+        : day;
+    },
+  });
+}
+
+/**
+ * Match centre: header, overview, scorecard, commentary, squads, stats and related news.
+ * GET /matches/{slug}. Resolves to null when the match does not exist.
+ */
+export async function getMatchDetail(slug: string): Promise<MatchDetail | null> {
+  "use cache";
+  cacheLife("seconds");
+  cacheTag("matches");
+
+  return apiGet<MatchDetail | null>(`matches/${encodeURIComponent(slug)}`, {
+    fallback: () => buildMockMatchDetail(slug),
+  });
+}
+
+export async function getMatchSummary(): Promise<MatchSummaryStats> {
+  "use cache";
+  cacheLife("seconds");
+  cacheTag("matches");
+
+  return apiGet<MatchSummaryStats>("matches/summary", {
+    fallback: () => ({
+      matchesToday: 6,
+      liveNow: mockLiveMatches.length,
+      competitionsTracked: 8,
+      dataProvider: "TMN Sport Live",
+    }),
+  });
+}
+
+export async function getFeaturedStories(): Promise<FeaturedStories> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("articles");
+
+  return apiGet<FeaturedStories>("articles/featured", {
+    fallback: () => buildMockArticles().featured,
+  });
+}
+
+export async function getLatestNews(perPage = 9): Promise<Article[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("articles");
+
+  return apiGet<Article[]>("articles", {
+    query: { per_page: perPage },
+    fallback: () => buildMockArticles().latest.slice(0, perPage),
+  });
+}
+
+/**
+ * News listing with an optional category filter.
+ * GET /news?category=<slug>&limit=<n>
+ */
+export async function getNewsPage(category: string | undefined, limit: number): Promise<NewsPage> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("articles");
+
+  return apiGet<NewsPage>("news", {
+    query: { category, limit },
+    fallback: () => buildMockNewsPage(category, limit),
+  });
+}
+
+/**
+ * Single article with body blocks, tags and related stories. Resolves to null when unknown.
+ * GET /articles/{slug}
+ */
+export async function getArticle(slug: string): Promise<ArticleDetail | null> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("articles");
+
+  return apiGet<ArticleDetail | null>(`articles/${encodeURIComponent(slug)}`, {
+    fallback: () => buildMockArticleDetail(slug),
+  });
+}
+
+export async function getTopHeadlines(): Promise<Article[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("articles");
+
+  return apiGet<Article[]>("articles/top-headlines", {
+    fallback: () => buildMockArticles().topHeadlines,
+  });
+}
+
+export async function getMostRead(): Promise<Article[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("articles");
+
+  return apiGet<Article[]>("articles/most-read", {
+    fallback: () => buildMockArticles().mostRead,
+  });
+}
+
+export async function getStatHighlights(): Promise<StatHighlight[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("stats");
+
+  return apiGet<StatHighlight[]>("stats/highlights", { fallback: () => mockStatHighlights });
+}
+
+export async function getBattingLeaders(): Promise<BattingLeaders> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("stats");
+
+  return apiGet<BattingLeaders>("stats/batting-leaders", { fallback: () => mockBattingLeaders });
+}
+
+export async function getTrendingPlayers(): Promise<TrendingPlayer[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("players");
+
+  return apiGet<TrendingPlayer[]>("players/trending", { fallback: () => mockTrendingPlayers });
+}
+
+export async function getTeams(): Promise<TeamSummary[]> {
+  "use cache";
+  cacheLife("days");
+  cacheTag("teams");
+
+  return apiGet<TeamSummary[]>("teams", { fallback: () => mockTeamList });
+}
+
+export async function getTeamFixtures(slug: string): Promise<TeamFixtures | null> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("teams", "matches");
+
+  return apiGet<TeamFixtures | null>(`teams/${encodeURIComponent(slug)}/fixtures`, {
+    fallback: () => {
+      const team = mockTeamList.find((candidate) => candidate.slug === slug);
+      if (!team) {
+        return null;
+      }
+
+      const matches =
+        slug === "india"
+          ? mockIndiaFixtures
+          : mockAllMatches.filter(
+              (match) => match.home.team.slug === slug || match.away.team.slug === slug,
+            );
+
+      return { team: { ...team, ...(mockTeamProfiles[slug] ?? emptyTeamProfile) }, matches };
+    },
+  });
+}
+
+export async function getVideoHighlights(): Promise<Video[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("videos");
+
+  return apiGet<Video[]>("videos/highlights", { fallback: () => buildMockVideos() });
+}
+
+export async function getTournamentSpotlight(): Promise<Tournament[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("competitions");
+
+  return apiGet<Tournament[]>("competitions/spotlight", { fallback: () => mockTournaments });
+}
+
+export async function getWriters(): Promise<Writer[]> {
+  "use cache";
+  cacheLife("days");
+  cacheTag("writers");
+
+  return apiGet<Writer[]>("writers", { fallback: () => mockWriters });
+}
+
+/** GET /series - directory of series and tournaments grouped by current / upcoming / completed. */
+export async function getSeriesDirectory(): Promise<Directory> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("competitions");
+
+  return apiGet<Directory>("series", { fallback: () => mockSeriesDirectory });
+}
+
+/** GET /series/{slug} - tournament overview, matches, points table, teams, statistics and news. */
+export async function getTournament(slug: string): Promise<TournamentDetail | null> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("competitions", "matches");
+
+  return apiGet<TournamentDetail | null>(`series/${encodeURIComponent(slug)}`, {
+    fallback: () => buildMockTournament(slug),
+  });
+}
+
+/** GET /teams/directory - national and domestic sides grouped for the Teams page. */
+export async function getTeamsDirectory(): Promise<Directory> {
+  "use cache";
+  cacheLife("days");
+  cacheTag("teams");
+
+  return apiGet<Directory>("teams/directory", { fallback: () => mockTeamsDirectory });
+}
+
+/** GET /teams/{slug} - team profile with rankings and featured players. */
+export async function getTeamPage(slug: string): Promise<TeamPage | null> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("teams", "players");
+
+  return apiGet<TeamPage | null>(`teams/${encodeURIComponent(slug)}`, {
+    fallback: () => buildMockTeamPage(slug),
+  });
+}
+
+/** GET /players/{slug} - player profile, career statistics and related news. */
+export async function getPlayerPage(slug: string): Promise<PlayerPage | null> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("players", "articles");
+
+  return apiGet<PlayerPage | null>(`players/${encodeURIComponent(slug)}`, {
+    fallback: () => buildMockPlayerPage(slug),
+  });
+}
+
+/**
+ * Leading run scorers (kind "stats") or batting records (kind "records") for a format/season/team.
+ * GET /stats/leaders?kind=&format=&season=&team=
+ */
+export async function getStatTable(
+  kind: "stats" | "records",
+  format?: string,
+  season?: string,
+  team?: string,
+): Promise<StatTable> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("stats");
+
+  return apiGet<StatTable>("stats/leaders", {
+    query: { kind, format, season, team },
+    fallback: () =>
+      buildMockStatTable(kind === "stats" ? "Leading run scorers" : "Batting records", { format, season, team }),
+  });
+}
+
+/** GET /videos?category=&limit= - video hub with a featured clip. */
+export async function getVideosPage(category: string | undefined, limit: number): Promise<VideosPage> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("videos");
+
+  return apiGet<VideosPage>("videos", {
+    query: { category, limit },
+    fallback: () => buildMockVideosPage(category, limit),
+  });
+}
+
+/** GET /pages/{slug} - editorial legal pages (privacy policy, terms of use). */
+export async function getLegalPage(slug: string): Promise<LegalPage | null> {
+  "use cache";
+  cacheLife("days");
+  cacheTag("pages");
+
+  return apiGet<LegalPage | null>(`pages/${encodeURIComponent(slug)}`, {
+    fallback: () => buildMockLegalPage(slug),
+  });
+}
+
+/**
+ * Site-wide search across stories, matches, teams, players and videos.
+ * GET /search?q=<text>&type=all|news|matches|teams|players|videos&limit=<n>
+ */
+export async function getSearchResults(query: string, type: SearchType, limit: number): Promise<SearchResults> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("search", "articles", "matches", "teams", "players", "videos");
+
+  return apiGet<SearchResults>("search", {
+    query: { q: query, type: type === "all" ? null : type, limit },
+    fallback: () => buildMockSearch(query, type, limit),
+  });
+}
