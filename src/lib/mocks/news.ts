@@ -1,5 +1,7 @@
 import type { Article, ArticleDetail, NewsCategory, NewsPage } from "@/lib/api/types";
 
+import { buildMockArticles } from "./content";
+
 const stadium = (name: string) => `/images/stadiums/${name}`;
 
 function minutesAgo(minutes: number): string {
@@ -112,11 +114,18 @@ export function buildMockNewsPage(category: string | undefined, limit: number): 
   };
 }
 
+/** Stories shown on the home page (Featured Stories, Latest News, headlines), so their links resolve. */
+function homePageArticles(): Article[] {
+  const { featured, latest, topHeadlines, mostRead } = buildMockArticles();
+
+  return [featured.lead, ...featured.side, ...latest, ...topHeadlines, ...mostRead];
+}
+
 export function buildMockArticleDetail(slug: string): ArticleDetail | null {
   const base =
     slug === "a-fearless-generation-is-rewriting-the-rules-of-the-modern-game"
       ? null
-      : [...allArticles(), featuredArticle].find((article) => article.slug === slug);
+      : [...allArticles(), featuredArticle, ...homePageArticles()].find((article) => article.slug === slug);
 
   if (slug !== "a-fearless-generation-is-rewriting-the-rules-of-the-modern-game" && !base) {
     return null;

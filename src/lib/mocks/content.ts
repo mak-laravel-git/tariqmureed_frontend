@@ -286,7 +286,7 @@ export function buildMockVideos(): Video[] {
 export const mockTournaments: Tournament[] = [
   {
     id: 1,
-    slug: "indian-premier-league-2026",
+    slug: "indian-premier-league",
     name: "Indian Premier League",
     image: img("stadium-crowd.jpg"),
     format: "T20",
@@ -299,7 +299,7 @@ export const mockTournaments: Tournament[] = [
   },
   {
     id: 2,
-    slug: "pakistan-super-league-2026",
+    slug: "pakistan-super-league",
     name: "Pakistan Super League",
     image: img("keeper-appeal.jpg"),
     format: "T20",

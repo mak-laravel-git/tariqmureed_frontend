@@ -115,8 +115,8 @@ export const mockTicker: TickerItem[] = [
 ];
 
 export const mockSeriesChips: CompetitionRef[] = [
-  { slug: "bpl-2026", name: "BPL", format: "T20" },
-  { slug: "ashes", name: "Ashes", format: "Test" },
-  { slug: "world-cups", name: "World Cups", format: "ODI" },
+  { slug: "bangladesh-premier-league", name: "BPL", format: "T20" },
+  { slug: "the-ashes", name: "Ashes", format: "Test" },
+  { slug: "icc-world-cup", name: "World Cups", format: "ODI" },
   { slug: "t20-world-cup", name: "T20 WC", format: "T20" },
 ];
