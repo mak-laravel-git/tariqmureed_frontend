@@ -64,6 +64,8 @@ export const mockTeamsDirectory: Directory = {
     item("India", "IND", "international", "Upcoming", TEAM_DESCRIPTION, NAVY),
     item("South Africa", "SA", "international", "Upcoming", TEAM_DESCRIPTION),
     item("Australia", "AUS", "international", "Upcoming", TEAM_DESCRIPTION, NAVY),
+    item("England", "ENG", "international", "Upcoming", TEAM_DESCRIPTION),
+    item("New Zealand", "NZ", "international", "Upcoming", TEAM_DESCRIPTION, NAVY),
     item("Rangpur Riders", "RR", "domestic", "In progress", "Domestic cricket team", NAVY),
     item("Fortune Barishal", "FB", "domestic", "In progress", "Domestic cricket team"),
     item("Dhaka Capitals", "DC", "domestic", "Upcoming", "Domestic cricket team", NAVY),
@@ -149,6 +151,12 @@ export function buildMockTeamPage(slug: string): TeamPage | null {
   };
 }
 
+/** Squad members linked from the Bangladesh team page. */
+const MOCK_SQUAD_PLAYERS = [
+  { slug: "mehidy-hasan", name: "Mehidy Hasan", role: "All-rounder", image: "/images/stadiums/kajaria-floodlight.jpg" },
+  { slug: "taskin-ahmed", name: "Taskin Ahmed", role: "Bowler", image: "/images/stadiums/kajaria-dusk.jpg" },
+];
+
 export function buildMockPlayerPage(slug: string): PlayerPage | null {
   const trending = mockTrendingPlayers.find((player) => player.slug === slug);
 
@@ -169,6 +177,20 @@ export function buildMockPlayerPage(slug: string): PlayerPage | null {
           highScore: "—",
         },
       ],
+      news: buildMockNewsPage(undefined, 3).articles,
+    };
+  }
+
+  const squadMember = MOCK_SQUAD_PLAYERS.find((player) => player.slug === slug);
+
+  if (squadMember) {
+    return {
+      slug,
+      name: squadMember.name,
+      image: squadMember.image,
+      teamAndRole: `Bangladesh · ${squadMember.role}`,
+      facts: [{ label: "Team", value: "Bangladesh" }],
+      career: [{ format: "ODI", matches: 0, runs: "—", average: "—", hundreds: 0, highScore: "—" }],
       news: buildMockNewsPage(undefined, 3).articles,
     };
   }
@@ -293,6 +315,35 @@ export function buildMockLegalPage(slug: string): LegalPage | null {
           heading: "Your choices",
           paragraphs: [
             "You may request details of, or deletion of, any personal data we hold about you by contacting the newsroom. Data is retained only for as long as needed for the purpose it was collected.",
+          ],
+        },
+      ],
+    };
+  }
+
+  if (slug === "cookie-preferences") {
+    return {
+      slug,
+      title: "Cookie Preferences",
+      description: "How TMN Sports uses cookies and how you can control them.",
+      contact: CONTACT,
+      sections: [
+        {
+          heading: "Essential cookies",
+          paragraphs: [
+            "These cookies keep the website working, for example remembering your session and security settings. They cannot be switched off.",
+          ],
+        },
+        {
+          heading: "Analytics cookies",
+          paragraphs: [
+            "We use aggregated analytics to understand which pages are read and to improve the site. You can block these cookies in your browser settings at any time.",
+          ],
+        },
+        {
+          heading: "Managing cookies",
+          paragraphs: [
+            "Most browsers let you review, block or delete cookies. Blocking essential cookies may stop parts of the site from working.",
           ],
         },
       ],

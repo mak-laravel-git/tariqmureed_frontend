@@ -341,6 +341,33 @@ export async function getWriters(): Promise<Writer[]> {
   return apiGet<Writer[]>("writers", { fallback: () => mockWriters });
 }
 
+/** GET /videos/{slug} - single video page. */
+export async function getVideo(slug: string): Promise<Video | null> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("videos");
+
+  return apiGet<Video | null>(`videos/${encodeURIComponent(slug)}`, {
+    fallback: () => {
+      const page = buildMockVideosPage(undefined, 100);
+      const all = [...(page.featured ? [page.featured] : []), ...page.videos, ...buildMockVideos()];
+
+      return all.find((video) => video.slug === slug) ?? null;
+    },
+  });
+}
+
+/** GET /writers/{slug} - writer profile. */
+export async function getWriter(slug: string): Promise<Writer | null> {
+  "use cache";
+  cacheLife("days");
+  cacheTag("writers");
+
+  return apiGet<Writer | null>(`writers/${encodeURIComponent(slug)}`, {
+    fallback: () => mockWriters.find((writer) => writer.slug === slug) ?? null,
+  });
+}
+
 /** GET /series - directory of series and tournaments grouped by current / upcoming / completed. */
 export async function getSeriesDirectory(): Promise<Directory> {
   "use cache";

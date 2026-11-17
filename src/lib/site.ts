@@ -48,11 +48,11 @@ export const footerColumns: { title: string; links: NavItem[] }[] = [
   {
     title: "Series",
     links: [
-      { label: "IPL", href: "/series/ipl" },
-      { label: "PSL", href: "/series/psl" },
-      { label: "BPL", href: "/series/bpl" },
-      { label: "Ashes", href: "/series/ashes" },
-      { label: "World Cups", href: "/series/world-cups" },
+      { label: "IPL", href: "/series/indian-premier-league" },
+      { label: "PSL", href: "/series/pakistan-super-league" },
+      { label: "BPL", href: "/series/bangladesh-premier-league" },
+      { label: "Ashes", href: "/series/the-ashes" },
+      { label: "World Cups", href: "/series/icc-world-cup" },
       { label: "T20 WC", href: "/series/t20-world-cup" },
     ],
   },

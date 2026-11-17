@@ -1,6 +1,7 @@
 import type { MatchDetail, SquadList } from "@/lib/api/types";
 
 import { buildMockMatchday } from "./matchday";
+import { mockAllMatches } from "./matches";
 import { buildMockNewsPage } from "./news";
 
 const ordinal = (n: number) => {
@@ -28,13 +29,15 @@ export function buildMockMatchDetail(slug: string): MatchDetail | null {
   const base = buildMockMatchday("live")
     .groups.flatMap((group) => group.matches)
     .concat(buildMockMatchday("week").groups.flatMap((group) => group.matches))
+    // Home page cards link to the featured fixtures, which are not part of the matchday lists.
+    .concat(mockAllMatches)
     .find((match) => match.slug === slug);
 
   if (!base) {
     return null;
   }
 
-  const number = Number(base.id.toString().split("-").pop());
+  const number = typeof base.id === "string" ? Number(base.id.split("-").pop()) : Number.NaN;
   const live = base.state === "live";
   const squads: SquadList[] = [
     { team: base.home.team, players: XI },
@@ -44,7 +47,9 @@ export function buildMockMatchDetail(slug: string): MatchDetail | null {
   return {
     ...base,
     title: `${base.home.team.name} vs ${base.away.team.name}`,
-    subtitle: `${ordinal(number)} Match · ${base.venue ?? ""}`.replace(/ · $/, ""),
+    subtitle: Number.isFinite(number)
+      ? `${ordinal(number)} Match · ${base.venue ?? ""}`.replace(/ · $/, "")
+      : (base.venue ?? base.competition.name),
     tossNote: live ? "Bangladesh chose to bat first" : null,
     updatedAt: new Date().toISOString(),
     overview: {
