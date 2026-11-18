@@ -16,7 +16,7 @@ export function SearchForm({ query, type }: SearchFormProps) {
       className="flex h-16 items-center border-b-2 border-black transition-colors focus-within:border-gold sm:h-20 lg:h-[93px]"
     >
       <label htmlFor="site-search" className="sr-only">
-        Search TMN Sports
+        Search TMN Sport
       </label>
       <input
         id="site-search"

@@ -5,7 +5,7 @@ import { LegalPageView } from "@/components/legal/LegalPageView";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "What TMN Sports collects, why we collect it, and the choices available to readers.",
+  description: "What TMN Sport collects, why we collect it, and the choices available to readers.",
 };
 
 export default function PrivacyPolicyPage() {

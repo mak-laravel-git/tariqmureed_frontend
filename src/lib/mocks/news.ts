@@ -1,6 +1,7 @@
 import type { Article, ArticleDetail, NewsCategory, NewsPage } from "@/lib/api/types";
 
 import { buildMockArticles } from "./content";
+import { mockTeamList } from "./teams";
 
 const stadium = (name: string) => `/images/stadiums/${name}`;
 
@@ -103,11 +104,18 @@ export function listMockArticles(): Article[] {
   return [...allArticles(), featuredArticle];
 }
 
-export function buildMockNewsPage(category: string | undefined, limit: number): NewsPage {
-  const matching = allArticles().filter((article) => !category || article.categorySlug === category);
+function mentionsTeam(article: Article, teamName: string): boolean {
+  return [article.title, article.excerpt, article.category].join(" ").toLowerCase().includes(teamName.toLowerCase());
+}
+
+export function buildMockNewsPage(category: string | undefined, limit: number, team?: string): NewsPage {
+  const teamName = team ? mockTeamList.find((entry) => entry.slug === team)?.name : undefined;
+  const matches = (article: Article & { categorySlug: string }) =>
+    (!category || article.categorySlug === category) && (!teamName || mentionsTeam(article, teamName));
+  const matching = allArticles().filter(matches);
 
   return {
-    featured: !category || featuredArticle.categorySlug === category ? featuredArticle : null,
+    featured: matches(featuredArticle) ? featuredArticle : null,
     articles: matching.slice(0, limit),
     categories: mockNewsCategories,
     total: matching.length,

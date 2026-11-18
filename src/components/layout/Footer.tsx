@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { TikTokIcon } from "@/components/ui/icons";
 import { footerColumns, legalLinks, socialLinks } from "@/lib/site";
 
 /** Centered 1320px column with 32px side padding, matching the footer grid in the design. */
@@ -38,7 +39,7 @@ export function Footer() {
                       aria-label={link.label}
                       className="flex size-9 items-center justify-center rounded-lg border border-tuna text-base leading-6 text-white/60 transition-colors hover:border-gold hover:text-gold"
                     >
-                      {link.label.startsWith("X") ? "𝕏" : link.glyph}
+                      {link.label === "TikTok" ? <TikTokIcon /> : link.label.startsWith("X") ? "𝕏" : link.glyph}
                     </a>
                   </li>
                 ))}

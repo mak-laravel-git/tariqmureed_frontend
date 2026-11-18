@@ -3,7 +3,6 @@ import type {
   DirectoryItem,
   LegalPage,
   PlayerPage,
-  StatTable,
   TeamPage,
   TournamentDetail,
   Video,
@@ -91,8 +90,8 @@ export function buildMockTournament(slug: string): TournamentDetail | null {
     status: entry.status,
     dateline: isBpl ? "2 January — 7 February 2026 · Bangladesh" : "Dates to be announced",
     overview: isBpl
-      ? "Seven teams compete across three venues for Bangladesh cricket's biggest domestic prize. Follow every fixture, result and table update on TMN Sports."
-      : `Follow every fixture, result and table update from ${entry.name} on TMN Sports.`,
+      ? "Seven teams compete across three venues for Bangladesh cricket's biggest domestic prize. Follow every fixture, result and table update on TMN Sport."
+      : `Follow every fixture, result and table update from ${entry.name} on TMN Sport.`,
     upcoming: fixtures.slice(0, 2),
     matches: fixtures.slice(0, 3),
     pointsTable: [
@@ -217,34 +216,6 @@ export function buildMockPlayerPage(slug: string): PlayerPage | null {
   };
 }
 
-const LEADERS = [
-  { rank: 1, player: "N. Shanto", team: "Bangladesh", matches: 14, runs: 842, average: "56.13", strikeRate: "94.40" },
-  { rank: 2, player: "B. Azam", team: "Pakistan", matches: 15, runs: 798, average: "49.87", strikeRate: "91.28" },
-  { rank: 3, player: "K. Mendis", team: "Sri Lanka", matches: 13, runs: 712, average: "47.46", strikeRate: "98.17" },
-  { rank: 4, player: "S. Gill", team: "India", matches: 12, runs: 689, average: "53.00", strikeRate: "101.40" },
-];
-
-export function buildMockStatTable(
-  title: string,
-  filters: { format?: string; season?: string; team?: string },
-): StatTable {
-  const format = filters.format ?? "ODI";
-  const season = filters.season ?? "2026 season";
-  const team = filters.team ?? "All teams";
-
-  return {
-    filters: { format, season, team },
-    options: {
-      formats: ["ODI", "Test", "T20I"],
-      seasons: ["2026 season", "2025 season", "2024 season"],
-      teams: ["All teams", "Bangladesh", "Pakistan", "Sri Lanka", "India"],
-    },
-    eyebrow: `${format} · ${season.split(" ")[0]}`,
-    title,
-    rows: LEADERS.filter((row) => team === "All teams" || row.team === team),
-  };
-}
-
 function video(id: number, title: string, category: string, minutesAgo: number, image: string, duration: string): Video {
   return {
     id,
@@ -289,7 +260,7 @@ export function buildMockLegalPage(slug: string): LegalPage | null {
     return {
       slug,
       title: "Privacy Policy",
-      description: "What TMN Sports collects, why we collect it, and the choices available to readers.",
+      description: "What TMN Sport collects, why we collect it, and the choices available to readers.",
       contact: CONTACT,
       sections: [
         {
@@ -325,7 +296,7 @@ export function buildMockLegalPage(slug: string): LegalPage | null {
     return {
       slug,
       title: "Cookie Preferences",
-      description: "How TMN Sports uses cookies and how you can control them.",
+      description: "How TMN Sport uses cookies and how you can control them.",
       contact: CONTACT,
       sections: [
         {
@@ -354,26 +325,26 @@ export function buildMockLegalPage(slug: string): LegalPage | null {
     return {
       slug,
       title: "Terms of Use",
-      description: "The terms that apply when you use the TMN Sports public website.",
+      description: "The terms that apply when you use the TMN Sport public website.",
       contact: CONTACT,
       sections: [
         {
           heading: "Use of the site",
           paragraphs: [
-            "TMN Sports content is provided for personal, non-commercial use. You may share links and short quotations with attribution. Reproduction of full articles, data tables or video without permission is not permitted.",
+            "TMN Sport content is provided for personal, non-commercial use. You may share links and short quotations with attribution. Reproduction of full articles, data tables or video without permission is not permitted.",
             "Automated scraping of live score data or statistics feeds is prohibited without a written agreement.",
           ],
         },
         {
           heading: "Accuracy",
           paragraphs: [
-            "Live scores, fixtures and statistics are supplied by third-party data providers and may be delayed, incomplete or corrected after publication. TMN Sports is not liable for decisions taken in reliance on provisional match data.",
+            "Live scores, fixtures and statistics are supplied by third-party data providers and may be delayed, incomplete or corrected after publication. TMN Sport is not liable for decisions taken in reliance on provisional match data.",
           ],
         },
         {
           heading: "Advertising",
           paragraphs: [
-            "Advertising placements are clearly labelled. TMN Sports is not responsible for the content of external sites reached through advertisements.",
+            "Advertising placements are clearly labelled. TMN Sport is not responsible for the content of external sites reached through advertisements.",
           ],
         },
         {

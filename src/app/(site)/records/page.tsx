@@ -1,19 +1,12 @@
 import type { Metadata } from "next";
 
-import { StatsPage } from "@/components/stats/StatsPage";
+import { RecordsPage } from "@/components/stats/RecordsPage";
 
 export const metadata: Metadata = {
-  title: "Records",
-  description: "The definitive list of landmark batting, bowling and team achievements.",
+  title: "Cricket Records",
+  description: "Landmark performances across batting, bowling, teams and tournaments.",
 };
 
-export default function RecordsPage(props: PageProps<"/records">) {
-  return (
-    <StatsPage
-      kind="records"
-      title="Records"
-      description="The definitive list of landmark batting, bowling and team achievements."
-      searchParams={props.searchParams}
-    />
-  );
+export default function CricketRecordsPage(props: PageProps<"/records">) {
+  return <RecordsPage searchParams={props.searchParams} />;
 }

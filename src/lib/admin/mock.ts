@@ -66,7 +66,7 @@ export const mockUser: AdminUser = {
   initials: "BA",
   role: "Super Admin",
   jobTitle: "Head of Digital Operations",
-  bio: "Leading digital publishing operations and platform strategy for TMN Sports.",
+  bio: "Leading digital publishing operations and platform strategy for TMN Sport.",
 };
 
 export const mockMedia: MediaAsset[] = [
@@ -95,7 +95,7 @@ export const mockIntegration: IntegrationStatus = {
 };
 
 export const mockSettings: SiteSettings = {
-  websiteName: "TMN Sports",
+  websiteName: "TMN Sport",
   contactEmail: "editorial@tmnsports.com",
   description: "Independent sports news, scores and analysis from around the world.",
   defaultStatus: "Draft",

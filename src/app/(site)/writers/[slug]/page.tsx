@@ -30,7 +30,7 @@ async function WriterView({ params }: { params: Promise<{ slug: string }> }) {
               <dd className="text-sm leading-5 font-bold text-white">{writer.articleCount}</dd>
             </div>
             <div>
-              <dt className="text-sm leading-5 text-[#71717b]">With TMN Sports since</dt>
+              <dt className="text-sm leading-5 text-[#71717b]">With TMN Sport since</dt>
               <dd className="text-sm leading-5 font-bold text-white">{writer.since}</dd>
             </div>
           </dl>

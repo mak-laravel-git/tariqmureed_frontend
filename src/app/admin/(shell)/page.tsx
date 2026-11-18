@@ -34,7 +34,7 @@ export default async function DashboardPage() {
     <>
       <PageHeader
         title={`${greeting(new Date().getHours())}, ${firstName}`}
-        description="Here is the current state of the TMN Sports newsroom, editorial pipeline and platform integrations."
+        description="Here is the current state of the TMN Sport newsroom, editorial pipeline and platform integrations."
         actions={
           <>
             <PrimaryLink href="/admin/content/new">

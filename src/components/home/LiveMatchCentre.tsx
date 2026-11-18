@@ -54,7 +54,7 @@ export async function LiveMatchCentre({ searchParams }: LiveMatchCentreProps) {
           id="live-match-centre-title"
           title="Live Match Centre"
           live
-          description="Ball-by-ball scores across every competition covered by TMN Sports."
+          description="Ball-by-ball scores across every competition covered by TMN Sport."
           descriptionClassName="text-body"
           action={{ href: "/live-scores", label: "All matches" }}
         />

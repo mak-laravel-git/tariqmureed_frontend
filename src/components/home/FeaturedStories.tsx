@@ -98,7 +98,7 @@ export async function FeaturedStories() {
           id="featured-stories-title"
           title="Featured Stories"
           titleClassName="text-ink"
-          description="The reporting and analysis TMN Sports editors are leading with."
+          description="The reporting and analysis TMN Sport editors are leading with."
         />
 
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,790fr)_minmax(0,510fr)]">

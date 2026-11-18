@@ -12,7 +12,7 @@ interface PageIntroProps {
 }
 
 /** Grey page header used by the listing pages: eyebrow, large title and one-line summary. */
-export function PageIntro({ title, description, eyebrow = "TMN Sports", uppercase, children }: PageIntroProps) {
+export function PageIntro({ title, description, eyebrow = "TMN Sport", uppercase, children }: PageIntroProps) {
   return (
     <section className="bg-surface">
       <Container className="py-16">

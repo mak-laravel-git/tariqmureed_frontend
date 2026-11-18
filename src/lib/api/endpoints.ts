@@ -24,10 +24,10 @@ import { buildMockMatchday } from "@/lib/mocks/matchday";
 import { buildMockMatchDetail } from "@/lib/mocks/matchdetail";
 import { buildMockArticleDetail, buildMockNewsPage } from "@/lib/mocks/news";
 import { buildMockSearch } from "@/lib/mocks/search";
+import { buildMockRecordsPage, buildMockStatsPage } from "@/lib/mocks/statistics";
 import {
   buildMockLegalPage,
   buildMockPlayerPage,
-  buildMockStatTable,
   buildMockTeamPage,
   buildMockTournament,
   buildMockVideosPage,
@@ -44,7 +44,10 @@ import type {
   PlayerPage,
   SearchResults,
   SearchType,
-  StatTable,
+  RecordGroup,
+  RecordsPageData,
+  StatsPageData,
+  StatsScope,
   TeamPage,
   TournamentDetail,
   VideosPage,
@@ -81,7 +84,7 @@ import type {
  *   GET /matches/summary           -> getMatchSummary
  *   GET /articles/featured         -> getFeaturedStories
  *   GET /articles?per_page=        -> getLatestNews
- *   GET /news?category=&limit=     -> getNewsPage
+ *   GET /news?category=&team=&limit= -> getNewsPage
  *   GET /articles/{slug}           -> getArticle
  *   GET /matchday?view=&competition= -> getMatchday
  *   GET /articles/top-headlines    -> getTopHeadlines
@@ -95,6 +98,8 @@ import type {
  *   GET /competitions/spotlight    -> getTournamentSpotlight
  *   GET /writers                   -> getWriters
  *   GET /search?q=&type=&limit=    -> getSearchResults
+ *   GET /stats?scope=&format=      -> getStatsPage
+ *   GET /records?group=&format=    -> getRecordsPage
  */
 
 export async function getTicker(): Promise<TickerItem[]> {
@@ -213,17 +218,17 @@ export async function getLatestNews(perPage = 9): Promise<Article[]> {
 }
 
 /**
- * News listing with an optional category filter.
- * GET /news?category=<slug>&limit=<n>
+ * News listing with optional category and team filters.
+ * GET /news?category=<slug>&team=<team-slug>&limit=<n>
  */
-export async function getNewsPage(category: string | undefined, limit: number): Promise<NewsPage> {
+export async function getNewsPage(category: string | undefined, limit: number, team?: string): Promise<NewsPage> {
   "use cache";
   cacheLife("minutes");
   cacheTag("articles");
 
   return apiGet<NewsPage>("news", {
-    query: { category, limit },
-    fallback: () => buildMockNewsPage(category, limit),
+    query: { category, team, limit },
+    fallback: () => buildMockNewsPage(category, limit, team),
   });
 }
 
@@ -420,23 +425,32 @@ export async function getPlayerPage(slug: string): Promise<PlayerPage | null> {
 }
 
 /**
- * Leading run scorers (kind "stats") or batting records (kind "records") for a format/season/team.
- * GET /stats/leaders?kind=&format=&season=&team=
+ * Statistics centre: leaderboards for a scope (player, team or tournament) and format.
+ * GET /stats?scope=player|team|tournament&format=Test|ODI|T20I|T20
  */
-export async function getStatTable(
-  kind: "stats" | "records",
-  format?: string,
-  season?: string,
-  team?: string,
-): Promise<StatTable> {
+export async function getStatsPage(scope: StatsScope, format?: string): Promise<StatsPageData> {
   "use cache";
   cacheLife("hours");
   cacheTag("stats");
 
-  return apiGet<StatTable>("stats/leaders", {
-    query: { kind, format, season, team },
-    fallback: () =>
-      buildMockStatTable(kind === "stats" ? "Leading run scorers" : "Batting records", { format, season, team }),
+  return apiGet<StatsPageData>("stats", {
+    query: { scope, format },
+    fallback: () => buildMockStatsPage(scope, format),
+  });
+}
+
+/**
+ * Records centre: landmark performances for a record group and format.
+ * GET /records?group=batting|bowling|team|tournament&format=Test|ODI|T20I|T20
+ */
+export async function getRecordsPage(group?: RecordGroup, format?: string): Promise<RecordsPageData> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("stats");
+
+  return apiGet<RecordsPageData>("records", {
+    query: { group, format },
+    fallback: () => buildMockRecordsPage(group, format),
   });
 }
 

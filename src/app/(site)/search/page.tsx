@@ -11,7 +11,7 @@ import { firstParam, pageHref, type SearchParams } from "@/lib/url";
 
 export const metadata: Metadata = {
   title: "Search",
-  description: "Search TMN Sports for news, matches, teams, players and video.",
+  description: "Search TMN Sport for news, matches, teams, players and video.",
   robots: { index: false, follow: true },
 };
 
@@ -30,7 +30,7 @@ async function SearchBody({ searchParams }: { searchParams: Promise<SearchParams
   return (
     <Container className="py-10 md:py-16">
       <p className="text-[11px] leading-[16.5px] font-black tracking-[2.26px] text-[#d08700] uppercase">
-        Search TMN Sports
+        Search TMN Sport
       </p>
 
       <div className="pt-4">

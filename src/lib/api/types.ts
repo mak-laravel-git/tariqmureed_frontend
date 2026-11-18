@@ -122,7 +122,7 @@ export interface Article {
   publishedAt: string;
   readMinutes: number;
   caption?: string | null;
-  /** Photo credit shown after the caption, e.g. "TMN Sports / Action Images". */
+  /** Photo credit shown after the caption, e.g. "TMN Sport / Action Images". */
   credit?: string | null;
 }
 
@@ -363,14 +363,64 @@ export interface PlayerPage {
   news: Article[];
 }
 
-export interface StatTable {
-  /** Filter selections currently applied. */
-  filters: { format: string; season: string; team: string };
-  options: { formats: string[]; seasons: string[]; teams: string[] };
-  /** "ODI · 2026" */
+export type StatsScope = "player" | "team" | "tournament";
+
+export interface StatsMetricRow {
+  rank: number;
+  /** Player, team or tournament side the figure belongs to. */
+  name: string;
+  /** Qualification shown in the Competition column, e.g. "Min. 500 runs". */
+  note: string;
+  /** Pre-formatted figure, e.g. "11168" or "172.10". */
+  value: string;
+}
+
+/** One leaderboard: a single metric ranked within a scope and format. */
+export interface StatsMetricTable {
+  id: string;
+  /** "PLAYER · ODI" */
   eyebrow: string;
+  /** "Most runs" */
   title: string;
-  rows: { rank: number; player: string; team: string; matches: number; runs: number; average: string; strikeRate: string }[];
+  /** Heading of the first name column: "Player" or "Team". */
+  subject: string;
+  /** Heading of the value column, e.g. "Most runs". */
+  valueLabel: string;
+  rows: StatsMetricRow[];
+}
+
+export interface StatsPageData {
+  scope: StatsScope;
+  /** Applied format filter, or null for all formats. */
+  format: string | null;
+  metricCount: number;
+  tables: StatsMetricTable[];
+}
+
+export type RecordGroup = "batting" | "bowling" | "team" | "tournament";
+
+export interface RecordEntry {
+  id: string;
+  /** "Highest individual score" */
+  title: string;
+  group: RecordGroup;
+  holder: string;
+  /** "Test", "ODI", "T20I" or "T20". */
+  format: string;
+  detail: string;
+  /** Pre-formatted figure, e.g. "400*" or "10/53". */
+  value: string;
+}
+
+export interface RecordsPageData {
+  /** Applied record group filter, or null for all groups. */
+  group: RecordGroup | null;
+  /** Applied format filter, or null for all formats. */
+  format: string | null;
+  total: number;
+  /** Records per group under the current format filter. */
+  groupCounts: Record<RecordGroup, number>;
+  records: RecordEntry[];
 }
 
 export interface VideosPage {

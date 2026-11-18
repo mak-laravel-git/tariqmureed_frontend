@@ -14,7 +14,7 @@ import { firstParam, pageHref, type SearchParams } from "@/lib/url";
 
 export const metadata: Metadata = {
   title: "Videos",
-  description: "Highlights, interviews, analysis and original TMN Sports features.",
+  description: "Highlights, interviews, analysis and original TMN Sport features.",
 };
 
 const PAGE_SIZE = 6;
@@ -144,7 +144,7 @@ async function VideosBody({ searchParams }: { searchParams: Promise<SearchParams
 export default function VideosPage(props: PageProps<"/videos">) {
   return (
     <>
-      <PageIntro title="Videos" description="Highlights, interviews, analysis and original TMN Sports features." />
+      <PageIntro title="Videos" description="Highlights, interviews, analysis and original TMN Sport features." />
       <Suspense fallback={<div role="status" aria-label="Loading videos" className="min-h-[900px]" />}>
         <VideosBody searchParams={props.searchParams} />
       </Suspense>

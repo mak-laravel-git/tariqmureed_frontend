@@ -22,7 +22,7 @@ export const resources: Record<ResourceKey, ResourceConfig> = {
     key: "content",
     label: "Content Management",
     singular: "article",
-    description: "Create, review and publish stories across the TMN Sports network.",
+    description: "Create, review and publish stories across the TMN Sport network.",
     form: "article",
     apiPath: "articles",
   },

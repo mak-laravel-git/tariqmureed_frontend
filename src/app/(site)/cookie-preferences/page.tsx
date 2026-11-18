@@ -5,7 +5,7 @@ import { LegalPageView } from "@/components/legal/LegalPageView";
 
 export const metadata: Metadata = {
   title: "Cookie Preferences",
-  description: "How TMN Sports uses cookies and how you can control them.",
+  description: "How TMN Sport uses cookies and how you can control them.",
 };
 
 export default function CookiePreferencesPage() {

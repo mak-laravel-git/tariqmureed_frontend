@@ -5,7 +5,7 @@ import { LegalPageView } from "@/components/legal/LegalPageView";
 
 export const metadata: Metadata = {
   title: "Terms of Use",
-  description: "The terms that apply when you use the TMN Sports public website.",
+  description: "The terms that apply when you use the TMN Sport public website.",
 };
 
 export default function TermsOfUsePage() {

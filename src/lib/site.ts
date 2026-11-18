@@ -24,6 +24,7 @@ export const socialLinks = [
   { label: "Facebook", glyph: "f", href: "https://facebook.com" },
   { label: "Instagram", glyph: "◎", href: "https://instagram.com" },
   { label: "YouTube", glyph: "▶", href: "https://youtube.com" },
+  { label: "TikTok", glyph: "♪", href: "https://tiktok.com" },
   { label: "WhatsApp", glyph: "✆", href: "https://whatsapp.com" },
 ] as const;
 

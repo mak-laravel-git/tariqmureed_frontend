@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
@@ -114,11 +115,13 @@ async function ArticleContent({ params }: { params: Promise<{ slug: string }> })
           {article.tags.length > 0 && (
             <ul className="mt-10 flex flex-wrap gap-2" aria-label="Tags">
               {article.tags.map((tag) => (
-                <li
-                  key={tag}
-                  className="rounded-[4px] border border-[#e4e4e7] bg-white px-3 py-2 text-xs leading-4 font-bold text-[#3f3f46]"
-                >
-                  {tag}
+                <li key={tag}>
+                  <Link
+                    href={`/search?q=${encodeURIComponent(tag)}`}
+                    className="block rounded-[4px] border border-[#e4e4e7] bg-white px-3 py-2 text-xs leading-4 font-bold text-[#3f3f46] transition-colors hover:border-[#09090b] hover:bg-[#09090b] hover:text-white"
+                  >
+                    {tag}
+                  </Link>
                 </li>
               ))}
             </ul>

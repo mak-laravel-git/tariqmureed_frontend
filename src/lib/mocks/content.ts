@@ -47,7 +47,7 @@ export function buildMockArticles() {
     minutesAgo: 1,
     readMinutes: 6,
     caption: "Suryakumar Yadav hits through the off side during the IPL 2026 match in Mumbai.",
-    credit: "TMN Sports / Action Images",
+    credit: "TMN Sport / Action Images",
   });
 
   const smith = article(2, "smiths-96-keeps-australia-in-it-adelaide", {
@@ -346,7 +346,7 @@ export const mockWriters: Writer[] = [
     slug: "arif-hossain",
     name: "Arif Hossain",
     title: "Senior Cricket Correspondent",
-    bio: "Arif has covered four World Cups and reported from 38 Test venues. He leads TMN Sports' subcontinent coverage and writes the weekly match column.",
+    bio: "Arif has covered four World Cups and reported from 38 Test venues. He leads TMN Sport' subcontinent coverage and writes the weekly match column.",
     avatar: avatar("arif-hossain.jpg"),
     articleCount: 412,
     since: 2016,
@@ -366,7 +366,7 @@ export const mockWriters: Writer[] = [
     slug: "daniel-okoye",
     name: "Daniel Okoye",
     title: "Data & Statistics Editor",
-    bio: "Daniel builds the numbers behind TMN Sports' match coverage, from expected-run models to bowler-matchup tools and the live stats centre.",
+    bio: "Daniel builds the numbers behind TMN Sport' match coverage, from expected-run models to bowler-matchup tools and the live stats centre.",
     avatar: avatar("daniel-okoye.jpg"),
     articleCount: 236,
     since: 2019,
@@ -386,7 +386,7 @@ export const mockWriters: Writer[] = [
     slug: "priya-nair",
     name: "Priya Nair",
     title: "Live Match Editor",
-    bio: "Priya runs the TMN Sports live blog on match days and writes the tactical review published within an hour of the final ball.",
+    bio: "Priya runs the TMN Sport live blog on match days and writes the tactical review published within an hour of the final ball.",
     avatar: avatar("priya-nair.jpg"),
     articleCount: 301,
     since: 2021,
