@@ -95,10 +95,10 @@ export function buildMockTournament(slug: string): TournamentDetail | null {
     upcoming: fixtures.slice(0, 2),
     matches: fixtures.slice(0, 3),
     pointsTable: [
-      { position: 1, team: "Rangpur Riders", played: 8, won: 6, points: 12, netRunRate: "+1.284" },
-      { position: 2, team: "Fortune Barishal", played: 8, won: 5, points: 10, netRunRate: "+0.732" },
-      { position: 3, team: "Dhaka Capitals", played: 8, won: 4, points: 8, netRunRate: "+0.214" },
-      { position: 4, team: "Chattogram Kings", played: 8, won: 3, points: 6, netRunRate: "-0.158" },
+      { position: 1, team: "Rangpur Riders", played: 8, won: 6, lost: 2, noResult: 0, form: ["W", "W", "L", "W", "W"], points: 12, netRunRate: "+1.284" },
+      { position: 2, team: "Fortune Barishal", played: 8, won: 5, lost: 3, noResult: 0, form: ["L", "W", "W", "W", "L"], points: 10, netRunRate: "+0.732" },
+      { position: 3, team: "Dhaka Capitals", played: 8, won: 4, lost: 3, noResult: 1, form: ["W", "N", "L", "W", "L"], points: 9, netRunRate: "+0.214" },
+      { position: 4, team: "Chattogram Kings", played: 8, won: 3, lost: 5, noResult: 0, form: ["L", "L", "W", "L", "W"], points: 6, netRunRate: "-0.158" },
     ],
     teams: ["Rangpur Riders", "Fortune Barishal", "Dhaka Capitals"],
     stats: [

@@ -258,9 +258,26 @@ export interface CommentaryEntry {
   text: string;
 }
 
+export interface SquadPlayer {
+  /** Player profile slug; null when the player has no profile page yet. */
+  slug: string | null;
+  name: string;
+  image?: string | null;
+  /** "Batsman", "Bowler", "Allrounder", "Wicketkeeper" ... as supplied by the data feed. */
+  role?: string | null;
+  captain?: boolean;
+  wicketkeeper?: boolean;
+  /** Named substitute rather than one of the starting players. */
+  substitute?: boolean;
+  /** "Right hand bat" */
+  battingStyle?: string | null;
+  /** "Slow left arm orthodox" */
+  bowlingStyle?: string | null;
+}
+
 export interface SquadList {
   team: TeamSummary;
-  players: string[];
+  players: SquadPlayer[];
 }
 
 export interface MatchStatRow {
@@ -313,6 +330,11 @@ export interface PointsRow {
   team: string;
   played: number;
   won: number;
+  lost: number;
+  /** Tied or abandoned matches. */
+  noResult: number;
+  /** Latest results, oldest first: "W", "L" or "N" (no result). */
+  form: string[];
   points: number;
   netRunRate: string;
 }

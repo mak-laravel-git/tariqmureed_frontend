@@ -39,6 +39,11 @@ export default async function IntegrationPage(props: PageProps<"/admin/integrati
       </div>
 
       {firstParam(params.synced) && <Flash>Synchronisation started.</Flash>}
+      {firstParam(params.error) && (
+        <p role="alert" className="mb-4 rounded-md border border-[#f3c4c1] bg-[#fde8e7] px-4 py-2.5 text-xs font-medium text-live">
+          {firstParam(params.error)?.slice(0, 300)}
+        </p>
+      )}
 
       <dl className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat) => (

@@ -221,6 +221,12 @@ export async function uploadMediaAction(_previous: FormState, formData: FormData
 }
 
 export async function syncAction(): Promise<void> {
-  await runSync();
+  try {
+    await runSync();
+  } catch (error) {
+    const message = failure(error, "The synchronisation could not be started.").message ?? "";
+    redirect(`/admin/integrations?error=${encodeURIComponent(message)}`);
+  }
+
   redirect("/admin/integrations?synced=1");
 }

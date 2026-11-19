@@ -1,4 +1,4 @@
-import type { MatchDetail, SquadList } from "@/lib/api/types";
+import type { MatchDetail, SquadList, SquadPlayer } from "@/lib/api/types";
 
 import { buildMockMatchday } from "./matchday";
 import { mockAllMatches } from "./matches";
@@ -9,19 +9,19 @@ const ordinal = (n: number) => {
   return `${n}${suffix}`;
 };
 
-const XI = [
-  "T. Iqbal",
-  "N. Shanto (c)",
-  "L. Das (wk)",
-  "M. Rahim",
-  "T. Hridoy",
-  "M. Miraz",
-  "T. Sakib",
-  "T. Ahmed",
-  "M. Rahman",
-  "S. Islam",
-  "R. Hossain",
-];
+const XI: SquadPlayer[] = [
+  { name: "T. Iqbal", role: "Batsman", battingStyle: "Left hand bat" },
+  { name: "N. Shanto", role: "Batsman", battingStyle: "Left hand bat", captain: true },
+  { name: "L. Das", role: "Wicketkeeper", battingStyle: "Right hand bat", wicketkeeper: true },
+  { name: "M. Rahim", role: "Wicketkeeper", battingStyle: "Right hand bat" },
+  { name: "T. Hridoy", role: "Batsman", battingStyle: "Right hand bat" },
+  { name: "M. Miraz", role: "Allrounder", battingStyle: "Right hand bat", bowlingStyle: "Off break" },
+  { name: "T. Sakib", role: "Allrounder", battingStyle: "Left hand bat", bowlingStyle: "Slow left arm orthodox" },
+  { name: "T. Ahmed", role: "Bowler", bowlingStyle: "Right arm fast" },
+  { name: "M. Rahman", role: "Bowler", bowlingStyle: "Left arm fast" },
+  { name: "S. Islam", role: "Bowler", bowlingStyle: "Right arm fast medium" },
+  { name: "R. Hossain", role: "Bowler", bowlingStyle: "Right arm fast medium" },
+].map((player) => ({ ...player, slug: null }));
 
 /** Full match centre payload for a fixture; unknown slugs resolve to null. */
 export function buildMockMatchDetail(slug: string): MatchDetail | null {

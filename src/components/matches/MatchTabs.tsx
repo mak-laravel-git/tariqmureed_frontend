@@ -1,11 +1,13 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { NewsCard } from "@/components/news/NewsCard";
 import { AdSlot } from "@/components/ui/AdSlot";
 import { Container } from "@/components/ui/Container";
 import { EmptyNote as Empty } from "@/components/ui/Panel";
+import { Photo } from "@/components/ui/Photo";
 import { UnderlineTabs } from "@/components/ui/UnderlineTabs";
-import type { MatchDetail } from "@/lib/api/types";
+import type { MatchDetail, SquadPlayer } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 
 export const matchTabs = [
@@ -193,6 +195,49 @@ function Commentary({ match }: { match: MatchDetail }) {
   );
 }
 
+function PlayerAvatar({ player }: { player: SquadPlayer }) {
+  const initials = player.name
+    .split(/\s+/)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  return (
+    <span
+      aria-hidden="true"
+      className="relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#f4f4f5] text-xs leading-4 font-black text-[#71717b]"
+    >
+      {player.image ? <Photo src={player.image} sizes="40px" /> : initials}
+    </span>
+  );
+}
+
+function PlayerBadge({ title, muted, children }: { title: string; muted?: boolean; children: ReactNode }) {
+  return (
+    <abbr
+      title={title}
+      className={cn(
+        "rounded-[3px] px-1.5 py-0.5 text-[10px] leading-[14px] font-black tracking-[0.5px] no-underline",
+        muted ? "bg-[#f4f4f5] text-[#71717b]" : "bg-[#fdc700] text-[#09090b]",
+      )}
+    >
+      {children}
+    </abbr>
+  );
+}
+
+/** "Allrounder · Bat: Right hand bat · Bowl: Off break" */
+function playerSummary(player: SquadPlayer): string {
+  return [
+    player.role,
+    player.battingStyle && `Bat: ${player.battingStyle}`,
+    player.bowlingStyle && `Bowl: ${player.bowlingStyle}`,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
+
 function Teams({ match }: { match: MatchDetail }) {
   return (
     <>
@@ -208,13 +253,31 @@ function Teams({ match }: { match: MatchDetail }) {
             <ol className="pt-4">
               {squad.players.map((player, index) => (
                 <li
-                  key={`${player}-${index}`}
+                  key={`${player.slug ?? player.name}-${index}`}
                   className="flex items-center gap-3 border-t border-[#f4f4f5] py-2.5"
                 >
-                  <span className="text-sm leading-5 text-[#9f9fa9] tabular-nums">
+                  <span className="w-5 shrink-0 text-sm leading-5 text-[#9f9fa9] tabular-nums">
                     {String(index + 1).padStart(2, "0")}
                   </span>
-                  <span className="text-sm leading-5 font-bold text-[#09090b]">{player}</span>
+                  <PlayerAvatar player={player} />
+                  <div className="min-w-0 flex-1">
+                    <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                      {player.slug ? (
+                        <Link
+                          href={`/players/${player.slug}`}
+                          className="text-sm leading-5 font-bold text-[#09090b] hover:underline"
+                        >
+                          {player.name}
+                        </Link>
+                      ) : (
+                        <span className="text-sm leading-5 font-bold text-[#09090b]">{player.name}</span>
+                      )}
+                      {player.captain && <PlayerBadge title="Captain">C</PlayerBadge>}
+                      {player.wicketkeeper && <PlayerBadge title="Wicketkeeper">WK</PlayerBadge>}
+                      {player.substitute && <PlayerBadge title="Substitute" muted>Sub</PlayerBadge>}
+                    </p>
+                    <p className="text-xs leading-4 text-[#71717b]">{playerSummary(player)}</p>
+                  </div>
                 </li>
               ))}
             </ol>

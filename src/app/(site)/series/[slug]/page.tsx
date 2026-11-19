@@ -24,6 +24,36 @@ const tabs = [
 
 type TabKey = (typeof tabs)[number]["key"];
 
+const formStyles: Record<string, string> = {
+  W: "bg-[#dcfce7] text-[#15803d]",
+  L: "bg-[#fee2e2] text-[#b91c1c]",
+  N: "bg-[#f4f4f5] text-[#71717b]",
+};
+
+/** Latest results as small coloured chips: W won, L lost, N no result. */
+function FormChips({ form }: { form: string[] }) {
+  if (form.length === 0) {
+    return <span className="text-[#9f9fa9]">—</span>;
+  }
+
+  return (
+    <span className="flex gap-1" role="img" aria-label={`Recent form: ${form.join(", ")}`}>
+      {form.map((result, index) => (
+        <span
+          key={index}
+          aria-hidden="true"
+          className={cn(
+            "flex size-6 items-center justify-center rounded-full text-[10px] leading-4 font-black",
+            formStyles[result] ?? formStyles.N,
+          )}
+        >
+          {result}
+        </span>
+      ))}
+    </span>
+  );
+}
+
 function SectionTitle({ children }: { children: string }) {
   return (
     <div className="border-b border-[#e4e4e7] pb-4">
@@ -87,11 +117,34 @@ function TournamentContent({ tournament, tab }: { tournament: TournamentDetail; 
               { key: "position", label: "#" },
               { key: "team", label: "Team", strong: true },
               { key: "played", label: "P" },
-              { key: "won", label: "W" },
-              { key: "points", label: "Pts" },
-              { key: "netRunRate", label: "NRR" },
+              {
+                key: "won",
+                label: "W",
+                render: (row) => <span className="font-black text-[#15803d]">{row.won}</span>,
+              },
+              {
+                key: "lost",
+                label: "L",
+                render: (row) => <span className="font-bold text-[#b91c1c]">{row.lost}</span>,
+              },
+              { key: "noResult", label: "N/R" },
+              { key: "form", label: "Form", render: (row) => <FormChips form={row.form} /> },
+              { key: "points", label: "Pts", render: (row) => <span className="font-black">{row.points}</span> },
+              {
+                key: "netRunRate",
+                label: "NRR",
+                render: (row) => (
+                  <span className={cn("font-semibold", row.netRunRate.startsWith("-") ? "text-[#b91c1c]" : "text-[#15803d]")}>
+                    {row.netRunRate}
+                  </span>
+                ),
+              },
             ]}
           />
+          <p className="pt-4 text-xs leading-4 text-[#71717b]">
+            P played · W won · L lost · N/R tied or no result · Pts points · NRR net run rate. Form shows the latest
+            results, oldest first.
+          </p>
         </>
       );
 

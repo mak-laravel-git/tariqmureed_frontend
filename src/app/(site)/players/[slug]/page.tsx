@@ -46,7 +46,21 @@ async function PlayerView({ params }: { params: Promise<{ slug: string }> }) {
       <section className="bg-[#2d2d2d] text-white">
         <Container className="grid items-end gap-8 py-10 md:grid-cols-[300px_minmax(0,1fr)]">
           <div className="relative h-[375px] w-full max-w-[300px] overflow-hidden rounded-[4px] justify-self-start self-end">
-            <Photo src={player.image} alt={player.name} priority sizes="300px" />
+            {player.image ? (
+              <Photo src={player.image} alt={player.name} priority sizes="300px" />
+            ) : (
+              <span
+                aria-hidden="true"
+                className="flex size-full items-center justify-center bg-[#3f3f46] text-7xl font-black text-white/40"
+              >
+                {player.name
+                  .split(/\s+/)
+                  .map((part) => part[0])
+                  .join("")
+                  .slice(0, 2)
+                  .toUpperCase()}
+              </span>
+            )}
           </div>
 
           <div className="min-w-0 self-end pb-10">

@@ -22,6 +22,9 @@ function buildRemotePatterns(): NonNullable<NextConfig["images"]>["remotePattern
     }
   }
 
+  // Team, league and player images from the SportMonks cricket data feed.
+  patterns.push({ protocol: "https", hostname: "cdn.sportmonks.com" });
+
   for (const host of (process.env.IMAGE_HOSTS ?? "").split(",")) {
     const hostname = host.trim();
     if (hostname) {
