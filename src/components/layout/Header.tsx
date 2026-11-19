@@ -17,14 +17,14 @@ export function Header() {
           <Image
             src="/images/brand/logo.png"
             alt="TMN Sport"
-            width={136}
-            height={45}
+            width={163}
+            height={54}
             priority
-            className="h-[34px] w-[103px] object-cover sm:h-[45px] sm:w-[136px]"
+            className="h-[34px] w-[103px] object-contain sm:h-[45px] sm:w-[136px] lg:h-[50px] lg:w-[150px] xl:h-[54px] xl:w-[163px]"
           />
         </Link>
 
-        <nav aria-label="Main navigation" className="hidden pl-4 lg:block">
+        <nav aria-label="Main navigation" className="hidden pl-4 lg:block xl:pl-6">
           <Suspense fallback={<div className="h-[37px] w-[743px]" />}>
             <NavLinks items={mainNav} />
           </Suspense>
