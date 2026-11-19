@@ -7,6 +7,12 @@ import { footerColumns, legalLinks, socialLinks } from "@/lib/site";
 /** Centered 1320px column with 32px side padding, matching the footer grid in the design. */
 const footerInner = "mx-auto w-full max-w-site px-4 sm:px-6 xl:px-8";
 
+/** "View all" links shown at the end of a footer column, keyed by column title. */
+const allLinks: Record<string, { href: string; label: string }> = {
+  Series: { href: "/series", label: "All series →" },
+  Teams: { href: "/teams", label: "All Teams →" },
+};
+
 export function Footer() {
   return (
     <footer className="mt-auto border-t border-tuna bg-ink text-white">
@@ -48,6 +54,7 @@ export function Footer() {
 
             {footerColumns.map((column) => {
               const compact = column.title === "Teams";
+              const allLink = allLinks[column.title];
 
               return (
                 <nav key={column.title} aria-label={column.title} className="lg:col-span-2">
@@ -67,10 +74,10 @@ export function Footer() {
                         </Link>
                       </li>
                     ))}
-                    {column.title === "Series" && (
-                      <li className="pt-[2.5px] pb-[0.5px]">
-                        <Link href="/series" className="block text-[13.5px] leading-[20.25px] font-semibold text-gold">
-                          All series →
+                    {allLink && (
+                      <li className={compact ? "pt-[3px] pb-px" : "pt-[2.5px] pb-[0.5px]"}>
+                        <Link href={allLink.href} className="block text-[13.5px] leading-[20.25px] font-semibold text-gold">
+                          {allLink.label}
                         </Link>
                       </li>
                     )}
