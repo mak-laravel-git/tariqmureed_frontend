@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { PrivacySettingsButton } from "@/components/consent/PrivacySettingsButton";
 import { TikTokIcon } from "@/components/ui/icons";
 import { footerColumns, legalLinks, socialLinks } from "@/lib/site";
 
@@ -104,6 +105,9 @@ export function Footer() {
                 </Link>
               </li>
             ))}
+            <li>
+              <PrivacySettingsButton className="cursor-pointer text-xs leading-[18px] text-white/45 transition-colors hover:text-white" />
+            </li>
           </ul>
         </div>
       </div>

@@ -456,8 +456,24 @@ export interface LegalPage {
   slug: string;
   title: string;
   description: string;
-  sections: { heading: string; paragraphs: string[] }[];
+  /** Paragraphs may contain `[label](https://…)` links; `bullets` render as a list after them. */
+  sections: { heading: string; paragraphs: string[]; bullets?: string[] }[];
   contact: { email: string; address: string };
+  /** Shows a button that reopens the visitor's cookie choices. */
+  privacySettings?: boolean;
+}
+
+/** Website settings the public site reads (GET /settings), edited in the admin dashboard. */
+export interface PublicSettings {
+  websiteName: string;
+  contactEmail: string;
+  contactAddress: string;
+  /** Google Analytics 4 Measurement ID ("G-…"); empty means analytics is off. */
+  gaMeasurementId: string;
+  /** AdSense publisher ID ("ca-pub-…"); empty means no ads. */
+  adsenseClientId: string;
+  /** "builtin": the site's own cookie banner. "google": Google's certified message from AdSense. */
+  consentMode: "builtin" | "google";
 }
 
 export type SearchType = "all" | "news" | "matches" | "teams" | "players" | "videos";

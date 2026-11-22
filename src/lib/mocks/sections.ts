@@ -250,77 +250,10 @@ export function buildMockVideosPage(category: string | undefined, limit: number)
   };
 }
 
-const CONTACT = {
-  email: "newsroom@tmnsports.example",
-  address: "TMN Media House, 14 Press Avenue, Colombo 00300",
-};
+/** Real contact details come from Website Settings; the legal page loader fills them in. */
+const CONTACT = { email: "", address: "" };
 
 export function buildMockLegalPage(slug: string): LegalPage | null {
-  if (slug === "privacy-policy") {
-    return {
-      slug,
-      title: "Privacy Policy",
-      description: "What TMN Sport collects, why we collect it, and the choices available to readers.",
-      contact: CONTACT,
-      sections: [
-        {
-          heading: "What we collect",
-          paragraphs: [
-            "We collect the information needed to operate the website: technical logs such as the pages requested, aggregated analytics, and — if you subscribe to the newsletter — your email address.",
-            "We do not require registration to read editorial content, follow live scores or verify a press card.",
-          ],
-        },
-        {
-          heading: "Newsletter",
-          paragraphs: [
-            "Email addresses supplied to the TMN Daily newsletter are used only to send that newsletter. You can unsubscribe from any email. We do not sell or rent subscriber lists.",
-          ],
-        },
-        {
-          heading: "Press card verification",
-          paragraphs: [
-            "Verification queries are logged with the submitted code, the result and a timestamp for security and audit purposes. These records do not contain private identity data and are deleted on a rolling schedule.",
-          ],
-        },
-        {
-          heading: "Your choices",
-          paragraphs: [
-            "You may request details of, or deletion of, any personal data we hold about you by contacting the newsroom. Data is retained only for as long as needed for the purpose it was collected.",
-          ],
-        },
-      ],
-    };
-  }
-
-  if (slug === "cookie-preferences") {
-    return {
-      slug,
-      title: "Cookie Preferences",
-      description: "How TMN Sport uses cookies and how you can control them.",
-      contact: CONTACT,
-      sections: [
-        {
-          heading: "Essential cookies",
-          paragraphs: [
-            "These cookies keep the website working, for example remembering your session and security settings. They cannot be switched off.",
-          ],
-        },
-        {
-          heading: "Analytics cookies",
-          paragraphs: [
-            "We use aggregated analytics to understand which pages are read and to improve the site. You can block these cookies in your browser settings at any time.",
-          ],
-        },
-        {
-          heading: "Managing cookies",
-          paragraphs: [
-            "Most browsers let you review, block or delete cookies. Blocking essential cookies may stop parts of the site from working.",
-          ],
-        },
-      ],
-    };
-  }
-
   if (slug === "terms-of-use") {
     return {
       slug,

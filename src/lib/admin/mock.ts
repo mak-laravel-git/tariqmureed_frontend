@@ -1,6 +1,7 @@
 import "server-only";
 
 import type {
+  AdminPage,
   ActivityEntry,
   AdminNotification,
   AdminRecord,
@@ -97,11 +98,15 @@ export const mockIntegration: IntegrationStatus = {
 export const mockSettings: SiteSettings = {
   websiteName: "TMN Sport",
   contactEmail: "editorial@tmnsports.com",
+  contactAddress: "",
   description: "Independent sports news, scores and analysis from around the world.",
   defaultStatus: "Draft",
   timezone: "Asia/Karachi (UTC+5)",
   requireApproval: true,
   notifyEditors: true,
+  gaMeasurementId: "",
+  adsenseClientId: "",
+  consentMode: "builtin",
 };
 
 const allActions = ["view", "create", "edit", "delete", "publish", "manage"];
@@ -158,6 +163,7 @@ export function buildMockPermissions(selected: string): PermissionMatrix {
 interface Store {
   records: Record<ResourceKey, AdminRecord[]>;
   settings: SiteSettings;
+  pages: Record<string, AdminPage>;
   user: AdminUser;
   nextId: number;
 }
@@ -166,6 +172,7 @@ function seed(): Store {
   return {
     nextId: 100,
     settings: { ...mockSettings },
+    pages: {},
     user: { ...mockUser },
     records: {
       content: [

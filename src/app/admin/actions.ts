@@ -1,12 +1,16 @@
 "use server";
 
+import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { ApiError, apiPost } from "@/lib/api/client";
 import { apiConfig } from "@/lib/api/config";
 import {
   deleteRecord,
+  pageLabels,
+  resetPage,
   runSync,
+  savePage,
   saveRecord,
   savePermissions,
   saveSettings,
@@ -127,17 +131,56 @@ export async function saveSettingsAction(_previous: FormState, formData: FormDat
     await saveSettings({
       websiteName: text(formData, "websiteName"),
       contactEmail: text(formData, "contactEmail"),
+      contactAddress: text(formData, "contactAddress"),
       description: text(formData, "description"),
       defaultStatus: text(formData, "defaultStatus"),
       timezone: text(formData, "timezone"),
       requireApproval: formData.get("requireApproval") === "on",
       notifyEditors: formData.get("notifyEditors") === "on",
+      gaMeasurementId: text(formData, "gaMeasurementId"),
+      adsenseClientId: text(formData, "adsenseClientId"),
+      consentMode: text(formData, "consentMode") === "google" ? "google" : "builtin",
     });
   } catch (error) {
     return failure(error);
   }
 
-  return { status: "success", message: "Settings saved." };
+  // The public site caches these (banner, Google tags, contact card): refresh them right away.
+  updateTag("settings");
+
+  return { status: "success", message: "Settings saved. The website now uses the new values." };
+}
+
+export async function savePageAction(slug: string, _previous: FormState, formData: FormData): Promise<FormState> {
+  if (!(slug in pageLabels)) {
+    return { status: "error", message: "This page cannot be edited." };
+  }
+
+  const title = text(formData, "title");
+  const content = String(formData.get("content") ?? "").trim();
+
+  if (!title || !content) {
+    return { status: "error", message: "A title and the page text are required." };
+  }
+
+  try {
+    await savePage(slug, { title, description: text(formData, "description"), content });
+  } catch (error) {
+    return failure(error);
+  }
+
+  updateTag("pages");
+
+  return { status: "success", message: "Page saved. It is live on the website now." };
+}
+
+export async function resetPageAction(slug: string): Promise<void> {
+  if (slug in pageLabels) {
+    await resetPage(slug);
+    updateTag("pages");
+  }
+
+  redirect(`/admin/pages/${slug}?reset=1`);
 }
 
 export async function savePermissionsAction(role: string, _previous: FormState, formData: FormData): Promise<FormState> {

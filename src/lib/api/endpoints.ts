@@ -26,7 +26,6 @@ import { buildMockArticleDetail, buildMockNewsPage } from "@/lib/mocks/news";
 import { buildMockSearch } from "@/lib/mocks/search";
 import { buildMockRecordsPage, buildMockStatsPage } from "@/lib/mocks/statistics";
 import {
-  buildMockLegalPage,
   buildMockPlayerPage,
   buildMockTeamPage,
   buildMockTournament,
@@ -35,6 +34,7 @@ import {
   mockTeamsDirectory,
 } from "@/lib/mocks/sections";
 import { emptyTeamProfile, mockTeamList, mockTeamProfiles } from "@/lib/mocks/teams";
+import { builtInLegalPage } from "@/lib/legal-content";
 
 import { apiGet } from "./client";
 import type {
@@ -42,6 +42,7 @@ import type {
   Directory,
   LegalPage,
   PlayerPage,
+  PublicSettings,
   SearchResults,
   SearchType,
   RecordGroup,
@@ -466,15 +467,53 @@ export async function getVideosPage(category: string | undefined, limit: number)
   });
 }
 
-/** GET /pages/{slug} - editorial legal pages (privacy policy, terms of use). */
+/**
+ * Website settings for the public site (GET /settings): contact details, Google tag IDs and consent
+ * mode, all edited in the admin dashboard. Anything left empty there falls back to the environment
+ * (GA_MEASUREMENT_ID, ADSENSE_CLIENT_ID, CONSENT_MODE, CONTACT_EMAIL, CONTACT_ADDRESS).
+ */
+export async function getPublicSettings(): Promise<PublicSettings> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("settings");
+
+  const stored = await apiGet<Partial<PublicSettings>>("settings", { fallback: () => ({}) }).catch(
+    (): Partial<PublicSettings> => ({}),
+  );
+  const env = (name: string): string => process.env[name]?.trim() ?? "";
+
+  return {
+    websiteName: stored.websiteName || "TMN Sport",
+    contactEmail: stored.contactEmail || env("CONTACT_EMAIL"),
+    contactAddress: stored.contactAddress || env("CONTACT_ADDRESS"),
+    gaMeasurementId: stored.gaMeasurementId || env("GA_MEASUREMENT_ID"),
+    adsenseClientId: stored.adsenseClientId || env("ADSENSE_CLIENT_ID"),
+    consentMode: (stored.consentMode || env("CONSENT_MODE")) === "google" ? "google" : "builtin",
+  };
+}
+
+/**
+ * GET /pages/{slug} - editorial legal pages (privacy policy, cookies, terms of use).
+ * A page saved in the admin dashboard wins; until then (or if the API is unreachable) the text built
+ * into the website is used, so these pages always render. The contact card comes from the settings.
+ */
 export async function getLegalPage(slug: string): Promise<LegalPage | null> {
   "use cache";
-  cacheLife("days");
-  cacheTag("pages");
+  cacheLife("minutes");
+  cacheTag("pages", "settings");
 
-  return apiGet<LegalPage | null>(`pages/${encodeURIComponent(slug)}`, {
-    fallback: () => buildMockLegalPage(slug),
-  });
+  const edited = await apiGet<LegalPage | null>(`pages/${encodeURIComponent(slug)}`, { fallback: () => null }).catch(
+    () => null,
+  );
+  const page = edited ?? builtInLegalPage(slug);
+
+  if (!page) {
+    return null;
+  }
+
+  const settings = await getPublicSettings();
+
+  return { ...page, contact: { email: settings.contactEmail, address: settings.contactAddress } };
 }
 
 /**

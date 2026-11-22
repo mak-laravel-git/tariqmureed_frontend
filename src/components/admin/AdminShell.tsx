@@ -25,6 +25,7 @@ const standalone: Record<string, string> = {
   "/admin/media/upload": "Upload Media",
   "/admin/integrations": "SportMonks API Integration",
   "/admin/settings": "Website Settings",
+  "/admin/pages": "Legal Pages",
   "/admin/roles": "Roles & Permissions",
   "/admin/profile": "Admin Profile",
   "/admin/password": "Password Management",
@@ -37,6 +38,10 @@ function describeRoute(pathname: string): { crumb: string; title: string } {
       crumb: pathname === "/admin" ? "Dashboard" : `Dashboard / ${pathname === "/admin/integrations" ? "API Integration" : standalone[pathname]}`,
       title: standalone[pathname],
     };
+  }
+
+  if (pathname.startsWith("/admin/pages/")) {
+    return { crumb: "Dashboard / Legal Pages", title: "Edit Legal Page" };
   }
 
   const [, , resource, id, action] = pathname.split("/");

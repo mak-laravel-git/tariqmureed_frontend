@@ -70,8 +70,11 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
             <Field label="Website name">
               <TextInput name="websiteName" defaultValue={settings.websiteName} />
             </Field>
-            <Field label="Contact email">
+            <Field label="Contact email" hint="Shown on the Privacy Policy, Cookie and Terms pages so visitors can reach you.">
               <TextInput name="contactEmail" type="email" defaultValue={settings.contactEmail} />
+            </Field>
+            <Field label="Contact address" hint="Shown with the contact email on the Privacy Policy page. Optional.">
+              <TextInput name="contactAddress" defaultValue={settings.contactAddress} autoComplete="off" />
             </Field>
             <Field label="Website description">
               <TextArea name="description" defaultValue={settings.description} />
@@ -104,6 +107,31 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
               <input type="checkbox" name="notifyEditors" defaultChecked={settings.notifyEditors} className="size-4 accent-[#f5c400]" />
               Notify editors about new drafts
             </label>
+          </div>
+        </Card>
+
+        <Card className="lg:col-span-2">
+          <CardHeader
+            title="Privacy and advertising"
+            description="Google Analytics, AdSense and the cookie consent banner. Changes go live on the website within seconds."
+          />
+          <div className="grid gap-5 p-5 md:grid-cols-2">
+            <Field label="Google Analytics Measurement ID" hint="Looks like G-XXXXXXXXXX. Leave empty to switch analytics off.">
+              <TextInput name="gaMeasurementId" defaultValue={settings.gaMeasurementId} placeholder="G-XXXXXXXXXX" autoComplete="off" spellCheck={false} />
+            </Field>
+            <Field label="AdSense publisher ID" hint="Looks like ca-pub-1234567890123456. Leave empty to show no ads. Also publishes /ads.txt.">
+              <TextInput name="adsenseClientId" defaultValue={settings.adsenseClientId} placeholder="ca-pub-1234567890123456" autoComplete="off" spellCheck={false} />
+            </Field>
+            <Field
+              className="md:col-span-2"
+              label="Cookie consent"
+              hint="Our own banner needs no setup and loads nothing from Google until a visitor agrees. Choose Google’s message once Privacy & messaging is published in your AdSense account (required for Google-certified consent in the EEA and UK)."
+            >
+              <SelectInput name="consentMode" defaultValue={settings.consentMode}>
+                <option value="builtin">Our own banner (Accept, Decline, Manage)</option>
+                <option value="google">Google’s certified message (AdSense Privacy &amp; messaging)</option>
+              </SelectInput>
+            </Field>
           </div>
         </Card>
       </div>

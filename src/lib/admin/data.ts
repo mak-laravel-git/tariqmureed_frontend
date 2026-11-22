@@ -1,5 +1,6 @@
 import "server-only";
 
+import { ApiError } from "@/lib/api/client";
 import { apiConfig } from "@/lib/api/config";
 
 import { adminRequest, adminRequestRaw } from "./api";
@@ -15,6 +16,8 @@ import { resources, tabStatuses } from "./resources";
 import { getAdminToken } from "./session";
 import type {
   AdminNotification,
+  AdminPage,
+  AdminPageSummary,
   AdminRecord,
   AdminUser,
   Dashboard,
@@ -30,6 +33,13 @@ import type {
 } from "./types";
 
 export const PER_PAGE = 10;
+
+/** Pages editable in the dashboard (kept in step with SitePage::SLUGS in the Laravel app). */
+export const pageLabels: Record<string, string> = {
+  "privacy-policy": "Privacy Policy",
+  "cookie-preferences": "Cookie Preferences",
+  "terms-of-use": "Terms of Use",
+};
 
 function initials(name: string): string {
   return name
@@ -171,7 +181,16 @@ export async function getDashboard(): Promise<Dashboard> {
 }
 
 export async function getNotifications(): Promise<AdminNotification[]> {
-  return adminRequest<AdminNotification[]>("notifications", { fallback: () => mockNotifications });
+  try {
+    return await adminRequest<AdminNotification[]>("notifications", { fallback: () => mockNotifications });
+  } catch (error) {
+    // The Laravel API has no notifications endpoint yet: show an empty bell instead of failing every admin page.
+    if (error instanceof ApiError && error.status === 404) {
+      return [];
+    }
+
+    throw error;
+  }
 }
 
 export async function getMedia(): Promise<MediaAsset[]> {
@@ -199,6 +218,53 @@ export async function saveSettings(input: SiteSettings): Promise<void> {
     method: "PUT",
     body: input,
     fallback: () => Object.assign(mockStore().settings, input),
+  });
+}
+
+/** The legal pages the dashboard can edit, and whether each one has been customised. */
+export async function listPages(): Promise<AdminPageSummary[]> {
+  return adminRequest<AdminPageSummary[]>("pages", {
+    fallback: () =>
+      Object.entries(pageLabels).map(([slug, label]) => {
+        const saved = mockStore().pages[slug];
+
+        return { slug, label, customised: Boolean(saved), updatedAt: saved?.updatedAt ?? null };
+      }),
+  });
+}
+
+/** The saved text of a page, or null while the website's built-in text is still in use. */
+export async function getPage(slug: string): Promise<AdminPage | null> {
+  try {
+    return await adminRequest<AdminPage | null>(`pages/${encodeURIComponent(slug)}`, {
+      fallback: () => mockStore().pages[slug] ?? null,
+    });
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return null;
+    }
+
+    throw error;
+  }
+}
+
+export async function savePage(slug: string, input: { title: string; description: string; content: string }): Promise<void> {
+  await adminRequest<AdminPage>(`pages/${encodeURIComponent(slug)}`, {
+    method: "PUT",
+    body: input,
+    fallback: () => (mockStore().pages[slug] = { slug, ...input, updatedAt: "Just now" }),
+  });
+}
+
+/** Deletes the saved text so the website's built-in text is used again. */
+export async function resetPage(slug: string): Promise<void> {
+  await adminRequest<null>(`pages/${encodeURIComponent(slug)}`, {
+    method: "DELETE",
+    fallback: () => {
+      delete mockStore().pages[slug];
+
+      return null;
+    },
   });
 }
 

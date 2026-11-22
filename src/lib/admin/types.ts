@@ -131,11 +131,35 @@ export interface IntegrationStatus {
 export interface SiteSettings {
   websiteName: string;
   contactEmail: string;
+  contactAddress: string;
   description: string;
   defaultStatus: string;
   timezone: string;
   requireApproval: boolean;
   notifyEditors: boolean;
+  /** Google Analytics 4 Measurement ID ("G-…"); empty means analytics is off. */
+  gaMeasurementId: string;
+  /** AdSense publisher ID ("ca-pub-…"); empty means no ads. */
+  adsenseClientId: string;
+  consentMode: "builtin" | "google";
+}
+
+/** A legal page listed in the admin "Legal Pages" screen. */
+export interface AdminPageSummary {
+  slug: string;
+  label: string;
+  /** False while the website's built-in text is still in use. */
+  customised: boolean;
+  updatedAt: string | null;
+}
+
+/** The saved text of a legal page, in the editor format ("## Heading", "- bullet", paragraphs). */
+export interface AdminPage {
+  slug: string;
+  title: string;
+  description: string;
+  content: string;
+  updatedAt: string | null;
 }
 
 export interface PermissionModule {
