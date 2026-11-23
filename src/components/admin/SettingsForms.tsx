@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { useActionState } from "react";
+import { type ChangeEvent, type FormEvent, useActionState, useEffect, useState, useTransition } from "react";
 
 import {
   loginAction,
@@ -204,28 +205,103 @@ export function PasswordForm({ user }: { user: AdminUser }) {
   );
 }
 
+const IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+
+function readableSize(bytes: number): string {
+  return bytes >= 1024 * 1024 ? `${(bytes / (1024 * 1024)).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
+}
+
 export function UploadForm() {
   const [state, action, pending] = useActionState(uploadMediaAction, initial);
+  const [, startTransition] = useTransition();
+  const [preview, setPreview] = useState<{ url: string; name: string; size: string } | null>(null);
+  const [fileError, setFileError] = useState("");
+  const [title, setTitle] = useState("");
+
+  // Free the browser's copy of the previewed file when it is replaced or the page closes.
+  useEffect(() => {
+    return () => {
+      if (preview) {
+        URL.revokeObjectURL(preview.url);
+      }
+    };
+  }, [preview]);
+
+  function chooseFile(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+
+    setPreview(null);
+
+    if (!file) {
+      setFileError("");
+
+      return;
+    }
+
+    if (!IMAGE_TYPES.includes(file.type)) {
+      setFileError("Choose a PNG, JPG, WebP or GIF image.");
+      event.target.value = "";
+
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_BYTES) {
+      setFileError("Images must be 10 MB or smaller.");
+      event.target.value = "";
+
+      return;
+    }
+
+    setFileError("");
+    setPreview({ url: URL.createObjectURL(file), name: file.name, size: readableSize(file.size) });
+    setTitle((current) => current || file.name.replace(/\.[^.]+$/, ""));
+  }
+
+  // Submitting through a handler (not the form's action) keeps the chosen file after a failed upload.
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const data = new FormData(event.currentTarget);
+
+    startTransition(() => action(data));
+  }
 
   return (
     <Card>
-      <form action={action}>
-        <div className="flex flex-col items-center gap-2 border-b border-line px-5 py-14 text-center">
-          <AdminIcon name="upload" width={22} height={22} className="text-charade" />
-          <p className="mt-2 text-sm leading-5 text-ink">Drop an image here</p>
-          <p className="text-[11px] leading-4 text-muted">PNG, JPG, WebP or SVG up to 10 MB</p>
+      <form onSubmit={submit}>
+        <div className="flex flex-col items-center gap-2 border-b border-line px-5 py-10 text-center">
+          {preview ? (
+            <div className="relative h-56 w-full max-w-md overflow-hidden rounded-lg border border-line bg-surface">
+              <Image src={preview.url} alt="Preview of the chosen image" fill unoptimized className="object-contain" />
+            </div>
+          ) : (
+            <AdminIcon name="upload" width={22} height={22} className="text-charade" />
+          )}
+          <p className="mt-2 text-sm leading-5 text-ink">{preview ? preview.name : "Choose an image to upload"}</p>
+          <p className="text-[11px] leading-4 text-muted">
+            {preview ? preview.size : "PNG, JPG, WebP or GIF up to 10 MB"}
+          </p>
           <label className={primaryButtonClass("mt-3 cursor-pointer")}>
-            Choose file
-            <input type="file" name="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" className="sr-only" />
+            {preview ? "Choose another file" : "Choose file"}
+            <input
+              type="file"
+              name="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              onChange={chooseFile}
+              className="sr-only"
+            />
           </label>
+          {fileError && (
+            <p role="alert" className="text-xs text-live">
+              {fileError}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-col gap-5 p-5">
           <Field label="Asset title">
-            <TextInput name="title" placeholder="Enter a descriptive title" />
-          </Field>
-          <Field label="Alternative text">
-            <TextArea name="alt" placeholder="Describe the image for accessibility" />
+            <TextInput name="title" value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Enter a descriptive title" />
           </Field>
           <FormMessage status={state.status} message={state.message} />
           <div className="flex justify-end gap-2.5">

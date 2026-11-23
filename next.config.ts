@@ -38,6 +38,12 @@ function buildRemotePatterns(): NonNullable<NextConfig["images"]>["remotePattern
 const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
+  experimental: {
+    // Image uploads from the admin dashboard are sent through a Server Action (default limit: 1 MB).
+    // The Laravel API accepts 10 MB per image; the extra room covers the multipart overhead.
+    serverActions: { bodySizeLimit: "12mb" },
+    proxyClientMaxBodySize: "12mb",
+  },
   turbopack: {
     // The Laravel app lives one level up and has its own lockfile; pin the root to this app.
     root: import.meta.dirname,
@@ -50,6 +56,9 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: buildRemotePatterns(),
+    // The local Laravel app runs on localhost, which the image optimizer blocks by default. Production images
+    // come from a public hostname, so this stays off there.
+    dangerouslyAllowLocalIP: process.env.NODE_ENV === "development",
   },
 };
 
