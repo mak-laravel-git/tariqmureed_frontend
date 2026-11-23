@@ -5,7 +5,7 @@ import { useActionState, useState } from "react";
 
 import { saveRecordAction } from "@/app/admin/actions";
 import { statusOptions } from "@/lib/admin/resources";
-import type { AdminRecord, ArticleOptions, FormState } from "@/lib/admin/types";
+import type { AdminRecord, AdOptions, ArticleOptions, FormState } from "@/lib/admin/types";
 
 import {
   Card,
@@ -180,6 +180,107 @@ export function ArticleForm({ resource, record, cancelHref, options }: FormProps
           </Link>
           <button type="submit" disabled={pending} className={primaryButtonClass()}>
             {pending ? "Saving…" : "Save article"}
+          </button>
+        </div>
+      </div>
+    </form>
+  );
+}
+
+/** Campaign form: which ad, where on the website it runs and for how long. */
+export function AdvertisementForm({ resource, record, cancelHref, options }: FormProps & { options: AdOptions }) {
+  const [state, action, pending] = useActionState(saveRecordAction.bind(null, resource, record?.id ?? null), initialState);
+  const [adType, setAdType] = useState(record?.adType ?? "image");
+
+  return (
+    <form action={action} className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_330px]">
+      <Card className="p-5">
+        <div className="flex flex-col gap-5">
+          <Field label="Campaign name">
+            <TextInput name="title" required maxLength={150} defaultValue={record?.title} placeholder="e.g. Summer sale banner" />
+          </Field>
+
+          <Field label="Where it appears" hint="Each place of the website shows one ad. If two campaigns share a place, the newest one runs.">
+            <SelectInput name="subtitle" defaultValue={record?.placement ?? ""} required>
+              <option value="" disabled>
+                Choose a place on the website
+              </option>
+              {options.placements.map((placement) => (
+                <option key={placement.key} value={placement.key}>
+                  {placement.label} ({placement.size})
+                </option>
+              ))}
+            </SelectInput>
+          </Field>
+
+          <Field label="Ad type">
+            <SelectInput name="adType" value={adType} onChange={(event) => setAdType(event.target.value)}>
+              <option value="image">Image banner (your own advertiser)</option>
+              <option value="adsense">Google AdSense ad unit</option>
+            </SelectInput>
+          </Field>
+
+          {adType === "image" ? (
+            <>
+              <Field label="Banner image" hint="Upload the banner in the Media Library first, at the size shown next to the place above.">
+                <SelectInput name="image" defaultValue={record?.image ?? ""}>
+                  <option value="">Choose an image</option>
+                  {record?.image && !options.media.some((asset) => asset.url === record.image) && (
+                    <option value={record.image}>Current image</option>
+                  )}
+                  {options.media.flatMap((asset) => (asset.url ? [<option key={asset.id} value={asset.url}>{asset.title}</option>] : []))}
+                </SelectInput>
+              </Field>
+              <Field label="Link" hint="Where a click on the banner goes (optional).">
+                <TextInput name="linkUrl" type="url" defaultValue={record?.linkUrl ?? ""} placeholder="https://advertiser.example/offer" />
+              </Field>
+            </>
+          ) : (
+            <Field
+              label="AdSense ad unit ID"
+              hint="The number from AdSense (Ads → By ad unit → data-ad-slot). The AdSense publisher ID is set in Website Settings."
+            >
+              <TextInput name="adsenseSlot" inputMode="numeric" defaultValue={record?.adsenseSlot ?? ""} placeholder="1234567890" />
+            </Field>
+          )}
+
+          <Field label="Internal notes">
+            <TextArea name="notes" defaultValue={record?.notes ?? ""} placeholder="Add optional notes for administrators." className="min-h-[96px]" />
+          </Field>
+        </div>
+      </Card>
+
+      <div className="flex flex-col gap-5">
+        <Card>
+          <CardHeader title="Campaign" description="Advertiser, status and dates" />
+          <div className="flex flex-col gap-4 p-5">
+            <Field label="Advertiser">
+              <TextInput name="owner" defaultValue={record?.owner ?? ""} placeholder="Company or client" />
+            </Field>
+            <Field label="Status" hint="Only Active campaigns are shown on the website.">
+              <SelectInput name="status" defaultValue={record?.status ?? "Active"}>
+                {["Active", "Draft", "Archived"].map((option) => (
+                  <option key={option}>{option}</option>
+                ))}
+              </SelectInput>
+            </Field>
+            <Field label="Start date" hint="Leave empty to start right away. Times are in Bangladesh time (Asia/Dhaka).">
+              <TextInput name="startsAt" type="datetime-local" defaultValue={record?.startsAt ?? ""} />
+            </Field>
+            <Field label="End date" hint="Leave empty to run until you stop it.">
+              <TextInput name="endsAt" type="datetime-local" defaultValue={record?.endsAt ?? ""} />
+            </Field>
+          </div>
+        </Card>
+
+        <FormMessage status={state.status} message={state.message} />
+
+        <div className="flex justify-end gap-2.5">
+          <Link href={cancelHref} className={secondaryButtonClass()}>
+            Cancel
+          </Link>
+          <button type="submit" disabled={pending} className={primaryButtonClass()}>
+            {pending ? "Saving…" : "Save advertisement"}
           </button>
         </div>
       </div>

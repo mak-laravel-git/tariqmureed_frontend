@@ -35,6 +35,26 @@ export interface AdminRecord {
   publishAt?: string | null;
   /** Article editor only: URL of the cover image from the media library. */
   image?: string | null;
+  /** Advertisement editor only. */
+  placement?: string | null;
+  adType?: string | null;
+  linkUrl?: string | null;
+  adsenseSlot?: string | null;
+  startsAt?: string | null;
+  endsAt?: string | null;
+}
+
+/** A place on the website where an advertisement can run. */
+export interface AdPlacementOption {
+  key: string;
+  label: string;
+  size: string;
+}
+
+/** Choices offered by the advertisement editor. */
+export interface AdOptions {
+  placements: AdPlacementOption[];
+  media: MediaAsset[];
 }
 
 /** Choices offered by the article editor. */
@@ -55,6 +75,11 @@ export interface RecordInput {
   tags?: string;
   publishAt?: string;
   image?: string;
+  adType?: string;
+  linkUrl?: string;
+  adsenseSlot?: string;
+  startsAt?: string;
+  endsAt?: string;
 }
 
 export interface RecordList {

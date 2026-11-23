@@ -8,7 +8,7 @@ export interface ResourceConfig {
   singular: string;
   description: string;
   /** "article" renders the rich article editor, "generic" the shared record form. */
-  form: "article" | "generic";
+  form: "article" | "advertisement" | "generic";
   /** Path segment below /admin/api on the Laravel side. */
   apiPath: string;
   readOnly?: boolean;
@@ -49,8 +49,8 @@ export const resources: Record<ResourceKey, ResourceConfig> = {
     key: "advertisements",
     label: "Advertisement Management",
     singular: "advertisement",
-    description: "Schedule campaigns and manage advertising placements.",
-    form: "generic",
+    description: "Choose which advertisement runs on each place of the website.",
+    form: "advertisement",
     apiPath: "advertisements",
   },
   staff: {

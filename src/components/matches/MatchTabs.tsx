@@ -90,7 +90,7 @@ function Overview({ match }: { match: MatchDetail }) {
         )}
       </div>
 
-      <AdSlot className="h-32 min-h-[128px] w-full rounded-[4px] py-0 lg:self-start" />
+      <AdSlot placement="match-sidebar" className="w-full lg:self-start" />
     </div>
   );
 }

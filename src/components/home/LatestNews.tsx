@@ -190,7 +190,7 @@ export async function LatestNews() {
             </div>
           </section>
 
-          <AdSlot format="300 × 250 — Medium Rectangle" className="min-h-[268px]" />
+          <AdSlot placement="home-sidebar-top" />
 
           <section aria-label="Number crunching">
             <AsideHeading>Number Crunching</AsideHeading>
@@ -204,7 +204,7 @@ export async function LatestNews() {
             </Link>
           </section>
 
-          <AdSlot format="300 × 250 — Medium Rectangle" className="min-h-[268px]" />
+          <AdSlot placement="home-sidebar-bottom" />
         </aside>
       </div>
     </Section>

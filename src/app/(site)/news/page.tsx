@@ -87,7 +87,7 @@ async function NewsBody({ searchParams }: { searchParams: Promise<SearchParams> 
         </div>
 
         <aside aria-label="Sidebar" className="flex flex-col gap-6 lg:self-start">
-          <AdSlot format="" note="" className="h-32" />
+          <AdSlot placement="news-sidebar" />
 
           <section className="rounded-lg bg-[#f4f4f5] p-6">
             <h2 className="text-lg leading-7 font-black text-[#09090b]">Get the daily briefing</h2>

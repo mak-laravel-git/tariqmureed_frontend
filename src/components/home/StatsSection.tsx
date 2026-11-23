@@ -98,7 +98,7 @@ export async function StatsSection() {
             </div>
           </div>
 
-          <AdSlot format="300 × 250 — Medium Rectangle" className="min-h-[268px]" />
+          <AdSlot placement="home-stats" />
         </aside>
       </div>
     </Section>

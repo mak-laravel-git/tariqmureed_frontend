@@ -464,6 +464,22 @@ export interface LegalPage {
 }
 
 /** Website settings the public site reads (GET /settings), edited in the admin dashboard. */
+/** An advertisement running on one placement of the site (GET /ads), managed in the admin dashboard. */
+export interface Ad {
+  id: number;
+  type: "image" | "adsense";
+  name: string;
+  /** Banner image (type "image"). */
+  image: string | null;
+  /** Where a click on the banner goes. */
+  href: string | null;
+  /** Google AdSense ad unit ID (type "adsense"). */
+  slot: string | null;
+}
+
+/** The running ads, keyed by placement; a placement with no ad is missing. */
+export type AdMap = Record<string, Ad | undefined>;
+
 export interface PublicSettings {
   websiteName: string;
   contactEmail: string;

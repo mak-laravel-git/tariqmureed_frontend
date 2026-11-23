@@ -55,11 +55,7 @@ export async function ComingUpNext() {
           ))}
         </div>
 
-        <AdSlot
-          format="728 × 90 — Footer banner"
-          note="TMN Ad Network · no creative available"
-          className="mt-1 min-h-[110px] max-w-[1260px] sm:min-h-[156px]"
-        />
+        <AdSlot placement="home-bottom" className="mt-1 max-w-[1260px]" />
       </div>
     </Section>
   );

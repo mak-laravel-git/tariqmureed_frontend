@@ -20,7 +20,7 @@ export default function HomePage(props: PageProps<"/">) {
     <>
       <div className="bg-white">
         <Container className="py-4">
-          <AdSlot format="970 × 90 — Leaderboard" className="py-8" />
+          <AdSlot placement="home-top" className="py-4" />
         </Container>
       </div>
 

@@ -139,7 +139,7 @@ export async function LegalPageView({ slug }: { slug: string }) {
             </div>
             )}
 
-            <AdSlot format="300 × 250 — Medium Rectangle" className="min-h-[260px] rounded-lg uppercase tracking-[0.1em]" />
+            <AdSlot placement="legal-sidebar" />
           </aside>
         </div>
       </Container>

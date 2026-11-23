@@ -209,7 +209,7 @@ function TournamentContent({ tournament, tab }: { tournament: TournamentDetail; 
               </div>
             </div>
           </div>
-          <AdSlot className="h-32 min-h-[128px] w-full max-w-[320px] rounded-[4px] py-0 lg:self-start" />
+          <AdSlot placement="series-sidebar" className="w-full max-w-[320px] lg:self-start" />
         </div>
       );
   }

@@ -129,7 +129,7 @@ async function ArticleContent({ params }: { params: Promise<{ slug: string }> })
         </div>
 
         <aside aria-label="Related" className="flex min-w-0 flex-col lg:self-start">
-          <AdSlot className="h-32" />
+          <AdSlot placement="article-sidebar" />
 
           <section className="pt-8">
             <h2 className="text-sm leading-5 font-black tracking-[0.7px] text-[#09090b] uppercase">Related stories</h2>

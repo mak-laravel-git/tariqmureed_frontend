@@ -38,6 +38,7 @@ import { builtInLegalPage } from "@/lib/legal-content";
 
 import { apiGet } from "./client";
 import type {
+  AdMap,
   Article,
   Directory,
   LegalPage,
@@ -465,6 +466,18 @@ export async function getVideosPage(category: string | undefined, limit: number)
     query: { category, limit },
     fallback: () => buildMockVideosPage(category, limit),
   });
+}
+
+/**
+ * GET /ads - the advertisement running on each placement, edited in the admin dashboard. While the API is
+ * unreachable no ad is shown, so a failure never breaks a page.
+ */
+export async function getAds(): Promise<AdMap> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("ads");
+
+  return apiGet<AdMap>("ads", { fallback: () => ({}) }).catch((): AdMap => ({}));
 }
 
 /**

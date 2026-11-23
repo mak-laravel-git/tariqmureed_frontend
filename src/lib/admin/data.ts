@@ -14,8 +14,11 @@ import {
 } from "./mock";
 import { resources, tabStatuses } from "./resources";
 import { getAdminToken } from "./session";
+import { adPlacements } from "@/lib/ads";
 import type {
   AdminNotification,
+  AdOptions,
+  AdPlacementOption,
   ArticleOptions,
   AdminPage,
   AdminPageSummary,
@@ -196,6 +199,23 @@ export async function getNotifications(): Promise<AdminNotification[]> {
 
 export async function getMedia(): Promise<MediaAsset[]> {
   return adminRequest<MediaAsset[]>("media", { fallback: () => mockMedia });
+}
+
+/** Where an ad can run, and the images the advertisement editor offers. */
+export async function getAdOptions(): Promise<AdOptions> {
+  const [body, media] = await Promise.all([
+    adminRequestRaw("advertisements/placements", {
+      fallback: () =>
+        Object.entries(adPlacements).map(([key, placement]) => ({
+          key,
+          label: placement.label,
+          size: `${placement.width} x ${placement.height}`,
+        })),
+    }) as Promise<{ data: AdPlacementOption[] }>,
+    getMedia(),
+  ]);
+
+  return { placements: body.data, media };
 }
 
 /** Categories, authors and images the article editor offers. */

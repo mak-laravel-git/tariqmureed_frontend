@@ -34,6 +34,10 @@ function refreshPublicStories(resource: string): void {
     updateTag("articles");
     updateTag("writers");
   }
+
+  if (resource === "advertisements") {
+    updateTag("ads");
+  }
 }
 
 /** Only allow redirects back into the admin area. */
@@ -112,6 +116,11 @@ export async function saveRecordAction(
     tags: text(formData, "tags"),
     publishAt: text(formData, "publishAt"),
     image: text(formData, "image"),
+    adType: text(formData, "adType"),
+    linkUrl: text(formData, "linkUrl"),
+    adsenseSlot: text(formData, "adsenseSlot"),
+    startsAt: text(formData, "startsAt"),
+    endsAt: text(formData, "endsAt"),
   };
 
   if (!input.title) {

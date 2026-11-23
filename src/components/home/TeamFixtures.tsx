@@ -109,11 +109,7 @@ export async function TeamFixtures({ searchParams }: TeamFixturesProps) {
 
             <div className="flex min-w-0 flex-col gap-3.5">
               <TeamProfileCard team={fixtures.team} />
-              <AdSlot
-                format="300 × 250 — Medium Rectangle"
-                note="TMN Ad Network · no creative available"
-                className="min-h-[183px] lg:min-h-[250px]"
-              />
+              <AdSlot placement="home-team" />
             </div>
           </div>
         ) : (

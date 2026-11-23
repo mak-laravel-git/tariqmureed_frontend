@@ -97,7 +97,7 @@ async function TeamView({ params }: { params: Promise<{ slug: string }> }) {
           </div>
 
           <aside className="flex flex-col lg:self-start">
-            <AdSlot className="h-32 min-h-[128px] rounded-[4px] py-0" />
+            <AdSlot placement="team-sidebar" />
             <Link
               href="/schedule"
               className="mt-6 flex items-center justify-center rounded-[4px] bg-[#fdc700] px-6 py-4 text-xs leading-4 font-black text-[#09090b] uppercase transition-colors hover:brightness-95"

@@ -2,8 +2,8 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 
 import { PageHeader } from "@/components/admin/AdminUi";
-import { ArticleForm, GenericRecordForm } from "@/components/admin/RecordForms";
-import { getArticleOptions } from "@/lib/admin/data";
+import { AdvertisementForm, ArticleForm, GenericRecordForm } from "@/components/admin/RecordForms";
+import { getAdOptions, getArticleOptions } from "@/lib/admin/data";
 import { isResourceKey, resources } from "@/lib/admin/resources";
 
 /** Private, request-time page: allowed to block during navigation. */
@@ -35,6 +35,8 @@ export default async function NewRecordPage(props: PageProps<"/admin/[resource]/
 
       {article ? (
         <ArticleForm resource={resource} cancelHref={`/admin/${resource}`} options={await getArticleOptions()} />
+      ) : config.form === "advertisement" ? (
+        <AdvertisementForm resource={resource} cancelHref={`/admin/${resource}`} options={await getAdOptions()} />
       ) : (
         <GenericRecordForm resource={resource} cancelHref={`/admin/${resource}`} />
       )}

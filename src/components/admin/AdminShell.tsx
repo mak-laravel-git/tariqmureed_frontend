@@ -50,7 +50,7 @@ function describeRoute(pathname: string): { crumb: string; title: string } {
     const config = resources[resource];
 
     if (id === "new") {
-      return { crumb: `Dashboard / New ${config.singular}`, title: `Create New ${config.form === "article" ? "Article" : config.label}` };
+      return { crumb: `Dashboard / New ${config.singular}`, title: `Create New ${config.form === "article" ? "Article" : config.form === "advertisement" ? "Advertisement" : config.label}` };
     }
     if (id && action === "edit") {
       return { crumb: `Dashboard / ${config.label} Editor`, title: `Edit ${config.label}` };
