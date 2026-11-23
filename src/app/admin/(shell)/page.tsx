@@ -9,12 +9,12 @@ import { getCurrentAdmin, getDashboard } from "@/lib/admin/data";
 export const metadata: Metadata = { title: "Dashboard" };
 
 const quickActions = [
-  { label: "Create new article", href: "/admin/content/new", icon: "plus" },
-  { label: "Upload media", href: "/admin/media/upload", icon: "upload" },
-  { label: "Manage categories", href: "/admin/categories", icon: "folder" },
-  { label: "View all articles", href: "/admin/content", icon: "article" },
+  { label: "Edit legal pages", href: "/admin/pages", icon: "article" },
+  { label: "Website settings (Google tags, contact)", href: "/admin/settings", icon: "folder" },
+  { label: "Run or check the SportMonks sync", href: "/admin/integrations", icon: "plug" },
   { label: "Manage staff", href: "/admin/staff", icon: "user" },
-  { label: "View activity logs", href: "/admin/activity", icon: "pulse" },
+  { label: "Roles and permissions", href: "/admin/roles", icon: "shield" },
+  { label: "My profile and password", href: "/admin/profile", icon: "pulse" },
 ];
 
 function greeting(hour: number): string {
@@ -34,16 +34,16 @@ export default async function DashboardPage() {
     <>
       <PageHeader
         title={`${greeting(new Date().getHours())}, ${firstName}`}
-        description="Here is the current state of the TMN Sport newsroom, editorial pipeline and platform integrations."
+        description="Here is the current state of the TMN Sport match data and platform integrations."
         actions={
           <>
-            <PrimaryLink href="/admin/content/new">
+            <PrimaryLink href="/admin/settings">
               <AdminIcon name="plus" width={14} height={14} />
-              New article
+              Website settings
             </PrimaryLink>
-            <SecondaryLink href="/admin/activity">
+            <SecondaryLink href="/admin/integrations">
               <AdminIcon name="pulse" width={14} height={14} />
-              Activity log
+              Sync status
             </SecondaryLink>
           </>
         }
@@ -68,9 +68,9 @@ export default async function DashboardPage() {
         <Card className="self-start">
           <CardHeader
             title="Recent activity"
-            description="Latest actions across the editorial platform"
+            description="Latest SportMonks sync runs"
             action={
-              <Link href="/admin/activity" className="text-xs font-semibold text-ink hover:underline">
+              <Link href="/admin/integrations" className="text-xs font-semibold text-ink hover:underline">
                 View all
               </Link>
             }
@@ -118,7 +118,7 @@ export default async function DashboardPage() {
           </Card>
 
           <Card>
-            <CardHeader title="System status" description="Prototype monitoring view — not live infrastructure telemetry" />
+            <CardHeader title="System status" description="Connection and data status reported by the server" />
             <ul>
               {dashboard.system.map((row) => (
                 <li key={row.name} className="flex items-center gap-3 border-b border-line px-5 py-3.5">

@@ -13,7 +13,7 @@ export default async function NewRecordPage(props: PageProps<"/admin/[resource]/
 
   const { resource } = await props.params;
 
-  if (!isResourceKey(resource) || resources[resource].readOnly) {
+  if (!isResourceKey(resource) || resources[resource].readOnly || resources[resource].noCreate) {
     notFound();
   }
 

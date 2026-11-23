@@ -166,12 +166,6 @@ export function ProfileForm({ user }: { user: AdminUser }) {
         <Field label="Email address">
           <TextInput name="email" type="email" required defaultValue={user.email} />
         </Field>
-        <Field label="Job title">
-          <TextInput name="jobTitle" defaultValue={user.jobTitle} />
-        </Field>
-        <Field label="Bio">
-          <TextArea name="bio" defaultValue={user.bio} className="min-h-[110px]" />
-        </Field>
         <FormMessage status={state.status} message={state.message} />
         <div>
           <button type="submit" disabled={pending} className={primaryButtonClass()}>

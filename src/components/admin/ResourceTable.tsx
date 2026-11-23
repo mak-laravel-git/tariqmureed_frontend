@@ -143,7 +143,7 @@ export function ResourceActions({ resource }: { resource: ResourceKey }) {
       <SecondaryLink href={`/admin/export/${resource}`} prefetch={false}>
         Export
       </SecondaryLink>
-      {!config.readOnly && (
+      {!config.readOnly && !config.noCreate && (
         <PrimaryLink href={`/admin/${resource}/new`}>
           <AdminIcon name="plus" width={14} height={14} />
           Add new

@@ -12,6 +12,10 @@ export interface ResourceConfig {
   /** Path segment below /admin/api on the Laravel side. */
   apiPath: string;
   readOnly?: boolean;
+  /** The module has no Laravel endpoint yet: the list shows a notice instead of calling the API. */
+  unavailable?: boolean;
+  /** Rows can be viewed and edited but not created here (staff accounts need a password). */
+  noCreate?: boolean;
   newLabel?: string;
   /** Column heading overrides: [title, subtitle, owner, status, updated]. */
   columns?: [string, string, string, string, string];
@@ -25,6 +29,8 @@ export const resources: Record<ResourceKey, ResourceConfig> = {
     description: "Create, review and publish stories across the TMN Sport network.",
     form: "article",
     apiPath: "articles",
+    readOnly: true,
+    unavailable: true,
   },
   categories: {
     key: "categories",
@@ -33,6 +39,8 @@ export const resources: Record<ResourceKey, ResourceConfig> = {
     description: "Organise the editorial taxonomy used across published content.",
     form: "generic",
     apiPath: "categories",
+    readOnly: true,
+    unavailable: true,
   },
   series: {
     key: "series",
@@ -41,6 +49,7 @@ export const resources: Record<ResourceKey, ResourceConfig> = {
     description: "Maintain competitions, fixtures and featured series shortcuts.",
     form: "generic",
     apiPath: "competitions",
+    readOnly: true,
   },
   advertisements: {
     key: "advertisements",
@@ -49,6 +58,8 @@ export const resources: Record<ResourceKey, ResourceConfig> = {
     description: "Schedule campaigns and manage advertising placements.",
     form: "generic",
     apiPath: "advertisements",
+    readOnly: true,
+    unavailable: true,
   },
   staff: {
     key: "staff",
@@ -57,6 +68,7 @@ export const resources: Record<ResourceKey, ResourceConfig> = {
     description: "Manage newsroom accounts, roles and account status.",
     form: "generic",
     apiPath: "staff",
+    noCreate: true,
   },
   authors: {
     key: "authors",
@@ -65,6 +77,8 @@ export const resources: Record<ResourceKey, ResourceConfig> = {
     description: "Maintain the journalists and analysts credited on stories.",
     form: "generic",
     apiPath: "writers",
+    readOnly: true,
+    unavailable: true,
   },
   activity: {
     key: "activity",
@@ -73,6 +87,7 @@ export const resources: Record<ResourceKey, ResourceConfig> = {
     description: "Review every action taken across the editorial platform.",
     form: "generic",
     apiPath: "activity-logs",
+    unavailable: true,
     readOnly: true,
   },
 };
