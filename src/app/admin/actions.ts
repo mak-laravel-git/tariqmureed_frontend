@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { ApiError, apiPost } from "@/lib/api/client";
 import { apiConfig } from "@/lib/api/config";
 import {
+  deleteMedia,
   deleteRecord,
   pageLabels,
   resetPage,
@@ -314,6 +315,17 @@ export async function uploadMediaAction(_previous: FormState, formData: FormData
   }
 
   redirect("/admin/media?uploaded=1");
+}
+
+export async function deleteMediaAction(id: string): Promise<void> {
+  try {
+    await deleteMedia(id);
+  } catch {
+    redirect("/admin/media?error=1");
+  }
+
+  updateTag("articles");
+  redirect("/admin/media?removed=1");
 }
 
 export async function syncAction(): Promise<void> {

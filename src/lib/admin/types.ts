@@ -28,6 +28,8 @@ export interface AdminRecord {
   /** Human readable "last updated" ("Today, 10:42", "Yesterday", "24 Jun"). */
   updatedAt: string;
   notes?: string | null;
+  /** Small picture shown beside the name in lists: cover image, author photo or latest story image. */
+  thumbnail?: string | null;
   /** Article editor only. */
   summary?: string | null;
   body?: string | null;

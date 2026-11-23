@@ -110,6 +110,7 @@ const paths: Record<string, React.ReactNode> = {
     </>
   ),
   plus: <path d="M12 5v14M5 12h14" />,
+  x: <path d="M6 6l12 12M18 6L6 18" />,
   upload: (
     <>
       <path d="M12 16V4M7.5 8.5 12 4l4.5 4.5" />

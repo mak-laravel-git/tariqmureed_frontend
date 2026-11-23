@@ -207,6 +207,21 @@ export async function getMedia(): Promise<MediaAsset[]> {
   return adminRequest<MediaAsset[]>("media", { fallback: () => mockMedia });
 }
 
+export async function deleteMedia(id: string): Promise<void> {
+  await adminRequest<null>(`media/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+    fallback: () => {
+      const index = mockMedia.findIndex((asset) => asset.id === id);
+
+      if (index >= 0) {
+        mockMedia.splice(index, 1);
+      }
+
+      return null;
+    },
+  });
+}
+
 /** Where an ad can run, and the images the advertisement editor offers. */
 export async function getAdOptions(): Promise<AdOptions> {
   const [body, media] = await Promise.all([

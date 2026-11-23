@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { PER_PAGE } from "@/lib/admin/data";
@@ -19,6 +20,18 @@ interface ResourceTableProps {
   params: SearchParams;
 }
 
+/** Lists that show a small picture beside each name. */
+const thumbnailResources: ResourceKey[] = ["content", "categories", "authors"];
+
+/** The record's picture, or its first letter on a grey tile while it has none. */
+function Thumbnail({ src, name }: { src?: string | null; name: string }) {
+  return (
+    <span className="relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md border border-line bg-surface text-xs font-bold text-charade">
+      {src ? <Image src={src} alt="" fill unoptimized sizes="40px" className="object-cover" /> : name.trim().charAt(0).toUpperCase()}
+    </span>
+  );
+}
+
 const headings = ["Name / Title", "Category / Email", "Owner / Scope", "Status", "Updated", "Actions"];
 
 /** Filterable, paginated table shared by every admin module. */
@@ -26,6 +39,7 @@ export function ResourceTable({ resource, records, total, tab, query, page, para
   const config = resources[resource];
   const base = `/admin/${resource}`;
   const lastPage = Math.max(1, Math.ceil(total / PER_PAGE));
+  const hasThumbnails = thumbnailResources.includes(resource);
 
   return (
     <>
@@ -78,7 +92,10 @@ export function ResourceTable({ resource, records, total, tab, query, page, para
               {records.map((record) => (
                 <tr key={record.id} className="border-t border-line text-[13px] leading-5 text-charade">
                   <th scope="row" className="px-4 py-3.5 pl-5 font-semibold text-ink">
-                    {record.title}
+                    <span className="flex items-center gap-3">
+                      {hasThumbnails && <Thumbnail src={record.thumbnail} name={record.title} />}
+                      {record.title}
+                    </span>
                   </th>
                   <td className="px-4 py-3.5">{record.subtitle}</td>
                   <td className="px-4 py-3.5">{record.owner}</td>

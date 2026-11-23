@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import { AdminIcon } from "@/components/admin/icons";
 import { Flash, PageHeader, PrimaryLink } from "@/components/admin/AdminUi";
 import { Photo } from "@/components/ui/Photo";
+import { deleteMediaAction } from "@/app/admin/actions";
 import { getMedia } from "@/lib/admin/data";
 import { firstParam } from "@/lib/url";
 
@@ -38,6 +39,12 @@ export default async function MediaLibraryPage(props: PageProps<"/admin/media">)
       />
 
       {firstParam(params.uploaded) && <Flash>Asset uploaded.</Flash>}
+      {firstParam(params.removed) && <Flash>Asset removed from the library.</Flash>}
+      {firstParam(params.error) && (
+        <p role="alert" className="mb-4 rounded-md border border-[#f1c0c0] bg-[#fdecec] px-4 py-2.5 text-xs font-medium text-[#b42318]">
+          The asset could not be removed. Please try again.
+        </p>
+      )}
 
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {assets.map((asset, index) => (
@@ -48,6 +55,16 @@ export default async function MediaLibraryPage(props: PageProps<"/admin/media">)
               ) : (
                 <AdminIcon name="image" width={22} height={22} className="text-white/70" />
               )}
+              <form action={deleteMediaAction.bind(null, asset.id)} className="absolute top-2 right-2">
+                <button
+                  type="submit"
+                  aria-label={`Remove ${asset.title}`}
+                  title="Remove"
+                  className="flex size-7 items-center justify-center rounded-full bg-white/95 text-ink shadow-sm transition-colors hover:bg-[#b42318] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+                >
+                  <AdminIcon name="x" width={14} height={14} />
+                </button>
+              </form>
             </div>
             <div className="px-3.5 py-3">
               <p className="text-xs leading-4 font-semibold text-ink">{asset.title}</p>
