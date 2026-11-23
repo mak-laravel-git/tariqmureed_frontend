@@ -215,7 +215,7 @@ function readableSize(bytes: number): string {
 export function UploadForm() {
   const [state, action, pending] = useActionState(uploadMediaAction, initial);
   const [, startTransition] = useTransition();
-  const [preview, setPreview] = useState<{ url: string; name: string; size: string } | null>(null);
+  const [preview, setPreview] = useState<{ url: string; name: string; size: string; type: string } | null>(null);
   const [fileError, setFileError] = useState("");
   const [title, setTitle] = useState("");
 
@@ -254,7 +254,7 @@ export function UploadForm() {
     }
 
     setFileError("");
-    setPreview({ url: URL.createObjectURL(file), name: file.name, size: readableSize(file.size) });
+    setPreview({ url: URL.createObjectURL(file), name: file.name, size: readableSize(file.size), type: file.type });
     setTitle((current) => current || file.name.replace(/\.[^.]+$/, ""));
   }
 
@@ -302,6 +302,20 @@ export function UploadForm() {
         <div className="flex flex-col gap-5 p-5">
           <Field label="Asset title">
             <TextInput name="title" value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Enter a descriptive title" />
+          </Field>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label="File Type">
+              <TextInput value={preview?.type ?? ""} readOnly placeholder="Filled in when you choose a file" />
+            </Field>
+            <Field label="File Size">
+              <TextInput value={preview?.size ?? ""} readOnly placeholder="Filled in when you choose a file" />
+            </Field>
+          </div>
+          <Field label="Image URL" hint="Optional: paste the address of an image that is already online instead of uploading a file.">
+            <TextInput name="url" type="url" placeholder="https://..." />
+          </Field>
+          <Field label="Alternative text">
+            <TextArea name="alt" placeholder="Describe the image for accessibility" />
           </Field>
           <FormMessage status={state.status} message={state.message} />
           <div className="flex justify-end gap-2.5">

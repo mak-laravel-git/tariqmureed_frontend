@@ -223,14 +223,25 @@ export interface NewsPage {
 }
 
 export interface ArticleBlock {
-  type: "lead" | "paragraph" | "heading" | "quote";
+  type: "lead" | "paragraph" | "heading" | "quote" | "list" | "image" | "video" | "table";
   text: string;
+  /** list: the items, and whether they are numbered. */
+  items?: string[];
+  ordered?: boolean;
+  /** image and video: the address. */
+  src?: string;
+  /** table: the rows of cells. */
+  rows?: string[][];
 }
 
 export interface ArticleDetail extends Article {
   subtitle?: string | null;
   /** Trail shown after "News /", e.g. ["International", "Match analysis"]. */
   breadcrumb: string[];
+  /** Search and social sharing details set in the dashboard. */
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+  socialImage?: string | null;
   blocks: ArticleBlock[];
   tags: string[];
   related: Article[];

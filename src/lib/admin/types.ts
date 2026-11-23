@@ -35,6 +35,15 @@ export interface AdminRecord {
   publishAt?: string | null;
   /** Article editor only: URL of the cover image from the media library. */
   image?: string | null;
+  /** Article editor only. */
+  slug?: string | null;
+  imageCaption?: string | null;
+  imageCredit?: string | null;
+  socialImage?: string | null;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+  isFeatured?: boolean;
+  isBreaking?: boolean;
   /** Advertisement editor only. */
   placement?: string | null;
   adType?: string | null;
@@ -61,6 +70,8 @@ export interface AdOptions {
 export interface ArticleOptions {
   categories: string[];
   authors: string[];
+  /** Tags already used on other articles. */
+  tags: string[];
   media: MediaAsset[];
 }
 
@@ -80,6 +91,14 @@ export interface RecordInput {
   adsenseSlot?: string;
   startsAt?: string;
   endsAt?: string;
+  slug?: string;
+  imageCaption?: string;
+  imageCredit?: string;
+  socialImage?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  isFeatured?: string;
+  isBreaking?: string;
 }
 
 export interface RecordList {

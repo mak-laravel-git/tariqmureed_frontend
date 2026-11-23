@@ -13,8 +13,6 @@ const quickActions = [
   { label: "Upload media", href: "/admin/media/upload", icon: "upload" },
   { label: "Manage categories", href: "/admin/categories", icon: "folder" },
   { label: "View all articles", href: "/admin/content", icon: "article" },
-  { label: "Edit legal pages", href: "/admin/pages", icon: "article" },
-  { label: "Website settings (Google tags, contact)", href: "/admin/settings", icon: "sliders" },
   { label: "Manage staff", href: "/admin/staff", icon: "user" },
   { label: "View activity logs", href: "/admin/activity", icon: "pulse" },
 ];
@@ -36,7 +34,7 @@ export default async function DashboardPage() {
     <>
       <PageHeader
         title={`${greeting(new Date().getHours())}, ${firstName}`}
-        description="Here is the current state of the TMN Sport newsroom, match data and platform integrations."
+        description="Here is the current state of the TMN Sports newsroom, editorial pipeline and platform integrations."
         actions={
           <>
             <PrimaryLink href="/admin/content/new">
@@ -70,7 +68,7 @@ export default async function DashboardPage() {
         <Card className="self-start">
           <CardHeader
             title="Recent activity"
-            description="Latest actions in the dashboard and data syncs"
+            description="Latest actions across the editorial platform"
             action={
               <Link href="/admin/activity" className="text-xs font-semibold text-ink hover:underline">
                 View all
@@ -120,7 +118,7 @@ export default async function DashboardPage() {
           </Card>
 
           <Card>
-            <CardHeader title="System status" description="Connection and data status reported by the server" />
+            <CardHeader title="System status" description="Live status of the data and integrations behind the site" />
             <ul>
               {dashboard.system.map((row) => (
                 <li key={row.name} className="flex items-center gap-3 border-b border-line px-5 py-3.5">

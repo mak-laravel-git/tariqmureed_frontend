@@ -28,6 +28,26 @@ function failure(error: unknown, fallback = "Something went wrong. Please try ag
   return { status: "error", message: error instanceof ApiError && error.status && error.status < 500 ? error.message : fallback };
 }
 
+/**
+ * The article editor's three buttons set the status: Save Draft keeps Scheduled or Archived when that is chosen in the
+ * Status list (and is a draft otherwise), Submit for Approval means Pending, Publish Now means Published.
+ */
+function articleStatus(selected: string, intent: string): string {
+  if (intent === "publish") {
+    return "Published";
+  }
+
+  if (intent === "approval") {
+    return "Pending";
+  }
+
+  if (intent === "draft") {
+    return selected === "Scheduled" || selected === "Archived" ? selected : "Draft";
+  }
+
+  return selected;
+}
+
 /** Stories, categories and authors feed the public news pages: refresh their cache right after a change. */
 function refreshPublicStories(resource: string): void {
   if (["content", "categories", "authors"].includes(resource)) {
@@ -109,7 +129,7 @@ export async function saveRecordAction(
     title: text(formData, "title"),
     subtitle: text(formData, "subtitle"),
     owner: text(formData, "owner"),
-    status: text(formData, "status") || "Draft",
+    status: articleStatus(text(formData, "status") || "Draft", text(formData, "intent")),
     notes: text(formData, "notes"),
     summary: text(formData, "summary"),
     body: text(formData, "body"),
@@ -121,6 +141,14 @@ export async function saveRecordAction(
     adsenseSlot: text(formData, "adsenseSlot"),
     startsAt: text(formData, "startsAt"),
     endsAt: text(formData, "endsAt"),
+    slug: text(formData, "slug"),
+    imageCaption: text(formData, "imageCaption"),
+    imageCredit: text(formData, "imageCredit"),
+    socialImage: text(formData, "socialImage"),
+    seoTitle: text(formData, "seoTitle"),
+    seoDescription: text(formData, "seoDescription"),
+    isFeatured: formData.has("isFeatured") ? "1" : "0",
+    isBreaking: formData.has("isBreaking") ? "1" : "0",
   };
 
   if (!input.title) {
@@ -267,12 +295,16 @@ export async function updatePasswordAction(_previous: FormState, formData: FormD
 
 export async function uploadMediaAction(_previous: FormState, formData: FormData): Promise<FormState> {
   const file = formData.get("file");
+  const hasFile = file instanceof File && file.size > 0;
 
-  if (!(file instanceof File) || file.size === 0) {
-    return { status: "error", message: "Choose an image to upload." };
+  if (!hasFile && !text(formData, "url")) {
+    return { status: "error", message: "Choose an image to upload, or paste the address of an image." };
   }
-  if (file.size > 10 * 1024 * 1024) {
+  if (hasFile && file.size > 10 * 1024 * 1024) {
     return { status: "error", message: "Images must be 10 MB or smaller." };
+  }
+  if (!hasFile) {
+    formData.delete("file");
   }
 
   try {

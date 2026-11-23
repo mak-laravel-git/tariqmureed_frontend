@@ -1,8 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { NewsCard } from "@/components/news/NewsCard";
+import { renderInline, videoEmbedUrl } from "@/components/news/RichText";
 import { AdSlot } from "@/components/ui/AdSlot";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Container } from "@/components/ui/Container";
@@ -25,21 +27,77 @@ function Block({ block }: { block: ArticleBlock }) {
   switch (block.type) {
     case "lead":
       return (
-        <p className="text-lg leading-[30px] font-semibold text-[#18181b] md:text-xl md:leading-[33px]">{block.text}</p>
+        <p className="text-lg leading-[30px] font-semibold text-[#18181b] md:text-xl md:leading-[33px]">{renderInline(block.text)}</p>
       );
     case "heading":
       return (
-        <h2 className="text-2xl leading-9 font-bold text-[#09090b] md:text-[28px] md:leading-[51.8px]">{block.text}</h2>
+        <h2 className="text-2xl leading-9 font-bold text-[#09090b] md:text-[28px] md:leading-[51.8px]">{renderInline(block.text)}</h2>
       );
     case "quote":
       return (
         <blockquote className="border-l-4 border-[#facc15] py-2 pl-6 text-xl leading-8 font-extrabold text-[#18181b] md:text-2xl md:leading-[34.8px]">
-          {block.text}
+          {renderInline(block.text)}
         </blockquote>
+      );
+    case "list": {
+      const Tag = block.ordered ? "ol" : "ul";
+
+      return (
+        <Tag className={`flex flex-col gap-2 pl-6 text-base leading-[30px] text-[#3f3f46] md:text-[16.8px] ${block.ordered ? "list-decimal" : "list-disc"}`}>
+          {(block.items ?? []).map((item, index) => (
+            <li key={index}>{renderInline(item)}</li>
+          ))}
+        </Tag>
+      );
+    }
+    case "image":
+      return block.src ? (
+        <figure className="flex flex-col gap-2">
+          {/* eslint-disable-next-line @next/next/no-img-element -- editors may link any image host */}
+          <img src={block.src} alt={block.text} className="h-auto w-full rounded-lg" loading="lazy" />
+          {block.text && <figcaption className="text-sm text-[#71717b]">{block.text}</figcaption>}
+        </figure>
+      ) : null;
+    case "video": {
+      const embed = block.src ? videoEmbedUrl(block.src) : null;
+
+      return embed ? (
+        <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-black">
+          <iframe src={embed} title="Video" allowFullScreen loading="lazy" className="absolute inset-0 size-full" />
+        </div>
+      ) : block.src ? (
+        <a href={block.src} className="font-semibold underline decoration-[#facc15] underline-offset-4">
+          Watch the video
+        </a>
+      ) : null;
+    }
+    case "table":
+      return (
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-left text-[15px] text-[#3f3f46]">
+            <tbody>
+              {(block.rows ?? []).map((row, rowIndex) => (
+                <tr key={rowIndex} className="border-b border-[#e4e4e7]">
+                  {row.map((cell, cellIndex) =>
+                    rowIndex === 0 ? (
+                      <th key={cellIndex} className="px-3 py-2 font-bold text-[#09090b]">
+                        {renderInline(cell)}
+                      </th>
+                    ) : (
+                      <td key={cellIndex} className="px-3 py-2">
+                        {renderInline(cell)}
+                      </td>
+                    ),
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       );
     default:
       return (
-        <p className="text-base leading-[30px] text-[#3f3f46] md:text-[16.8px] md:leading-[31.08px]">{block.text}</p>
+        <p className="text-base leading-[30px] text-[#3f3f46] md:text-[16.8px] md:leading-[31.08px]">{renderInline(block.text)}</p>
       );
   }
 }
@@ -145,6 +203,22 @@ async function ArticleContent({ params }: { params: Promise<{ slug: string }> })
       </div>
     </Container>
   );
+}
+
+/** Search and sharing details written in the dashboard's SEO section; the story's own title and summary fill the gaps. */
+export async function generateMetadata(props: PageProps<"/news/[slug]">): Promise<Metadata> {
+  const { slug } = await props.params;
+  const article = await getArticle(slug);
+
+  if (!article) {
+    return {};
+  }
+
+  const title = article.seoTitle || article.title;
+  const description = article.seoDescription || article.subtitle || article.excerpt;
+  const image = article.socialImage || article.image;
+
+  return { title, description, openGraph: { title, description, images: image ? [image] : undefined } };
 }
 
 export default function ArticlePage(props: PageProps<"/news/[slug]">) {

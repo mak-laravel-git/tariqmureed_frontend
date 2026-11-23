@@ -142,12 +142,18 @@ export async function saveRecord(resource: ResourceKey, id: string | null, input
       const existing = id ? list.find((entry) => entry.id === id) : undefined;
 
       if (existing) {
-        Object.assign(existing, input, { updatedAt: "Just now" });
+        Object.assign(existing, input, { isFeatured: input.isFeatured === "1", isBreaking: input.isBreaking === "1", updatedAt: "Just now" });
         return existing;
       }
 
       store.nextId += 1;
-      const created: AdminRecord = { id: String(store.nextId), ...input, updatedAt: "Just now" };
+      const created: AdminRecord = {
+        id: String(store.nextId),
+        ...input,
+        isFeatured: input.isFeatured === "1",
+        isBreaking: input.isBreaking === "1",
+        updatedAt: "Just now",
+      };
       list.unshift(created);
 
       return created;
@@ -229,13 +235,14 @@ export async function getArticleOptions(): Promise<ArticleOptions> {
     return body.data.map((entry) => entry.title);
   };
 
-  const [categories, authors, media] = await Promise.all([
+  const [categories, authors, media, tags] = await Promise.all([
     names("categories", ["Cricket", "Football", "Tennis"]),
     names("writers", ["Bilal Ahmed"]),
     getMedia(),
+    adminRequestRaw("articles/tags", { fallback: () => ["IPL 2026", "Premier League", "Transfer News"] }) as Promise<{ data: string[] }>,
   ]);
 
-  return { categories, authors, media };
+  return { categories, authors, media, tags: tags.data };
 }
 
 export async function uploadMedia(form: FormData): Promise<void> {
