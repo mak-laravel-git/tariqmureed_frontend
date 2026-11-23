@@ -16,6 +16,7 @@ import { resources, tabStatuses } from "./resources";
 import { getAdminToken } from "./session";
 import type {
   AdminNotification,
+  ArticleOptions,
   AdminPage,
   AdminPageSummary,
   AdminRecord,
@@ -195,6 +196,26 @@ export async function getNotifications(): Promise<AdminNotification[]> {
 
 export async function getMedia(): Promise<MediaAsset[]> {
   return adminRequest<MediaAsset[]>("media", { fallback: () => mockMedia });
+}
+
+/** Categories, authors and images the article editor offers. */
+export async function getArticleOptions(): Promise<ArticleOptions> {
+  const names = async (apiPath: string, mocked: string[]): Promise<string[]> => {
+    const body = (await adminRequestRaw(apiPath, {
+      query: { per_page: 100 },
+      fallback: () => mocked.map((title) => ({ title })),
+    })) as { data: { title: string }[] };
+
+    return body.data.map((entry) => entry.title);
+  };
+
+  const [categories, authors, media] = await Promise.all([
+    names("categories", ["Cricket", "Football", "Tennis"]),
+    names("writers", ["Bilal Ahmed"]),
+    getMedia(),
+  ]);
+
+  return { categories, authors, media };
 }
 
 export async function uploadMedia(form: FormData): Promise<void> {

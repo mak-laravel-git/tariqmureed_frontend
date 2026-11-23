@@ -3,7 +3,7 @@ import { connection } from "next/server";
 
 import { PageHeader } from "@/components/admin/AdminUi";
 import { ArticleForm, GenericRecordForm } from "@/components/admin/RecordForms";
-import { getRecord } from "@/lib/admin/data";
+import { getArticleOptions, getRecord } from "@/lib/admin/data";
 import { isResourceKey, resources } from "@/lib/admin/resources";
 
 /** Private, request-time page: allowed to block during navigation. */
@@ -35,7 +35,7 @@ export default async function EditRecordPage(props: PageProps<"/admin/[resource]
       />
 
       {config.form === "article" ? (
-        <ArticleForm resource={resource} record={record} cancelHref={`/admin/${resource}/${id}`} />
+        <ArticleForm resource={resource} record={record} cancelHref={`/admin/${resource}/${id}`} options={await getArticleOptions()} />
       ) : (
         <GenericRecordForm resource={resource} record={record} cancelHref={`/admin/${resource}/${id}`} />
       )}

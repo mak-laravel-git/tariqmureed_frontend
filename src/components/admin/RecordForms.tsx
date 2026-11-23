@@ -5,7 +5,7 @@ import { useActionState, useState } from "react";
 
 import { saveRecordAction } from "@/app/admin/actions";
 import { statusOptions } from "@/lib/admin/resources";
-import type { AdminRecord, FormState } from "@/lib/admin/types";
+import type { AdminRecord, ArticleOptions, FormState } from "@/lib/admin/types";
 
 import {
   Card,
@@ -70,15 +70,17 @@ export function GenericRecordForm({ resource, record, cancelHref }: FormProps) {
   );
 }
 
-const categories = ["Cricket", "Football", "Tennis", "Formula 1", "Basketball"];
+/** The saved value first, so editing a story never drops a category or author that was later renamed. */
+function withCurrent(values: string[], current?: string | null): string[] {
+  return current && !values.includes(current) ? [current, ...values] : values;
+}
 
-export function ArticleForm({ resource, record, cancelHref }: FormProps) {
+export function ArticleForm({ resource, record, cancelHref, options }: FormProps & { options: ArticleOptions }) {
   const [state, action, pending] = useActionState(saveRecordAction.bind(null, resource, record?.id ?? null), initialState);
   const [title, setTitle] = useState(record?.title ?? "");
 
   return (
     <form action={action} className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_330px]">
-      <input type="hidden" name="owner" value={record?.owner ?? "Bilal Ahmed"} />
 
       <Card className="p-5">
         <div className="flex flex-col gap-5">
@@ -101,10 +103,9 @@ export function ArticleForm({ resource, record, cancelHref }: FormProps) {
             <span className="mb-2 block text-xs leading-4 font-semibold text-ink">Article body</span>
             <div className="overflow-hidden rounded-md border border-line focus-within:border-ink">
               <div className="flex gap-4 border-b border-line px-3 py-2 text-xs text-charade" aria-hidden="true">
-                <span className="font-bold">B</span>
-                <span className="italic">I</span>
-                <span>Link</span>
-                <span>Quote</span>
+                <span>Plain text · blank line = new paragraph</span>
+                <span>## Heading</span>
+                <span>&gt; Quote</span>
               </div>
               <label>
                 <span className="sr-only">Article body</span>
@@ -141,10 +142,28 @@ export function ArticleForm({ resource, record, cancelHref }: FormProps) {
           <CardHeader title="Classification" description="Help readers discover this story" />
           <div className="flex flex-col gap-4 p-5">
             <Field label="Category">
-              <SelectInput name="subtitle" defaultValue={record?.subtitle ?? "Cricket"}>
-                {categories.map((option) => (
+              <SelectInput name="subtitle" defaultValue={record?.subtitle ?? ""}>
+                <option value="">No category</option>
+                {withCurrent(options.categories, record?.subtitle).map((option) => (
                   <option key={option}>{option}</option>
                 ))}
+              </SelectInput>
+            </Field>
+            <Field label="Author">
+              <SelectInput name="owner" defaultValue={record?.owner ?? ""}>
+                <option value="">TMN Sport Desk</option>
+                {withCurrent(options.authors, record?.owner).map((option) => (
+                  <option key={option}>{option}</option>
+                ))}
+              </SelectInput>
+            </Field>
+            <Field label="Cover image" hint="Upload pictures in the Media Library first.">
+              <SelectInput name="image" defaultValue={record?.image ?? ""}>
+                <option value="">No image</option>
+                {record?.image && !options.media.some((asset) => asset.url === record.image) && (
+                  <option value={record.image}>Current image</option>
+                )}
+                {options.media.flatMap((asset) => (asset.url ? [<option key={asset.id} value={asset.url}>{asset.title}</option>] : []))}
               </SelectInput>
             </Field>
             <Field label="Tags">

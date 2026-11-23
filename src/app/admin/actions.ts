@@ -28,6 +28,14 @@ function failure(error: unknown, fallback = "Something went wrong. Please try ag
   return { status: "error", message: error instanceof ApiError && error.status && error.status < 500 ? error.message : fallback };
 }
 
+/** Stories, categories and authors feed the public news pages: refresh their cache right after a change. */
+function refreshPublicStories(resource: string): void {
+  if (["content", "categories", "authors"].includes(resource)) {
+    updateTag("articles");
+    updateTag("writers");
+  }
+}
+
 /** Only allow redirects back into the admin area. */
 function safeNext(value: string): string {
   return value.startsWith("/admin") && !value.startsWith("//") ? value : "/admin";
@@ -103,6 +111,7 @@ export async function saveRecordAction(
     body: text(formData, "body"),
     tags: text(formData, "tags"),
     publishAt: text(formData, "publishAt"),
+    image: text(formData, "image"),
   };
 
   if (!input.title) {
@@ -115,12 +124,15 @@ export async function saveRecordAction(
     return failure(error);
   }
 
+  refreshPublicStories(resource);
+
   redirect(`/admin/${resource}?saved=1`);
 }
 
 export async function deleteRecordAction(resource: string, id: string): Promise<void> {
   if (isResourceKey(resource) && !resources[resource].readOnly) {
     await deleteRecord(resource, id);
+    refreshPublicStories(resource);
   }
 
   redirect(`/admin/${resource}?deleted=1`);

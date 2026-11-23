@@ -1,5 +1,4 @@
 import { listRecords } from "@/lib/admin/data";
-import { apiConfig } from "@/lib/api/config";
 import { isResourceKey, resources } from "@/lib/admin/resources";
 
 function csvCell(value: string): string {
@@ -12,7 +11,7 @@ function csvCell(value: string): string {
 export async function GET(_request: Request, context: RouteContext<"/admin/export/[resource]">) {
   const { resource } = await context.params;
 
-  if (!isResourceKey(resource) || (resources[resource].unavailable && !apiConfig.useMocks)) {
+  if (!isResourceKey(resource)) {
     return new Response("Not found", { status: 404 });
   }
 

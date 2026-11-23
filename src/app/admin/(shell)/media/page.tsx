@@ -2,10 +2,9 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 
 import { AdminIcon } from "@/components/admin/icons";
-import { Card, Flash, PageHeader, PrimaryLink } from "@/components/admin/AdminUi";
+import { Flash, PageHeader, PrimaryLink } from "@/components/admin/AdminUi";
 import { Photo } from "@/components/ui/Photo";
 import { getMedia } from "@/lib/admin/data";
-import { apiConfig } from "@/lib/api/config";
 import { firstParam } from "@/lib/url";
 
 export const metadata: Metadata = { title: "Media Library" };
@@ -22,19 +21,6 @@ export const instant = false;
 
 export default async function MediaLibraryPage(props: PageProps<"/admin/media">) {
   await connection();
-
-  if (!apiConfig.useMocks) {
-    return (
-      <>
-        <PageHeader title="Media Library" description="Browse and manage images, video thumbnails and editorial assets." />
-        <Card>
-          <p className="px-5 py-12 text-center text-sm text-muted">
-            The media library is not connected to the server yet. It will work here as soon as its API is added.
-          </p>
-        </Card>
-      </>
-    );
-  }
 
   const [assets, params] = await Promise.all([getMedia(), props.searchParams]);
 

@@ -33,6 +33,15 @@ export interface AdminRecord {
   body?: string | null;
   tags?: string | null;
   publishAt?: string | null;
+  /** Article editor only: URL of the cover image from the media library. */
+  image?: string | null;
+}
+
+/** Choices offered by the article editor. */
+export interface ArticleOptions {
+  categories: string[];
+  authors: string[];
+  media: MediaAsset[];
 }
 
 export interface RecordInput {
@@ -45,6 +54,7 @@ export interface RecordInput {
   body?: string;
   tags?: string;
   publishAt?: string;
+  image?: string;
 }
 
 export interface RecordList {
