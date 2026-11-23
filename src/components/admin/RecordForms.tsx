@@ -132,7 +132,7 @@ export function ArticleForm({ resource, record, cancelHref, options }: FormProps
                 ))}
               </SelectInput>
             </Field>
-            <Field label="Publish date">
+            <Field label="Publish date" hint="Leave empty to publish right away. Times are in Bangladesh time (Asia/Dhaka).">
               <TextInput name="publishAt" type="datetime-local" defaultValue={record?.publishAt ?? ""} />
             </Field>
           </div>
