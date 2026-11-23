@@ -15,6 +15,8 @@ export interface ResourceConfig {
   /** Rows can be viewed and edited but not created here (staff accounts need a password). */
   noCreate?: boolean;
   newLabel?: string;
+  /** The editor offers a picture (author photo, category image) under this label. */
+  imageLabel?: string;
   /** Column heading overrides: [title, subtitle, owner, status, updated]. */
   columns?: [string, string, string, string, string];
 }
@@ -35,6 +37,7 @@ export const resources: Record<ResourceKey, ResourceConfig> = {
     description: "Organise the editorial taxonomy used across published content.",
     form: "generic",
     apiPath: "categories",
+    imageLabel: "Category image",
   },
   series: {
     key: "series",
@@ -69,6 +72,7 @@ export const resources: Record<ResourceKey, ResourceConfig> = {
     description: "Maintain the journalists and analysts credited on stories.",
     form: "generic",
     apiPath: "writers",
+    imageLabel: "Author photo",
   },
   activity: {
     key: "activity",

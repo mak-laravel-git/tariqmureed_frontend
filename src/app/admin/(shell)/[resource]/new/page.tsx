@@ -3,7 +3,7 @@ import { connection } from "next/server";
 
 import { PageHeader } from "@/components/admin/AdminUi";
 import { AdvertisementForm, ArticleForm, GenericRecordForm } from "@/components/admin/RecordForms";
-import { getAdOptions, getArticleOptions } from "@/lib/admin/data";
+import { getAdOptions, getArticleOptions, getMedia } from "@/lib/admin/data";
 import { isResourceKey, resources } from "@/lib/admin/resources";
 
 /** Private, request-time page: allowed to block during navigation. */
@@ -38,7 +38,7 @@ export default async function NewRecordPage(props: PageProps<"/admin/[resource]/
       ) : config.form === "advertisement" ? (
         <AdvertisementForm resource={resource} cancelHref={`/admin/${resource}`} options={await getAdOptions()} />
       ) : (
-        <GenericRecordForm resource={resource} cancelHref={`/admin/${resource}`} />
+        <GenericRecordForm resource={resource} cancelHref={`/admin/${resource}`} imageLabel={config.imageLabel} media={config.imageLabel ? await getMedia() : undefined} />
       )}
     </>
   );

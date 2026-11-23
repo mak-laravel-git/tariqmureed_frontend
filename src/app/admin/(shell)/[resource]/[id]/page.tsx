@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 
@@ -32,6 +33,25 @@ export default async function RecordDetailPage(props: PageProps<"/admin/[resourc
     ["Status", <StatusBadge key="status" status={record.status} />],
     ["Last updated", record.updatedAt],
   ];
+
+  if (config.imageLabel) {
+    rows.splice(
+      1,
+      0,
+      [
+        config.imageLabel,
+        record.image ? (
+          <span key="image" className="relative block size-20 overflow-hidden rounded-md border border-line bg-surface">
+            <Image src={record.image} alt={record.title} fill unoptimized sizes="80px" className="object-cover" />
+          </span>
+        ) : (
+          <span key="image" className="font-normal text-muted">
+            Not set
+          </span>
+        ),
+      ],
+    );
+  }
 
   return (
     <>

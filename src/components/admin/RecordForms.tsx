@@ -1,11 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useActionState, useRef, useState } from "react";
 
 import { saveRecordAction } from "@/app/admin/actions";
 import { statusOptions } from "@/lib/admin/resources";
-import type { AdminRecord, AdOptions, ArticleOptions, FormState } from "@/lib/admin/types";
+import type { AdminRecord, AdOptions, ArticleOptions, FormState, MediaAsset } from "@/lib/admin/types";
 
 import {
   Card,
@@ -28,8 +29,9 @@ interface FormProps {
 }
 
 /** Shared name / category / owner / status / notes form used by every non-article module. */
-export function GenericRecordForm({ resource, record, cancelHref }: FormProps) {
+export function GenericRecordForm({ resource, record, cancelHref, imageLabel, media = [] }: FormProps & { imageLabel?: string; media?: MediaAsset[] }) {
   const [state, action, pending] = useActionState(saveRecordAction.bind(null, resource, record?.id ?? null), initialState);
+  const [image, setImage] = useState(record?.image ?? "");
 
   return (
     <Card className="p-5">
@@ -50,6 +52,28 @@ export function GenericRecordForm({ resource, record, cancelHref }: FormProps) {
             ))}
           </SelectInput>
         </Field>
+        {imageLabel && (
+          <Field label={imageLabel} hint="Paste an image address or pick one from the Media Library.">
+            <div className="flex items-start gap-3">
+              <span className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-md border border-line bg-surface text-[11px] text-muted">
+                {image ? <Image src={image} alt="" fill unoptimized sizes="64px" className="object-cover" /> : "No image"}
+              </span>
+              <div className="flex min-w-0 flex-1 flex-col gap-2">
+                <TextInput name="image" value={image} onChange={(event) => setImage(event.target.value)} placeholder="https://..." />
+                {media.length > 0 && (
+                  <SelectInput
+                    aria-label="Pick an image from the media library"
+                    value=""
+                    onChange={(event) => event.target.value && setImage(event.target.value)}
+                  >
+                    <option value="">Pick from the Media Library</option>
+                    {media.flatMap((asset) => (asset.url ? [<option key={asset.id} value={asset.url}>{asset.title}</option>] : []))}
+                  </SelectInput>
+                )}
+              </div>
+            </div>
+          </Field>
+        )}
         <Field label="Internal notes">
           <TextArea name="notes" defaultValue={record?.notes ?? ""} placeholder="Add optional notes for administrators." className="min-h-[120px]" />
         </Field>
