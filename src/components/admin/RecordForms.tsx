@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useActionState, useRef, useState } from "react";
 
@@ -18,6 +17,7 @@ import {
   TextArea,
   TextInput,
 } from "./AdminUi";
+import { ImageField } from "./ImageField";
 
 const initialState: FormState = { status: "idle", message: "" };
 
@@ -31,7 +31,6 @@ interface FormProps {
 /** Shared name / category / owner / status / notes form used by every non-article module. */
 export function GenericRecordForm({ resource, record, cancelHref, imageLabel, media = [] }: FormProps & { imageLabel?: string; media?: MediaAsset[] }) {
   const [state, action, pending] = useActionState(saveRecordAction.bind(null, resource, record?.id ?? null), initialState);
-  const [image, setImage] = useState(record?.image ?? "");
 
   return (
     <Card className="p-5">
@@ -52,28 +51,7 @@ export function GenericRecordForm({ resource, record, cancelHref, imageLabel, me
             ))}
           </SelectInput>
         </Field>
-        {imageLabel && (
-          <Field label={imageLabel} hint="Paste an image address or pick one from the Media Library.">
-            <div className="flex items-start gap-3">
-              <span className="relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-md border border-line bg-surface text-[11px] text-muted">
-                {image ? <Image src={image} alt="" fill unoptimized sizes="64px" className="object-cover" /> : "No image"}
-              </span>
-              <div className="flex min-w-0 flex-1 flex-col gap-2">
-                <TextInput name="image" value={image} onChange={(event) => setImage(event.target.value)} placeholder="https://..." />
-                {media.length > 0 && (
-                  <SelectInput
-                    aria-label="Pick an image from the media library"
-                    value=""
-                    onChange={(event) => event.target.value && setImage(event.target.value)}
-                  >
-                    <option value="">Pick from the Media Library</option>
-                    {media.flatMap((asset) => (asset.url ? [<option key={asset.id} value={asset.url}>{asset.title}</option>] : []))}
-                  </SelectInput>
-                )}
-              </div>
-            </div>
-          </Field>
-        )}
+        {imageLabel && <ImageField name="image" label={imageLabel} initial={record?.image} media={media} hint="Upload a picture, choose one from the Media Library, or paste an image address." />}
         <Field label="Internal notes">
           <TextArea name="notes" defaultValue={record?.notes ?? ""} placeholder="Add optional notes for administrators." className="min-h-[120px]" />
         </Field>
@@ -226,7 +204,6 @@ function TagPicker({ suggestions, initial: chosenAtStart }: { suggestions: strin
 
 export function ArticleForm({ resource, record, options }: FormProps & { options: ArticleOptions }) {
   const [state, action, pending] = useActionState(saveRecordAction.bind(null, resource, record?.id ?? null), initialState);
-  const [image, setImage] = useState(record?.image ?? "");
   const bodyRef = useRef<HTMLTextAreaElement>(null);
   const savedTags = (record?.tags ?? "").split(",").map((tag) => tag.trim()).filter(Boolean);
 
@@ -282,30 +259,17 @@ export function ArticleForm({ resource, record, options }: FormProps & { options
         <Card className="p-7">
           <h2 className="text-xl leading-7 font-medium text-ink">Featured Image</h2>
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
-            <Field label="Image URL">
-              <TextInput name="image" value={image} onChange={(event) => setImage(event.target.value)} placeholder="https://..." />
-              {options.media.length > 0 && (
-                <SelectInput
-                  aria-label="Pick an image from the media library"
-                  value=""
-                  onChange={(event) => event.target.value && setImage(event.target.value)}
-                  className="mt-2"
-                >
-                  <option value="">Or pick from the media library</option>
-                  {options.media.flatMap((asset) => (asset.url ? [<option key={asset.id} value={asset.url}>{asset.title}</option>] : []))}
-                </SelectInput>
-              )}
-            </Field>
-            <Field label="Image Caption">
+            <div className="sm:col-span-2">
+              <ImageField name="image" label="Featured Image" initial={record?.image} media={options.media} hint="Upload a picture, choose one from the Media Library, or paste an image address." />
+            </div>            <Field label="Image Caption">
               <TextInput name="imageCaption" defaultValue={record?.imageCaption ?? ""} placeholder="Caption..." />
             </Field>
             <Field label="Image Credit">
               <TextInput name="imageCredit" defaultValue={record?.imageCredit ?? ""} placeholder="Photo: ..." />
             </Field>
-            <Field label="Social Sharing Image">
-              <TextInput name="socialImage" defaultValue={record?.socialImage ?? ""} placeholder="https://..." />
-            </Field>
-          </div>
+            <div className="sm:col-span-2">
+              <ImageField name="socialImage" label="Social Sharing Image" initial={record?.socialImage} media={options.media} hint="Shown when the story is shared on social networks. Leave empty to use the featured image." />
+            </div>          </div>
         </Card>
 
         <Card className="p-7">
@@ -443,16 +407,14 @@ export function AdvertisementForm({ resource, record, cancelHref, options }: For
 
         {adType === "image" ? (
           <>
-            <Field label="Banner image" hint="Upload the banner in the Media Library first, at the size shown next to the place above.">
-              <SelectInput name="image" defaultValue={record?.image ?? ""}>
-                <option value="">Choose an image</option>
-                {record?.image && !options.media.some((asset) => asset.url === record.image) && (
-                  <option value={record.image}>Current image</option>
-                )}
-                {options.media.flatMap((asset) => (asset.url ? [<option key={asset.id} value={asset.url}>{asset.title}</option>] : []))}
-              </SelectInput>
-            </Field>
-            <Field label="Link" hint="Where a click on the banner goes (optional).">
+            <ImageField
+              name="image"
+              label="Banner image"
+              initial={record?.image}
+              media={options.media}
+              required
+              hint="Upload the banner here, at the size shown next to the place above, or choose one from the Media Library."
+            />            <Field label="Link" hint="Where a click on the banner goes (optional).">
               <TextInput name="linkUrl" type="url" defaultValue={record?.linkUrl ?? ""} placeholder="https://advertiser.example/offer" />
             </Field>
           </>

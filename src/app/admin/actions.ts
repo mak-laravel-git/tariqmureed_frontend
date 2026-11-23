@@ -21,7 +21,7 @@ import {
 } from "@/lib/admin/data";
 import { isResourceKey, resources } from "@/lib/admin/resources";
 import { clearAdminToken, getAdminToken, MOCK_TOKEN, mockAccounts, setAdminToken } from "@/lib/admin/session";
-import type { FormState, RecordInput } from "@/lib/admin/types";
+import type { FormState, MediaAsset, RecordInput } from "@/lib/admin/types";
 
 const text = (formData: FormData, key: string): string => String(formData.get(key) ?? "").trim();
 
@@ -315,6 +315,24 @@ export async function uploadMediaAction(_previous: FormState, formData: FormData
   }
 
   redirect("/admin/media?uploaded=1");
+}
+
+/** Upload from an image field inside an editor: saves the picture to the media library and returns it to the field. */
+export async function uploadImageAction(formData: FormData): Promise<{ asset?: MediaAsset; error?: string }> {
+  const file = formData.get("file");
+
+  if (!(file instanceof File) || file.size === 0) {
+    return { error: "Choose an image to upload." };
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    return { error: "Images must be 10 MB or smaller." };
+  }
+
+  try {
+    return { asset: await uploadMedia(formData) };
+  } catch (error) {
+    return { error: failure(error, "The image could not be uploaded.").message };
+  }
 }
 
 export async function deleteMediaAction(id: string): Promise<void> {

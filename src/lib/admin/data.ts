@@ -260,8 +260,13 @@ export async function getArticleOptions(): Promise<ArticleOptions> {
   return { categories, authors, media, tags: tags.data };
 }
 
-export async function uploadMedia(form: FormData): Promise<void> {
-  await adminRequest<null>("media", { method: "POST", form, fallback: () => null });
+/** Adds an image to the media library and returns the saved asset. */
+export async function uploadMedia(form: FormData): Promise<MediaAsset> {
+  return adminRequest<MediaAsset>("media", {
+    method: "POST",
+    form,
+    fallback: () => ({ id: `mock-${Date.now()}`, title: "Uploaded image", meta: "Mock · 0 KB", url: null }),
+  });
 }
 
 export async function getIntegration(): Promise<IntegrationStatus> {
