@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 
 import { MatchdayPage } from "@/components/matches/MatchdayPage";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Match Schedule",
-  description: "Plan your week with upcoming fixtures, start times and venue information.",
-};
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("/schedule", { title: "Match Schedule", description: "Plan your week with upcoming fixtures, start times and venue information." });
+}
 
 export default function SchedulePage(props: PageProps<"/schedule">) {
   return (

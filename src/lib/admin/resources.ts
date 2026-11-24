@@ -127,6 +127,7 @@ export const adminNav: { heading?: string; items: { label: string; href: string;
     heading: "Operations",
     items: [
       { label: "API Integration", href: "/admin/integrations", icon: "plug", match: "/admin/integrations" },
+      { label: "SEO", href: "/admin/seo", icon: "search", match: "/admin/seo" },
       { label: "Legal Pages", href: "/admin/pages", icon: "article", match: "/admin/pages" },
       { label: "Website Settings", href: "/admin/settings", icon: "sliders", match: "/admin/settings" },
     ],

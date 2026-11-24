@@ -11,9 +11,11 @@ import { Container } from "@/components/ui/Container";
 import { CountryName } from "@/components/ui/CountryName";
 import { Photo } from "@/components/ui/Photo";
 import { ShareButton } from "@/components/ui/ShareButton";
-import { getArticle } from "@/lib/api/endpoints";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { getArticle, getSeo } from "@/lib/api/endpoints";
 import type { ArticleBlock } from "@/lib/api/types";
 import { formatPublishedDate } from "@/lib/format";
+import { resolveSiteUrl, sharingMetadata } from "@/lib/seo";
 
 function initials(name: string): string {
   return name
@@ -241,16 +243,70 @@ export async function generateMetadata(props: PageProps<"/news/[slug]">): Promis
     return {};
   }
 
+  const seo = await getSeo();
   const title = article.seoTitle || article.title;
   const description = article.seoDescription || article.subtitle || article.excerpt;
   const image = article.socialImage || article.image;
+  const path = `/news/${article.slug}`;
+  const share = sharingMetadata(seo, { title, description, image, path, type: "article" });
 
-  return { title, description, openGraph: { title, description, images: image ? [image] : undefined } };
+  return {
+    title,
+    description,
+    alternates: { canonical: path },
+    ...share,
+    openGraph: {
+      ...share.openGraph,
+      type: "article",
+      publishedTime: article.publishedAt,
+      authors: [article.author.name],
+      section: article.category,
+      tags: article.tags,
+    },
+    robots: article.noindex ? { index: false, follow: true } : undefined,
+  };
+}
+
+/** NewsArticle structured data: lets Google show the story in Top Stories and rich results. */
+async function ArticleJsonLd({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const [article, seo] = await Promise.all([getArticle(slug), getSeo()]);
+
+  if (!article || article.noindex) {
+    return null;
+  }
+
+  const site = resolveSiteUrl(seo);
+  const absolute = (address: string): string => (address.startsWith("http") ? address : `${site}${address}`);
+
+  return (
+    <JsonLd
+      data={{
+        "@context": "https://schema.org",
+        "@type": "NewsArticle",
+        mainEntityOfPage: { "@type": "WebPage", "@id": `${site}/news/${article.slug}` },
+        headline: (article.seoTitle || article.title).slice(0, 110),
+        description: article.seoDescription || article.subtitle || article.excerpt,
+        image: [absolute(article.socialImage || article.image)],
+        datePublished: article.publishedAt,
+        dateModified: article.publishedAt,
+        articleSection: article.category,
+        keywords: article.tags.join(", "),
+        author: { "@type": "Person", name: article.author.name },
+        publisher: {
+          "@type": "Organization",
+          name: seo.settings.websiteName || "TMN Sport",
+          logo: { "@type": "ImageObject", url: `${site}/images/brand/logo.png` },
+        },
+      }}
+    />
+  );
 }
 
 export default function ArticlePage(props: PageProps<"/news/[slug]">) {
   return (
     <Suspense fallback={<div role="status" aria-label="Loading article" className="min-h-[1200px]" />}>
+      <ArticleJsonLd params={props.params} />
       <ArticleContent params={props.params} />
     </Suspense>
   );

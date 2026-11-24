@@ -11,11 +11,11 @@ import { FilterTabs } from "@/components/ui/FilterTabs";
 import { PageIntro } from "@/components/ui/PageIntro";
 import { getNewsPage, getTeams } from "@/lib/api/endpoints";
 import { firstParam, pageHref, type SearchParams } from "@/lib/url";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Latest News",
-  description: "Breaking stories, sharp analysis and original reporting from across the world of cricket.",
-};
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("/news", { title: "Latest News", description: "Breaking stories, sharp analysis and original reporting from across the world of cricket." });
+}
 
 const PAGE_SIZE = 8;
 

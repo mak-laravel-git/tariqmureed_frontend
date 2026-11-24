@@ -11,6 +11,7 @@ import {
   pageLabels,
   resetPage,
   runSync,
+  saveSeo,
   savePage,
   saveRecord,
   savePermissions,
@@ -162,6 +163,7 @@ export async function saveRecordAction(
     seoDescription: text(formData, "seoDescription"),
     isFeatured: formData.has("isFeatured") ? "1" : "0",
     isBreaking: formData.has("isBreaking") ? "1" : "0",
+    noindex: formData.has("noindex") ? "1" : "0",
   };
 
   if (!input.title) {
@@ -211,6 +213,50 @@ export async function saveSettingsAction(_previous: FormState, formData: FormDat
   updateTag("settings");
 
   return { status: "success", message: "Settings saved. The website now uses the new values." };
+}
+
+/** Saves the SEO screen: the global search/share settings and the text of every page. */
+export async function saveSeoAction(_previous: FormState, formData: FormData): Promise<FormState> {
+  const template = text(formData, "seoTitleTemplate");
+
+  if (!template.includes("%s")) {
+    return { status: "error", message: "The page title format must contain %s, where the page title goes (for example %s | TMN Sport)." };
+  }
+
+  const paths = formData.getAll("pagePath").map(String);
+  const titles = formData.getAll("pageTitle").map((value) => String(value).trim());
+  const descriptions = formData.getAll("pageDescription").map((value) => String(value).trim());
+  const images = formData.getAll("pageImage").map((value) => String(value).trim());
+  const hidden = new Set(formData.getAll("pageNoindex").map(String));
+
+  try {
+    await saveSeo(
+      {
+        seoSiteUrl: text(formData, "seoSiteUrl").replace(/\/+$/, ""),
+        seoTitleTemplate: template,
+        seoDefaultImage: text(formData, "seoDefaultImage"),
+        seoTwitterHandle: text(formData, "seoTwitterHandle"),
+        seoIndexing: formData.has("seoIndexing"),
+        seoGoogleVerification: text(formData, "seoGoogleVerification"),
+        seoBingVerification: text(formData, "seoBingVerification"),
+      },
+      paths.map((path, index) => ({
+        path,
+        title: titles[index] ?? "",
+        description: descriptions[index] ?? "",
+        image: images[index] ?? "",
+        noindex: hidden.has(path),
+      })),
+    );
+  } catch (error) {
+    return failure(error);
+  }
+
+  // Titles, robots.txt and the sitemap are cached by the public site: refresh them right away.
+  updateTag("seo");
+  updateTag("settings");
+
+  return { status: "success", message: "SEO saved. The website now uses the new titles, descriptions and search settings." };
 }
 
 export async function savePageAction(slug: string, _previous: FormState, formData: FormData): Promise<FormState> {

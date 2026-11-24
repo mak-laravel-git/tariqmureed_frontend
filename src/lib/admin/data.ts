@@ -17,6 +17,8 @@ import { getAdminToken } from "./session";
 import { adPlacements } from "@/lib/ads";
 import type {
   AdminNotification,
+  AdminSeo,
+  AdminSeoPage,
   AdOptions,
   AdPlacementOption,
   ArticleOptions,
@@ -142,7 +144,7 @@ export async function saveRecord(resource: ResourceKey, id: string | null, input
       const existing = id ? list.find((entry) => entry.id === id) : undefined;
 
       if (existing) {
-        Object.assign(existing, input, { isFeatured: input.isFeatured === "1", isBreaking: input.isBreaking === "1", updatedAt: "Just now" });
+        Object.assign(existing, input, { isFeatured: input.isFeatured === "1", isBreaking: input.isBreaking === "1", noindex: input.noindex === "1", updatedAt: "Just now" });
         return existing;
       }
 
@@ -152,6 +154,7 @@ export async function saveRecord(resource: ResourceKey, id: string | null, input
         ...input,
         isFeatured: input.isFeatured === "1",
         isBreaking: input.isBreaking === "1",
+        noindex: input.noindex === "1",
         updatedAt: "Just now",
       };
       list.unshift(created);
@@ -277,12 +280,32 @@ export async function getSettings(): Promise<SiteSettings> {
   return adminRequest<SiteSettings>("settings", { fallback: () => mockStore().settings });
 }
 
-export async function saveSettings(input: SiteSettings): Promise<void> {
+export async function saveSettings(input: Partial<SiteSettings>): Promise<void> {
   await adminRequest<SiteSettings>("settings", {
     method: "PUT",
     body: input,
     fallback: () => Object.assign(mockStore().settings, input),
   });
+}
+
+/** Search and share text of every page plus the site's SEO health checks (GET /admin/seo). */
+export async function getAdminSeo(): Promise<AdminSeo> {
+  return adminRequest<AdminSeo>("seo", {
+    fallback: () => ({
+      pages: [{ path: "/", label: "Home", defaultTitle: "TMN Sport", defaultDescription: "Live cricket scores, news and statistics.", title: "", description: "", image: "", noindex: false }],
+      health: [{ key: "indexing", label: "Search engines are allowed", status: "good", detail: "The site can appear in Google and Bing." }],
+    }),
+  });
+}
+
+/** Saves the global SEO settings and the text of every page. */
+export async function saveSeo(settings: Partial<SiteSettings>, pages: Pick<AdminSeoPage, "path" | "title" | "description" | "image" | "noindex">[]): Promise<void> {
+  await adminRequest<SiteSettings>("settings", {
+    method: "PUT",
+    body: settings,
+    fallback: () => Object.assign(mockStore().settings, settings),
+  });
+  await adminRequest<AdminSeo>("seo", { method: "PUT", body: { pages }, fallback: () => ({ pages: [], health: [] }) });
 }
 
 /** The legal pages the dashboard can edit, and whether each one has been customised. */

@@ -18,6 +18,7 @@ import {
   TextInput,
 } from "./AdminUi";
 import { GalleryField, ImageField } from "./ImageField";
+import { LengthMeter, SEO_DESCRIPTION, SEO_TITLE, SerpPreview } from "./SeoTools";
 
 const initialState: FormState = { status: "idle", message: "" };
 
@@ -205,6 +206,11 @@ function TagPicker({ suggestions, initial: chosenAtStart }: { suggestions: strin
 export function ArticleForm({ resource, record, options }: FormProps & { options: ArticleOptions }) {
   const [state, action, pending] = useActionState(saveRecordAction.bind(null, resource, record?.id ?? null), initialState);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
+  const [titleDraft, setTitleDraft] = useState(record?.title ?? "");
+  const [summaryDraft, setSummaryDraft] = useState(record?.summary ?? "");
+  const [slugDraft, setSlugDraft] = useState(record?.slug ?? "");
+  const [seoTitle, setSeoTitle] = useState(record?.seoTitle ?? "");
+  const [seoDescription, setSeoDescription] = useState(record?.seoDescription ?? "");
   const savedTags = (record?.tags ?? "").split(",").map((tag) => tag.trim()).filter(Boolean);
 
   return (
@@ -214,13 +220,13 @@ export function ArticleForm({ resource, record, options }: FormProps & { options
           <h2 className="text-xl leading-7 font-medium text-ink">Content</h2>
           <div className="mt-6 flex flex-col gap-5">
             <Field label="Article Title *">
-              <TextInput name="title" required maxLength={190} defaultValue={record?.title} placeholder="Enter article title..." />
+              <TextInput name="title" required maxLength={190} defaultValue={record?.title} onChange={(event) => setTitleDraft(event.target.value)} placeholder="Enter article title..." />
             </Field>
             <Field label="URL Slug">
-              <TextInput name="slug" maxLength={190} defaultValue={record?.slug ?? ""} placeholder="auto-generated-from-title" />
+              <TextInput name="slug" maxLength={190} defaultValue={record?.slug ?? ""} onChange={(event) => setSlugDraft(event.target.value)} placeholder="auto-generated-from-title" />
             </Field>
             <Field label="Short Description / Excerpt">
-              <TextArea name="summary" defaultValue={record?.summary ?? ""} maxLength={600} placeholder="Brief summary shown in listings..." className="min-h-[82px]" />
+              <TextArea name="summary" defaultValue={record?.summary ?? ""} maxLength={600} onChange={(event) => setSummaryDraft(event.target.value)} placeholder="Brief summary shown in listings..." className="min-h-[82px]" />
             </Field>
             <div>
               <span className="mb-2 block text-xs leading-4 font-semibold text-ink">Article Content *</span>
@@ -284,12 +290,21 @@ export function ArticleForm({ resource, record, options }: FormProps & { options
         <Card className="p-7">
           <h2 className="text-xl leading-7 font-medium text-ink">SEO</h2>
           <div className="mt-6 flex flex-col gap-5">
+            <SerpPreview
+              title={seoTitle || titleDraft}
+              description={seoDescription || summaryDraft}
+              address={`tmnsport.com › news › ${slugDraft || "your-story"}`}
+              siteName="TMN Sport"
+            />
             <Field label="SEO Meta Title">
-              <TextInput name="seoTitle" maxLength={120} defaultValue={record?.seoTitle ?? ""} placeholder="Meta title (60 chars)" />
+              <TextInput name="seoTitle" maxLength={120} value={seoTitle} onChange={(event) => setSeoTitle(event.target.value)} placeholder="Empty: the story title is used" />
+              <LengthMeter value={seoTitle || titleDraft} range={SEO_TITLE} />
             </Field>
             <Field label="SEO Meta Description">
-              <TextArea name="seoDescription" maxLength={300} defaultValue={record?.seoDescription ?? ""} placeholder="Meta description (160 chars)" className="min-h-[82px]" />
+              <TextArea name="seoDescription" maxLength={300} value={seoDescription} onChange={(event) => setSeoDescription(event.target.value)} placeholder="Empty: the short description is used" className="min-h-[82px]" />
+              <LengthMeter value={seoDescription || summaryDraft} range={SEO_DESCRIPTION} />
             </Field>
+            <Toggle name="noindex" label="Hide this story from Google (do not index)" defaultChecked={record?.noindex ?? false} />
           </div>
         </Card>
       </div>

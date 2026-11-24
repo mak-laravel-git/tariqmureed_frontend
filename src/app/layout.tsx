@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Barlow_Condensed, Inter } from "next/font/google";
 
+import { getSeo } from "@/lib/api/endpoints";
+import { resolveSiteUrl, sharingMetadata } from "@/lib/seo";
+
 import "./globals.css";
 
 const inter = Inter({
@@ -16,14 +19,29 @@ const barlowCondensed = Barlow_Condensed({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "TMN Sport — Live cricket scores, news, stats and video",
-    template: "%s | TMN Sport",
-  },
-  description:
-    "TMN Sport is an independent cricket media house delivering live scores, news, analysis, statistics and video from every major international and franchise competition.",
-};
+/** Title format, description, share previews, indexing switch and verification codes from the admin SEO screen. */
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await getSeo();
+  const home = seo.pages["/"];
+  const title = home?.title || "TMN Sport — Live cricket scores, news, stats and video";
+  const description =
+    home?.description ||
+    "TMN Sport is an independent cricket media house delivering live scores, news, analysis, statistics and video from every major international and franchise competition.";
+  const { settings } = seo;
+
+  return {
+    metadataBase: new URL(resolveSiteUrl(seo)),
+    applicationName: settings.websiteName || "TMN Sport",
+    title: { default: title, template: settings.seoTitleTemplate || "%s | TMN Sport" },
+    description,
+    ...sharingMetadata(seo, { title, description, image: home?.image }),
+    robots: settings.seoIndexing ? undefined : { index: false, follow: false },
+    verification: {
+      google: settings.seoGoogleVerification || undefined,
+      other: settings.seoBingVerification ? { "msvalidate.01": settings.seoBingVerification } : undefined,
+    },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#fed402",

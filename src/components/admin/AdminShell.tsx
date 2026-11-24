@@ -25,6 +25,7 @@ const standalone: Record<string, string> = {
   "/admin/media/upload": "Upload Media",
   "/admin/integrations": "SportMonks API Integration",
   "/admin/settings": "Website Settings",
+  "/admin/seo": "SEO Management",
   "/admin/pages": "Legal Pages",
   "/admin/roles": "Roles & Permissions",
   "/admin/profile": "Admin Profile",

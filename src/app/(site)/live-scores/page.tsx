@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 
 import { MatchdayPage } from "@/components/matches/MatchdayPage";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Live Scores",
-  description: "Follow matches live with current scores, key moments and verified status updates.",
-};
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("/live-scores", { title: "Live Scores", description: "Follow matches live with current scores, key moments and verified status updates." });
+}
 
 export default function LiveScoresPage(props: PageProps<"/live-scores">) {
   return (

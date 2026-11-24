@@ -107,6 +107,13 @@ export const mockSettings: SiteSettings = {
   gaMeasurementId: "",
   adsenseClientId: "",
   consentMode: "builtin",
+  seoSiteUrl: "",
+  seoTitleTemplate: "%s | TMN Sport",
+  seoDefaultImage: "",
+  seoTwitterHandle: "",
+  seoIndexing: true,
+  seoGoogleVerification: "",
+  seoBingVerification: "",
 };
 
 const allActions = ["view", "create", "edit", "delete", "publish", "manage"];

@@ -242,6 +242,8 @@ export interface ArticleDetail extends Article {
   seoTitle?: string | null;
   seoDescription?: string | null;
   socialImage?: string | null;
+  /** True when the story must stay out of search results and sitemap.xml. */
+  noindex?: boolean;
   /** Extra pictures shown as a gallery under the story. */
   gallery?: string[];
   blocks: ArticleBlock[];
@@ -503,6 +505,45 @@ export interface PublicSettings {
   adsenseClientId: string;
   /** "builtin": the site's own cookie banner. "google": Google's certified message from AdSense. */
   consentMode: "builtin" | "google";
+}
+
+/** Global search and share settings (admin "SEO" screen). */
+export interface SeoSettings {
+  /** The live address ("https://tmnsport.com"); empty falls back to SITE_URL. */
+  seoSiteUrl: string;
+  /** Page title format, "%s | TMN Sport". */
+  seoTitleTemplate: string;
+  /** Picture used when a shared page has none of its own. */
+  seoDefaultImage: string;
+  seoTwitterHandle: string;
+  /** False tells search engines to stay away from the whole site. */
+  seoIndexing: boolean;
+  seoGoogleVerification: string;
+  seoBingVerification: string;
+}
+
+/** Search and share text of one page, with the built-in text already filled in where nothing was edited. */
+export interface SeoPageText {
+  title: string;
+  description: string;
+  image: string;
+  noindex: boolean;
+}
+
+export interface SeoData {
+  settings: SeoSettings & { websiteName?: string };
+  /** Keyed by path: "/", "/news", "/live-scores"... */
+  pages: Record<string, SeoPageText | undefined>;
+}
+
+/** Addresses for sitemap.xml (GET /sitemap). */
+export interface SitemapData {
+  articles: { slug: string; updatedAt: string; publishedAt: string | null }[];
+  writers: string[];
+  teams: string[];
+  players: string[];
+  series: string[];
+  matches: string[];
 }
 
 export type SearchType = "all" | "news" | "matches" | "teams" | "players" | "videos";

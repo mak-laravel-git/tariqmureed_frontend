@@ -11,11 +11,11 @@ import { TimeAgo } from "@/components/ui/TimeAgo";
 import { getVideosPage } from "@/lib/api/endpoints";
 import type { Video } from "@/lib/api/types";
 import { firstParam, pageHref, type SearchParams } from "@/lib/url";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Videos",
-  description: "Highlights, interviews, analysis and original TMN Sport features.",
-};
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("/videos", { title: "Videos", description: "Highlights, interviews, analysis and original TMN Sport features." });
+}
 
 const PAGE_SIZE = 6;
 

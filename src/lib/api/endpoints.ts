@@ -44,6 +44,8 @@ import type {
   LegalPage,
   PlayerPage,
   PublicSettings,
+  SeoData,
+  SitemapData,
   SearchResults,
   SearchType,
   RecordGroup,
@@ -503,6 +505,45 @@ export async function getPublicSettings(): Promise<PublicSettings> {
     adsenseClientId: stored.adsenseClientId || env("ADSENSE_CLIENT_ID"),
     consentMode: (stored.consentMode || env("CONSENT_MODE")) === "google" ? "google" : "builtin",
   };
+}
+
+const defaultSeo: SeoData = {
+  settings: {
+    seoSiteUrl: "",
+    seoTitleTemplate: "%s | TMN Sport",
+    seoDefaultImage: "",
+    seoTwitterHandle: "",
+    seoIndexing: true,
+    seoGoogleVerification: "",
+    seoBingVerification: "",
+  },
+  pages: {},
+};
+
+/**
+ * Search and share settings written in the admin SEO screen (GET /seo): the title format, default picture,
+ * indexing switch and verification codes, and the text of every page. When the API cannot be reached the
+ * built-in defaults apply, so the pages keep their own titles and descriptions.
+ */
+export async function getSeo(): Promise<SeoData> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("seo", "settings");
+
+  const stored = await apiGet<Partial<SeoData>>("seo", { fallback: () => defaultSeo }).catch((): Partial<SeoData> => ({}));
+
+  return { settings: { ...defaultSeo.settings, ...stored.settings }, pages: stored.pages ?? {} };
+}
+
+/** The addresses sitemap.xml lists. GET /sitemap */
+export async function getSitemap(): Promise<SitemapData> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("articles", "seo");
+
+  return apiGet<SitemapData>("sitemap", {
+    fallback: () => ({ articles: [], writers: [], teams: [], players: [], series: [], matches: [] }),
+  }).catch((): SitemapData => ({ articles: [], writers: [], teams: [], players: [], series: [], matches: [] }));
 }
 
 /**

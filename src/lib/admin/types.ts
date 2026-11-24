@@ -48,6 +48,8 @@ export interface AdminRecord {
   seoDescription?: string | null;
   isFeatured?: boolean;
   isBreaking?: boolean;
+  /** Article editor only: keep the story out of search results. */
+  noindex?: boolean;
   /** Advertisement editor only. */
   placement?: string | null;
   adType?: string | null;
@@ -104,6 +106,7 @@ export interface RecordInput {
   seoDescription?: string;
   isFeatured?: string;
   isBreaking?: string;
+  noindex?: string;
 }
 
 export interface RecordList {
@@ -201,6 +204,38 @@ export interface SiteSettings {
   /** AdSense publisher ID ("ca-pub-…"); empty means no ads. */
   adsenseClientId: string;
   consentMode: "builtin" | "google";
+  /** Search and share settings (admin "SEO" screen). */
+  seoSiteUrl: string;
+  seoTitleTemplate: string;
+  seoDefaultImage: string;
+  seoTwitterHandle: string;
+  seoIndexing: boolean;
+  seoGoogleVerification: string;
+  seoBingVerification: string;
+}
+
+/** One website page in the SEO screen: its built-in text and what the editor wrote over it. */
+export interface AdminSeoPage {
+  path: string;
+  label: string;
+  defaultTitle: string;
+  defaultDescription: string;
+  title: string;
+  description: string;
+  image: string;
+  noindex: boolean;
+}
+
+export interface SeoHealthCheck {
+  key: string;
+  label: string;
+  status: "good" | "warning" | "error" | "info";
+  detail: string;
+}
+
+export interface AdminSeo {
+  pages: AdminSeoPage[];
+  health: SeoHealthCheck[];
 }
 
 /** A legal page listed in the admin "Legal Pages" screen. */

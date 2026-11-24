@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { ComingUpNext } from "@/components/home/ComingUpNext";
@@ -14,10 +15,50 @@ import { WritersSection } from "@/components/home/WritersSection";
 import { AdSlot } from "@/components/ui/AdSlot";
 import { Container } from "@/components/ui/Container";
 import { SectionSkeleton } from "@/components/ui/SectionSkeleton";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { getSeo } from "@/lib/api/endpoints";
+import { pageMetadata, resolveSiteUrl } from "@/lib/seo";
+
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("/", {
+    title: "TMN Sport — Live cricket scores, news, stats and video",
+    description:
+      "TMN Sport is an independent cricket media house delivering live scores, news, analysis, statistics and video from every major international and franchise competition.",
+  });
+}
+
+/** Tells search engines who runs the site and that it has a search box. */
+async function SiteJsonLd() {
+  const seo = await getSeo();
+  const site = resolveSiteUrl(seo);
+  const name = seo.settings.websiteName || "TMN Sport";
+
+  return (
+    <JsonLd
+      data={{
+        "@context": "https://schema.org",
+        "@graph": [
+          { "@type": "Organization", "@id": `${site}/#organization`, name, url: site, logo: `${site}/images/brand/logo.png` },
+          {
+            "@type": "WebSite",
+            "@id": `${site}/#website`,
+            url: site,
+            name,
+            publisher: { "@id": `${site}/#organization` },
+            potentialAction: { "@type": "SearchAction", target: `${site}/search?q={search_term_string}`, "query-input": "required name=search_term_string" },
+          },
+        ],
+      }}
+    />
+  );
+}
 
 export default function HomePage(props: PageProps<"/">) {
   return (
     <>
+      <Suspense fallback={null}>
+        <SiteJsonLd />
+      </Suspense>
       <div className="bg-white">
         <Container className="py-4">
           <AdSlot placement="home-top" className="py-4" />

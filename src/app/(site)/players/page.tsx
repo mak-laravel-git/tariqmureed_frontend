@@ -7,11 +7,11 @@ import { CountryName } from "@/components/ui/CountryName";
 import { PageIntro } from "@/components/ui/PageIntro";
 import { Photo } from "@/components/ui/Photo";
 import { getTrendingPlayers } from "@/lib/api/endpoints";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Players",
-  description: "Profiles and career statistics for the players making headlines.",
-};
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("/players", { title: "Players", description: "Profiles and career statistics for the players making headlines." });
+}
 
 async function PlayersBody() {
   const players = await getTrendingPlayers();
