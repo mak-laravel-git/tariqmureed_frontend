@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import { Container } from "@/components/ui/Container";
+import { CountryName } from "@/components/ui/CountryName";
 import { PageIntro } from "@/components/ui/PageIntro";
 import { Photo } from "@/components/ui/Photo";
 import { getTrendingPlayers } from "@/lib/api/endpoints";
@@ -22,7 +23,9 @@ async function PlayersBody() {
           <div className="relative aspect-[314/372] overflow-hidden rounded-[4px]">
             <Photo src={player.image} alt={player.name} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" />
           </div>
-          <p className="pt-3 text-[10px] leading-[15px] font-black text-[#d08700] uppercase">{player.country}</p>
+          <p className="pt-3 text-[10px] leading-[15px] font-black text-[#d08700] uppercase">
+            <CountryName name={player.country} />
+          </p>
           <h2 className="pt-1 text-base leading-6 font-black text-[#09090b] group-hover:underline">{player.name}</h2>
           <p className="text-sm leading-5 text-[#71717b]">{player.role}</p>
         </Link>

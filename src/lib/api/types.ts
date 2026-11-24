@@ -242,6 +242,8 @@ export interface ArticleDetail extends Article {
   seoTitle?: string | null;
   seoDescription?: string | null;
   socialImage?: string | null;
+  /** Extra pictures shown as a gallery under the story. */
+  gallery?: string[];
   blocks: ArticleBlock[];
   tags: string[];
   related: Article[];

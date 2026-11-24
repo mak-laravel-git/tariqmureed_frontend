@@ -42,6 +42,8 @@ export interface AdminRecord {
   imageCaption?: string | null;
   imageCredit?: string | null;
   socialImage?: string | null;
+  /** Article editor only: extra pictures shown in a gallery under the story. */
+  gallery?: string[];
   seoTitle?: string | null;
   seoDescription?: string | null;
   isFeatured?: boolean;
@@ -97,6 +99,7 @@ export interface RecordInput {
   imageCaption?: string;
   imageCredit?: string;
   socialImage?: string;
+  gallery?: string[];
   seoTitle?: string;
   seoDescription?: string;
   isFeatured?: string;

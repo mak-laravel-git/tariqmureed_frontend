@@ -6,6 +6,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Tag } from "@/components/ui/Tag";
 import { getTrendingPlayers } from "@/lib/api/endpoints";
 import type { TrendingPlayer } from "@/lib/api/types";
+import { CountryName } from "@/components/ui/CountryName";
 
 function PlayerCard({ player }: { player: TrendingPlayer }) {
   const stats = [
@@ -32,7 +33,7 @@ function PlayerCard({ player }: { player: TrendingPlayer }) {
           <p className="text-[11px] leading-4 font-bold tracking-[0.8px] text-gold uppercase">{player.role}</p>
           <h3 className="text-lg leading-6 font-bold text-white">{player.name}</h3>
           <p className="text-[13px] leading-[19.5px] text-white/65">
-            {player.team} · {player.country}
+            {player.team} · <CountryName name={player.country} className="align-middle" />
           </p>
         </div>
       </Link>

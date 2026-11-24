@@ -7,6 +7,8 @@ import type { AdminRecord, ResourceKey, StatusTab } from "@/lib/admin/types";
 import { cn } from "@/lib/cn";
 import { pageHref, type SearchParams } from "@/lib/url";
 
+import { CountryName } from "@/components/ui/CountryName";
+
 import { PrimaryLink, SecondaryLink, StatusBadge } from "./AdminUi";
 import { AdminIcon } from "./icons";
 
@@ -94,7 +96,7 @@ export function ResourceTable({ resource, records, total, tab, query, page, para
                   <th scope="row" className="px-4 py-3.5 pl-5 font-semibold text-ink">
                     <span className="flex items-center gap-3">
                       {hasThumbnails && <Thumbnail src={record.thumbnail} name={record.title} />}
-                      {record.title}
+                      {resource === "categories" ? <CountryName name={record.title} /> : record.title}
                     </span>
                   </th>
                   <td className="px-4 py-3.5">{record.subtitle}</td>

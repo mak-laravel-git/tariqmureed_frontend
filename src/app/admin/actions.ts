@@ -61,6 +61,17 @@ function refreshPublicStories(resource: string): void {
   }
 }
 
+/** The gallery field sends its image addresses as a JSON list. */
+function parseGallery(value: string): string[] {
+  try {
+    const parsed: unknown = JSON.parse(value || "[]");
+
+    return Array.isArray(parsed) ? parsed.filter((entry): entry is string => typeof entry === "string" && entry.trim() !== "") : [];
+  } catch {
+    return [];
+  }
+}
+
 /** Only allow redirects back into the admin area. */
 function safeNext(value: string): string {
   return value.startsWith("/admin") && !value.startsWith("//") ? value : "/admin";
@@ -146,6 +157,7 @@ export async function saveRecordAction(
     imageCaption: text(formData, "imageCaption"),
     imageCredit: text(formData, "imageCredit"),
     socialImage: text(formData, "socialImage"),
+    gallery: parseGallery(text(formData, "gallery")),
     seoTitle: text(formData, "seoTitle"),
     seoDescription: text(formData, "seoDescription"),
     isFeatured: formData.has("isFeatured") ? "1" : "0",

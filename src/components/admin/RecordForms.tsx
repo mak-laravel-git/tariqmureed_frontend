@@ -17,7 +17,7 @@ import {
   TextArea,
   TextInput,
 } from "./AdminUi";
-import { ImageField } from "./ImageField";
+import { GalleryField, ImageField } from "./ImageField";
 
 const initialState: FormState = { status: "idle", message: "" };
 
@@ -267,6 +267,15 @@ export function ArticleForm({ resource, record, options }: FormProps & { options
             <Field label="Image Credit">
               <TextInput name="imageCredit" defaultValue={record?.imageCredit ?? ""} placeholder="Photo: ..." />
             </Field>
+            <div className="sm:col-span-2">
+              <GalleryField
+                name="gallery"
+                label="Image Gallery"
+                initial={record?.gallery}
+                media={options.media}
+                hint="More pictures for this story. They appear as a gallery under the article, in the order shown here."
+              />
+            </div>
             <div className="sm:col-span-2">
               <ImageField name="socialImage" label="Social Sharing Image" initial={record?.socialImage} media={options.media} hint="Shown when the story is shared on social networks. Leave empty to use the featured image." />
             </div>          </div>

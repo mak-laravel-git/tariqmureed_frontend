@@ -8,6 +8,7 @@ import { renderInline, videoEmbedUrl } from "@/components/news/RichText";
 import { AdSlot } from "@/components/ui/AdSlot";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Container } from "@/components/ui/Container";
+import { CountryName } from "@/components/ui/CountryName";
 import { Photo } from "@/components/ui/Photo";
 import { ShareButton } from "@/components/ui/ShareButton";
 import { getArticle } from "@/lib/api/endpoints";
@@ -102,6 +103,30 @@ function Block({ block }: { block: ArticleBlock }) {
   }
 }
 
+/** More pictures for the story: opens each one full size in a new tab. */
+function Gallery({ images, title }: { images: string[]; title: string }) {
+  return (
+    <section aria-label="Photo gallery" className="mt-10">
+      <h2 className="text-sm leading-5 font-black tracking-[0.7px] text-[#09090b] uppercase">Photo gallery</h2>
+      <ul className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3">
+        {images.map((src, index) => (
+          <li key={src} className={images.length % 3 === 1 && index === 0 ? "col-span-2 md:col-span-3" : undefined}>
+            <a href={src} target="_blank" rel="noopener noreferrer" className="group block overflow-hidden rounded-lg bg-[#f4f4f5]">
+              {/* eslint-disable-next-line @next/next/no-img-element -- editors may link any image host */}
+              <img
+                src={src}
+                alt={`${title}, photo ${index + 1} of ${images.length}`}
+                loading="lazy"
+                className="aspect-[3/2] w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+              />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 async function ArticleContent({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const article = await getArticle(slug);
@@ -123,7 +148,7 @@ async function ArticleContent({ params }: { params: Promise<{ slug: string }> })
       <header className="mt-10">
         <div className="flex pt-[3px]">
           <span className="inline-flex items-center rounded-[4px] bg-[#fdc700] px-2.5 py-1 text-[10px] leading-[15px] font-black tracking-[1.5px] text-black uppercase">
-            {article.category}
+            <CountryName name={article.category} className="gap-1.5" />
           </span>
         </div>
         <h1 className="mt-5 text-[34px] leading-[1.1] font-bold text-[#09090b] sm:text-5xl lg:text-[60px] lg:leading-[63px]">
@@ -169,6 +194,8 @@ async function ArticleContent({ params }: { params: Promise<{ slug: string }> })
               <Block key={index} block={block} />
             ))}
           </div>
+
+          {article.gallery && article.gallery.length > 0 && <Gallery images={article.gallery} title={article.title} />}
 
           {article.tags.length > 0 && (
             <ul className="mt-10 flex flex-wrap gap-2" aria-label="Tags">
