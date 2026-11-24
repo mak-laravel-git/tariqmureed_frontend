@@ -119,7 +119,9 @@ export function Field({
 }
 
 export function TextInput(props: ComponentProps<"input">) {
-  return <input {...props} className={cn(fieldBase, "h-10", props.className)} />;
+  // suppressHydrationWarning: browser extensions (autofill / temp-mail) inject attributes
+  // into inputs before React hydrates, which otherwise floods the admin login with mismatches.
+  return <input {...props} suppressHydrationWarning className={cn(fieldBase, "h-10", props.className)} />;
 }
 
 export function TextArea(props: ComponentProps<"textarea">) {

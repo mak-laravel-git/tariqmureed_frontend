@@ -3,7 +3,7 @@
 export interface NavItem {
   label: string;
   href: string;
-  /** Shows the red "live" dot next to the label. */
+  /** Shows the red "live" dot between the first and remaining words of the label. */
   live?: boolean;
 }
 

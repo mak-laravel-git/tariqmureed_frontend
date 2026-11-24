@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { LiveDot } from "@/components/ui/LiveDot";
+import { LiveRefresh } from "@/components/ui/LiveRefresh";
 import { MatchCard } from "@/components/ui/MatchCard";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -49,6 +50,7 @@ export async function LiveMatchCentre({ searchParams }: LiveMatchCentreProps) {
 
   return (
     <Section id="live" tone="surface" aria-labelledby="live-match-centre-title">
+      {(summary.liveNow > 0 || activeTab === "live") && <LiveRefresh seconds={summary.liveNow > 0 ? 10 : 30} />}
       <div className="flex flex-col gap-5">
         <SectionHeading
           id="live-match-centre-title"

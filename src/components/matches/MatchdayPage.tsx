@@ -5,6 +5,7 @@ import { CompetitionSelect } from "@/components/ui/CompetitionSelect";
 import { Container } from "@/components/ui/Container";
 import { FilterTabs } from "@/components/ui/FilterTabs";
 import { FixtureCard } from "@/components/ui/FixtureCard";
+import { LiveRefresh } from "@/components/ui/LiveRefresh";
 import { PageIntro } from "@/components/ui/PageIntro";
 import { getMatchday } from "@/lib/api/endpoints";
 import type { MatchdayView } from "@/lib/api/types";
@@ -38,9 +39,12 @@ async function MatchdayBody({
   const competition = firstParam(params.competition);
 
   const day = await getMatchday(view, competition);
+  const anyLive = day.groups.some((group) => group.matches.some((match) => match.state === "live" || match.state === "break"));
 
   return (
     <Container className="pb-16">
+      {/* Scores move every few seconds while a match is on; the Live tab also watches for a match starting. */}
+      {(anyLive || view === "live") && <LiveRefresh seconds={anyLive ? 10 : 30} />}
       <FilterTabs
         className="py-6"
         label="Match view"

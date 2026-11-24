@@ -31,6 +31,7 @@ export function NavLinks({ items, orientation = "horizontal", onNavigate }: NavL
     >
       {items.map((item) => {
         const active = isActive(pathname, item.href);
+        const [liveLead, ...liveRest] = item.live ? item.label.split(" ") : [];
 
         return (
           <li key={item.href}>
@@ -39,12 +40,19 @@ export function NavLinks({ items, orientation = "horizontal", onNavigate }: NavL
               onClick={onNavigate}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "relative flex items-start gap-1.5 rounded-[6px] px-2.5 py-[7.5px] text-[13.5px] leading-[20.25px] font-bold tracking-[0.338px] uppercase transition-colors",
+                "relative flex items-center gap-1.5 rounded-[6px] px-2.5 py-[7.5px] text-[13.5px] leading-[20.25px] font-bold tracking-[0.338px] uppercase transition-colors",
                 active ? "text-ink" : "text-charade hover:text-ink",
               )}
             >
-              {item.label}
-              {item.live && <LiveDot size={6} className="mt-[8.8px]" />}
+              {item.live ? (
+                <>
+                  {liveLead}
+                  <LiveDot size={6} />
+                  {liveRest.join(" ")}
+                </>
+              ) : (
+                item.label
+              )}
               {active && (
                 <span
                   aria-hidden="true"

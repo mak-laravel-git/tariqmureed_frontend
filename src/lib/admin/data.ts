@@ -193,13 +193,9 @@ export async function getDashboard(): Promise<Dashboard> {
 export async function getNotifications(): Promise<AdminNotification[]> {
   try {
     return await adminRequest<AdminNotification[]>("notifications", { fallback: () => mockNotifications });
-  } catch (error) {
-    // The Laravel API has no notifications endpoint yet: show an empty bell instead of failing every admin page.
-    if (error instanceof ApiError && error.status === 404) {
-      return [];
-    }
-
-    throw error;
+  } catch {
+    // No notifications endpoint yet (404), or a transient API failure: keep the shell usable.
+    return [];
   }
 }
 

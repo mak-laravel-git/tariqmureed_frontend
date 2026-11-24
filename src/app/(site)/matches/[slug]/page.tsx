@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { MatchHeader } from "@/components/matches/MatchHeader";
+import { LiveRefresh } from "@/components/ui/LiveRefresh";
 import { MatchTabBar, MatchTabContent, resolveMatchTab } from "@/components/matches/MatchTabs";
 import { getMatchDetail } from "@/lib/api/endpoints";
 import { firstParam } from "@/lib/url";
@@ -21,6 +22,7 @@ async function MatchCentre({
 
   return (
     <>
+      {(match.state === "live" || match.state === "break") && <LiveRefresh seconds={10} />}
       <MatchHeader match={match} />
       <MatchTabBar slug={match.slug} active={tab} />
       <MatchTabContent match={match} tab={tab} />

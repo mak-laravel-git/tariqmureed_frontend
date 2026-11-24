@@ -107,6 +107,22 @@ export function countryCode(name: string | null | undefined): string | null {
   return codes[key] || null;
 }
 
+/**
+ * The flag code of a national cricket team. Women's, A and age-group sides carry their country's flag too
+ * ("India W", "Australia Women", "England A", "Pakistan U19"); clubs and franchises have none.
+ */
+export function teamCountryCode(name: string | null | undefined): string | null {
+  const full = countryCode(name);
+
+  if (full) {
+    return full;
+  }
+
+  const country = (name ?? "").replace(/\s+(w|women|women's|a|xi|u-?\d{2}|under[- ]?\d{2})$/i, "");
+
+  return country === name ? null : countryCode(country);
+}
+
 /** Flag picture address (flagcdn.com) for a country code, at the given pixel width. */
 export function flagUrl(code: string, width: 20 | 40 | 80 | 160): string {
   return `https://flagcdn.com/w${width}/${code}.png`;
