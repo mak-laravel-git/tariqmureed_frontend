@@ -162,6 +162,12 @@ export function ResourceActions({ resource }: { resource: ResourceKey }) {
       <SecondaryLink href={`/admin/export/${resource}`} prefetch={false}>
         Export
       </SecondaryLink>
+      {resource === "series" && (
+        <PrimaryLink href="/admin/series/arrange">
+          <AdminIcon name="sliders" width={14} height={14} />
+          Arrange series strip
+        </PrimaryLink>
+      )}
       {!config.readOnly && !config.noCreate && (
         <PrimaryLink href={`/admin/${resource}/new`}>
           <AdminIcon name="plus" width={14} height={14} />

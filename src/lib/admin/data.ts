@@ -19,6 +19,7 @@ import type {
   AdminNotification,
   AdminSeo,
   AdminSeoPage,
+  SeriesArrangement,
   AdOptions,
   AdPlacementOption,
   ArticleOptions,
@@ -285,6 +286,25 @@ export async function saveSettings(input: Partial<SiteSettings>): Promise<void> 
     method: "PUT",
     body: input,
     fallback: () => Object.assign(mockStore().settings, input),
+  });
+}
+
+/** Competitions on show in the website's series strip (in order) and the hidden ones (GET /admin/competitions/arrangement). */
+export async function getSeriesArrangement(): Promise<SeriesArrangement> {
+  return adminRequest<SeriesArrangement>("competitions/arrangement", {
+    fallback: () => ({
+      visible: [{ id: "1", name: "Andhra T20 League", detail: "T20", status: "Upcoming" }],
+      hidden: [{ id: "2", name: "Sample Series", detail: "ODI", status: "No matches yet" }],
+    }),
+  });
+}
+
+/** Saves which competitions show in the strip and in what order; every other one is hidden. */
+export async function saveSeriesArrangement(visible: number[]): Promise<void> {
+  await adminRequest<SeriesArrangement>("competitions/arrangement", {
+    method: "PUT",
+    body: { visible },
+    fallback: () => ({ visible: [], hidden: [] }),
   });
 }
 

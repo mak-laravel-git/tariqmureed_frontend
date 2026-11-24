@@ -233,6 +233,22 @@ export interface SeoHealthCheck {
   detail: string;
 }
 
+/** One competition in the series arrangement screen. */
+export interface SeriesRow {
+  id: string;
+  name: string;
+  /** "T20I · T20 · International" */
+  detail: string;
+  /** In progress, Upcoming, Completed or No matches yet. */
+  status: string;
+}
+
+/** The website's series strip: competitions on show in their order, and the hidden ones. */
+export interface SeriesArrangement {
+  visible: SeriesRow[];
+  hidden: SeriesRow[];
+}
+
 export interface AdminSeo {
   pages: AdminSeoPage[];
   health: SeoHealthCheck[];

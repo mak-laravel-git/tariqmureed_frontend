@@ -12,6 +12,7 @@ import {
   resetPage,
   runSync,
   saveSeo,
+  saveSeriesArrangement,
   savePage,
   saveRecord,
   savePermissions,
@@ -257,6 +258,32 @@ export async function saveSeoAction(_previous: FormState, formData: FormData): P
   updateTag("settings");
 
   return { status: "success", message: "SEO saved. The website now uses the new titles, descriptions and search settings." };
+}
+
+/** Saves the series strip: the listed competitions are shown in that order, the rest are hidden. */
+export async function saveSeriesArrangementAction(_previous: FormState, formData: FormData): Promise<FormState> {
+  let ids: number[];
+
+  try {
+    const parsed: unknown = JSON.parse(text(formData, "visible") || "[]");
+    ids = Array.isArray(parsed) ? parsed.map(Number).filter((id) => Number.isInteger(id) && id > 0) : [];
+  } catch {
+    return { status: "error", message: "The list could not be read. Reload the page and try again." };
+  }
+
+  try {
+    await saveSeriesArrangement(ids);
+  } catch (error) {
+    return failure(error);
+  }
+
+  // The strip, the home spotlight and the series directory are cached by the public site.
+  updateTag("competitions");
+
+  return {
+    status: "success",
+    message: ids.length === 0 ? "Saved. No series is shown on the website now." : `Saved. The website now shows ${ids.length} series, in this order.`,
+  };
 }
 
 export async function savePageAction(slug: string, _previous: FormState, formData: FormData): Promise<FormState> {
