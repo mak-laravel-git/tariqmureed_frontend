@@ -20,6 +20,8 @@ export interface TeamSummary {
   /** 2-3 letter code shown inside the circular badge, e.g. "MI". */
   shortName: string;
   colors: TeamColors;
+  /** The team's logo from the data feed; drawn in the badge for teams that have no country flag. */
+  image?: string | null;
 }
 
 export interface TeamProfile extends TeamSummary {
@@ -337,6 +339,8 @@ export interface DirectoryItem {
   /** Two or three letters inside the circular badge. */
   badge: string;
   colors: TeamColors;
+  /** The team's logo from the data feed, when it has one. */
+  image?: string | null;
   /** "In progress" | "Upcoming" | "Completed" */
   status: string;
   description: string;

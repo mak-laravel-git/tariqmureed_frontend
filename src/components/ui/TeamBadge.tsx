@@ -2,14 +2,14 @@ import type { TeamSummary } from "@/lib/api/types";
 import { flagUrl, teamCountryCode } from "@/lib/countries";
 
 interface TeamBadgeProps {
-  team: Pick<TeamSummary, "shortName" | "colors" | "name">;
+  team: Pick<TeamSummary, "shortName" | "colors" | "name" | "image">;
   /** Diameter in px (design uses 38 for score cards, 48 for the team profile). */
   size?: number;
 }
 
 /**
- * Circular team crest. A national team shows its country's flag; a club or franchise (no flag) is drawn from
- * its team colours and short code.
+ * Circular team crest. A national team shows its country's flag; any other team shows its own logo from the data
+ * feed, and when it has none it is drawn from its team colours and short code.
  */
 export function TeamBadge({ team, size = 38 }: TeamBadgeProps) {
   const flag = teamCountryCode(team.name);
@@ -33,6 +33,28 @@ export function TeamBadge({ team, size = 38 }: TeamBadgeProps) {
           height={size}
           loading="lazy"
           className="size-full object-cover"
+        />
+      </span>
+    );
+  }
+
+  if (team.image) {
+    return (
+      <span
+        role="img"
+        aria-label={team.name}
+        className="relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.12)]"
+        style={{ width: size, height: size }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element -- small team logo from the data feed CDN */}
+        <img
+          src={team.image}
+          alt=""
+          width={size}
+          height={size}
+          loading="lazy"
+          className="object-contain"
+          style={{ width: size * 0.86, height: size * 0.86 }}
         />
       </span>
     );

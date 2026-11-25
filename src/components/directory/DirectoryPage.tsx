@@ -59,7 +59,7 @@ async function DirectoryBody({ basePath, load, searchParams }: Omit<DirectoryPag
               className="flex h-full flex-col rounded-[4px] border border-[#e4e4e7] bg-white p-6 transition-shadow hover:shadow-[0_4px_14px_rgba(17,17,17,0.08)]"
             >
               <span className="flex items-start justify-between gap-3">
-                <TeamBadge team={{ name: entry.name, shortName: entry.badge, colors: entry.colors }} size={64} />
+                <TeamBadge team={{ name: entry.name, shortName: entry.badge, colors: entry.colors, image: entry.image }} size={64} />
                 <StatusTag status={entry.status} />
               </span>
               <span className="pt-7 text-xl leading-7 font-black text-[#09090b]">{entry.name}</span>
