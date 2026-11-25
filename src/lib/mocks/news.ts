@@ -16,7 +16,7 @@ export const mockNewsCategories: NewsCategory[] = [
   { slug: "features", name: "Features" },
 ];
 
-const desk = { slug: "tmn-desk", name: "TMN Desk" };
+const desk = { slug: "tmn-desk", name: "TMN Desk", hasProfile: false };
 
 interface SeedArticle {
   slug: string;

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { AuthorLink } from "@/components/news/AuthorLink";
 import { Photo } from "@/components/ui/Photo";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -50,7 +51,7 @@ function LeadStory({ article }: { article: Article }) {
         )}
 
         <p className="mt-auto flex flex-wrap items-center gap-3 pt-5 text-[12.5px] leading-[18.75px] text-white/60">
-          <span className="font-semibold text-white">{article.author.name}</span>
+          <AuthorLink author={article.author} className="font-semibold text-white" />
           <TimeAgo iso={article.publishedAt} />
           <span aria-hidden="true">·</span>
           <span>{article.readMinutes} min read</span>
@@ -81,7 +82,7 @@ function SideStory({ article }: { article: Article }) {
           </Link>
         </h3>
         <p className="text-xs leading-[18px] text-muted">
-          {article.author.name} · <TimeAgo iso={article.publishedAt} />
+          <AuthorLink author={article.author} /> · <TimeAgo iso={article.publishedAt} />
         </p>
       </div>
     </article>

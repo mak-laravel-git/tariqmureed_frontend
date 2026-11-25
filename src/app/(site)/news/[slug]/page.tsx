@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
+import { AuthorLink } from "@/components/news/AuthorLink";
 import { NewsCard } from "@/components/news/NewsCard";
 import { renderInline, videoEmbedUrl } from "@/components/news/RichText";
 import { AdSlot } from "@/components/ui/AdSlot";
@@ -167,7 +168,7 @@ async function ArticleContent({ params }: { params: Promise<{ slug: string }> })
               {initials(article.author.name)}
             </span>
             <p className="flex flex-wrap items-center gap-x-4 gap-y-0.5 text-xs leading-4">
-              <span className="font-bold text-[#09090b]">{article.author.name}</span>
+              <AuthorLink author={article.author} className="font-bold text-[#09090b]" />
               <span className="text-[#9f9fa9]">
                 Published {formatPublishedDate(article.publishedAt)} · {article.readMinutes} min read
               </span>
@@ -292,7 +293,11 @@ async function ArticleJsonLd({ params }: { params: Promise<{ slug: string }> }) 
         dateModified: article.publishedAt,
         articleSection: article.category,
         keywords: article.tags.join(", "),
-        author: { "@type": "Person", name: article.author.name },
+        author: {
+          "@type": "Person",
+          name: article.author.name,
+          ...(article.author.hasProfile === false ? {} : { url: `${site}/writers/${article.author.slug}` }),
+        },
         publisher: {
           "@type": "Organization",
           name: seo.settings.websiteName || "TMN Sport",

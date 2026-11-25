@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { AuthorLink } from "@/components/news/AuthorLink";
 import { Photo } from "@/components/ui/Photo";
 import { TimeAgo } from "@/components/ui/TimeAgo";
 import type { Article } from "@/lib/api/types";
@@ -45,7 +46,7 @@ export function NewsCard({ article, compact = false }: { article: Article; compa
             "mt-3 text-xs leading-4 text-[#71717b]"
           }
         >
-          <TimeAgo iso={article.publishedAt} /> · By {article.author.name}
+          <TimeAgo iso={article.publishedAt} /> · By <AuthorLink author={article.author} />
         </p>
       </div>
     </article>

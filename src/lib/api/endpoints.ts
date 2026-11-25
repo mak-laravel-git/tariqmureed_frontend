@@ -22,7 +22,7 @@ import {
 } from "@/lib/mocks/matches";
 import { buildMockMatchday } from "@/lib/mocks/matchday";
 import { buildMockMatchDetail } from "@/lib/mocks/matchdetail";
-import { buildMockArticleDetail, buildMockNewsPage } from "@/lib/mocks/news";
+import { buildMockArticleDetail, buildMockNewsPage, listMockArticles } from "@/lib/mocks/news";
 import { buildMockSearch } from "@/lib/mocks/search";
 import { buildMockRecordsPage, buildMockStatsPage } from "@/lib/mocks/statistics";
 import {
@@ -74,6 +74,7 @@ import type {
   TrendingPlayer,
   Video,
   Writer,
+  WriterArticles,
 } from "./types";
 
 /**
@@ -374,6 +375,27 @@ export async function getWriter(slug: string): Promise<Writer | null> {
 
   return apiGet<Writer | null>(`writers/${encodeURIComponent(slug)}`, {
     fallback: () => mockWriters.find((writer) => writer.slug === slug) ?? null,
+  });
+}
+
+/**
+ * GET /writers/{slug}/articles - every published story of one author, newest first.
+ * Cached under the "articles" tag, so a story published in the admin shows up on the profile straight away.
+ */
+export async function getWriterArticles(slug: string, limit: number): Promise<WriterArticles> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("articles", "writers");
+
+  return apiGet<WriterArticles>(`writers/${encodeURIComponent(slug)}/articles`, {
+    query: { limit },
+    fallback: () => {
+      const own = [...buildMockArticles().latest, ...listMockArticles()]
+        .filter((entry) => entry.author.slug === slug)
+        .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt));
+
+      return { articles: own.slice(0, limit), total: own.length };
+    },
   });
 }
 

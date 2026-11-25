@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { AuthorLink } from "@/components/news/AuthorLink";
 import { AdSlot } from "@/components/ui/AdSlot";
 import { Photo } from "@/components/ui/Photo";
 import { Section } from "@/components/ui/Section";
@@ -13,7 +14,7 @@ import type { Article, StatHighlight } from "@/lib/api/types";
 function ArticleMeta({ article }: { article: Article }) {
   return (
     <p className="flex flex-wrap items-center gap-x-1.5 text-xs leading-[18px] text-muted">
-      <span className="font-semibold text-ink">{article.author.name}</span>
+      <AuthorLink author={article.author} className="font-semibold text-ink" />
       <span aria-hidden="true">·</span>
       <TimeAgo iso={article.publishedAt} />
       <span aria-hidden="true">·</span>

@@ -78,6 +78,7 @@ async function NewsBody({ searchParams }: { searchParams: Promise<SearchParams> 
           {hasMore && (
             <Link
               href={pageHref(params, { limit: String(limit + PAGE_SIZE) }, undefined, "/news")}
+              replace
               scroll={false}
               className="mt-7 flex h-[52px] w-full items-center justify-center rounded-lg border border-[#09090b] text-xs leading-4 font-black tracking-[0.6px] text-[#09090b] uppercase transition-colors hover:bg-[#09090b] hover:text-white"
             >

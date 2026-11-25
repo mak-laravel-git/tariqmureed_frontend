@@ -107,6 +107,8 @@ export interface TickerItem {
 export interface Author {
   slug: string;
   name: string;
+  /** False when the author has no public profile page (a desk byline), so the name is not made a link. */
+  hasProfile?: boolean;
 }
 
 export interface Article {
@@ -207,6 +209,13 @@ export interface Writer {
   avatar: string;
   articleCount: number;
   since: number;
+}
+
+/** One author's published stories, newest first. */
+export interface WriterArticles {
+  articles: Article[];
+  /** All published stories of the author, used to decide whether "Show more" is shown. */
+  total: number;
 }
 
 export interface NewsCategory {
