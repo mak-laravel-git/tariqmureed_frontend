@@ -18,7 +18,7 @@ export function MobileNav({ items }: { items: NavItem[] }) {
         aria-controls="mobile-navigation"
         aria-label={open ? "Close menu" : "Open menu"}
         onClick={() => setOpen((value) => !value)}
-        className="flex size-10 items-center justify-center rounded-[4px] border border-ink lg:hidden"
+        className="flex size-10 items-center justify-center rounded-[4px] border border-ink xl:hidden"
       >
         <span aria-hidden="true" className="flex w-5 flex-col gap-[5px]">
           <span
@@ -34,7 +34,7 @@ export function MobileNav({ items }: { items: NavItem[] }) {
       {open && (
         <div
           id="mobile-navigation"
-          className="absolute inset-x-0 top-full border-t border-ink/10 bg-brand px-4 py-3 shadow-lg lg:hidden"
+          className="absolute inset-x-0 top-full border-t border-ink/10 bg-brand px-4 py-3 shadow-lg xl:hidden"
         >
           <Suspense fallback={null}>
             <NavLinks items={items} orientation="vertical" onNavigate={() => setOpen(false)} />

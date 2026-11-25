@@ -32,6 +32,7 @@ export function SearchFilters({ active, params }: SearchFiltersProps) {
         return (
           <Link
             key={entry.key}
+            replace
             href={pageHref(params, { type: entry.key === "all" ? null : entry.key, limit: null }, undefined, "/search")}
             aria-current={selected ? "page" : undefined}
             className={cn(

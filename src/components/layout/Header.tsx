@@ -12,19 +12,19 @@ import { NavLinks } from "./NavLinks";
 export function Header() {
   return (
     <header className="sticky top-0 z-40 bg-brand backdrop-blur-[8px]">
-      <div className="relative mx-auto flex h-[68px] w-full max-w-[1280px] items-center gap-3 px-4 sm:px-6 xl:px-0">
+      <div className="relative mx-auto flex h-[68px] w-full max-w-[1280px] items-center gap-3 px-4 sm:h-[72px] sm:px-6 xl:px-0">
         <Link href="/" aria-label="TMN Sport home" className="shrink-0">
           <Image
             src="/images/brand/logo.png"
             alt="TMN Sport"
-            width={163}
-            height={54}
+            width={196}
+            height={65}
             priority
-            className="h-[34px] w-[103px] object-contain sm:h-[45px] sm:w-[136px] lg:h-[50px] lg:w-[150px] xl:h-[54px] xl:w-[163px]"
+            className="h-[41px] w-[124px] object-contain sm:h-[54px] sm:w-[163px] lg:h-[60px] lg:w-[180px] xl:h-[65px] xl:w-[196px]"
           />
         </Link>
 
-        <nav aria-label="Main navigation" className="hidden pl-4 lg:block xl:pl-6">
+        <nav aria-label="Main navigation" className="hidden pl-6 xl:block">
           <Suspense fallback={<div className="h-[37px] w-[743px]" />}>
             <NavLinks items={mainNav} />
           </Suspense>

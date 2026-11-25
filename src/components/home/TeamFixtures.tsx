@@ -80,6 +80,7 @@ export async function TeamFixtures({ searchParams }: TeamFixturesProps) {
               <Link
                 key={team.slug}
                 href={pageHref(params, { team: team.slug === teams[0]?.slug ? null : team.slug }, "team-fixtures")}
+                replace
                 scroll={false}
                 aria-current={active ? "true" : undefined}
                 className={cn(

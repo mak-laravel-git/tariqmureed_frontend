@@ -23,6 +23,7 @@ export function UnderlineTabs({ tabs, label }: { tabs: UnderlineTab[]; label: st
             <Link
               key={tab.label}
               href={tab.href}
+              replace
               scroll={false}
               aria-current={tab.active ? "page" : undefined}
               className={cn(

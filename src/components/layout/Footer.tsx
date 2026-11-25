@@ -25,9 +25,9 @@ export function Footer() {
                 <Image
                   src="/images/brand/logo-white.png"
                   alt="TMN Sport"
-                  width={374}
-                  height={45}
-                  className="h-[45px] w-[374px] max-w-full object-contain object-left"
+                  width={243}
+                  height={29}
+                  className="h-[29px] w-[243px] max-w-full object-contain object-left"
                 />
               </Link>
 

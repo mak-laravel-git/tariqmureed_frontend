@@ -22,6 +22,7 @@ export function FilterTabs({ tabs, label, className }: FilterTabsProps) {
         <Link
           key={tab.label}
           href={tab.href}
+          replace
           scroll={false}
           aria-current={tab.active ? "page" : undefined}
           className={cn(

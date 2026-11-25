@@ -69,6 +69,7 @@ export async function LiveMatchCentre({ searchParams }: LiveMatchCentreProps) {
               <Link
                 key={tab.key}
                 href={pageHref(params, { status: tab.key === "live" ? null : tab.key }, "live")}
+                replace
                 scroll={false}
                 aria-current={active ? "true" : undefined}
                 className={cn(

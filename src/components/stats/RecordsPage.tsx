@@ -154,6 +154,7 @@ async function RecordsBody({ searchParams }: { searchParams: Promise<SearchParam
                 <li key={entry.key} className="border-t border-[#f1f5f9] first:border-t-0">
                   <Link
                     href={href({ group: entry.key })}
+                    replace
                     scroll={false}
                     className="flex items-center justify-between py-2.5 text-[13px] leading-[19.5px] text-[#334155] hover:text-[#0f172a]"
                   >

@@ -131,6 +131,7 @@ async function VideosBody({ searchParams }: { searchParams: Promise<SearchParams
       {page.total > page.videos.length && (
         <Link
           href={pageHref(params, { limit: String(limit + PAGE_SIZE) }, undefined, "/videos")}
+          replace
           scroll={false}
           className="mt-10 flex h-11 w-full items-center justify-center rounded-[4px] border border-[#09090b] bg-white text-[11px] font-bold tracking-[0.16em] text-[#09090b] uppercase transition-colors hover:bg-[#09090b] hover:text-white"
         >

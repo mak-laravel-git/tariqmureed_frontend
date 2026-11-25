@@ -112,6 +112,7 @@ export function FilterRow({ variant, label, items }: FilterRowProps) {
           <Link
             key={item.label}
             href={item.href}
+            replace
             scroll={false}
             aria-current={item.active ? "true" : undefined}
             className={cn(

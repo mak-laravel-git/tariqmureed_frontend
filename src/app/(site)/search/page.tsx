@@ -76,6 +76,7 @@ async function SearchBody({ searchParams }: { searchParams: Promise<SearchParams
               {found.total > found.results.length && (
                 <Link
                   href={pageHref(params, { limit: String(limit + PAGE_SIZE) }, undefined, "/search")}
+                  replace
                   scroll={false}
                   className="mt-10 flex h-11 w-full items-center justify-center rounded-[4px] border border-[#09090b] bg-white text-[11px] font-black tracking-[0.16em] text-[#09090b] uppercase transition-colors hover:bg-[#09090b] hover:text-white"
                 >
