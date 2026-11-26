@@ -38,7 +38,7 @@ export default async function NewRecordPage(props: PageProps<"/admin/[resource]/
       ) : config.form === "advertisement" ? (
         <AdvertisementForm resource={resource} cancelHref={`/admin/${resource}`} options={await getAdOptions()} />
       ) : (
-        <GenericRecordForm resource={resource} cancelHref={`/admin/${resource}`} imageLabel={config.imageLabel} media={config.imageLabel ? await getMedia() : undefined} />
+        <GenericRecordForm resource={resource} cancelHref={`/admin/${resource}`} imageLabel={config.imageLabel} imageRatio={config.imageRatio} media={config.imageLabel ? await getMedia() : undefined} />
       )}
     </>
   );

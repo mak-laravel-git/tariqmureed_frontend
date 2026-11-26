@@ -5,9 +5,12 @@ import { redirect } from "next/navigation";
 
 import { ApiError, apiPost } from "@/lib/api/client";
 import { apiConfig } from "@/lib/api/config";
+import type { CropRect } from "@/lib/admin/crop";
 import {
+  cropImage,
   deleteMedia,
   deleteRecord,
+  getImageSource,
   pageLabels,
   resetPage,
   runSync,
@@ -417,6 +420,28 @@ export async function uploadImageAction(formData: FormData): Promise<{ asset?: M
     return { asset: await uploadMedia(formData) };
   } catch (error) {
     return { error: failure(error, "The image could not be uploaded.").message };
+  }
+}
+
+/** The full picture behind an image address, for the crop window. */
+export async function imageSourceAction(url: string): Promise<{ asset?: MediaAsset; error?: string }> {
+  try {
+    return { asset: await getImageSource(url) };
+  } catch (error) {
+    // 404 = not a croppable Media Library file. The API words every 404 the same, so explain it here.
+    if (error instanceof ApiError && error.status === 404) {
+      return { error: "Only JPG, PNG and WebP images stored in the Media Library can be cropped." };
+    }
+
+    return { error: failure(error, "The image could not be opened for cropping.").message };
+  }
+}
+
+export async function cropImageAction(id: string, area: CropRect): Promise<{ asset?: MediaAsset; error?: string }> {
+  try {
+    return { asset: await cropImage(id, area) };
+  } catch (error) {
+    return { error: failure(error, "The image could not be cropped.").message };
   }
 }
 

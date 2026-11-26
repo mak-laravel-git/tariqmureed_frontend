@@ -23,7 +23,7 @@ export function Footer() {
             <div className="col-span-2 flex max-w-[392px] flex-col gap-5 sm:col-span-4 lg:col-span-4">
               <Link href="/" aria-label="TMN Sport home">
                 <Image
-                  src="/images/brand/logo-white.png"
+                  src="/images/brand/logo-white.svg"
                   alt="TMN Sport"
                   width={243}
                   height={29}
