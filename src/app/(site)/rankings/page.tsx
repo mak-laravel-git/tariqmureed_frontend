@@ -25,7 +25,7 @@ async function RankingsBody({ searchParams }: { searchParams: Promise<SearchPara
 
   const genders = Object.keys(data.tables).sort((a, b) => (a === "men" ? -1 : b === "men" ? 1 : a.localeCompare(b)));
   const requestedGender = firstParam(params.gender);
-  const gender = genders.find((entry) => entry === requestedGender) ?? genders[0];
+  const gender = genders.find((entry) => entry === requestedGender) ?? genders[0] ?? "men";
   const tables = data.tables[gender] ?? {};
   const formats = data.formats.filter((entry) => tables[entry.key]?.length);
   const requestedFormat = firstParam(params.format);
@@ -59,7 +59,7 @@ async function RankingsBody({ searchParams }: { searchParams: Promise<SearchPara
       </div>
 
       {rows.length === 0 ? (
-        <EmptyNote>Rankings are not available yet.</EmptyNote>
+        <EmptyNote>Rankings are not available yet. They appear here as soon as the official tables arrive.</EmptyNote>
       ) : (
         <div className="overflow-x-auto rounded-[4px] border border-[#e4e4e7] bg-white">
           <table className="w-full min-w-[520px] text-left">
@@ -105,9 +105,11 @@ async function RankingsBody({ searchParams }: { searchParams: Promise<SearchPara
         </div>
       )}
 
-      <p className="pt-4 text-xs leading-5 text-[#71717b]">
-        Select a team to see its leading batters and bowlers.{updated ? ` Table updated ${updated}.` : ""}
-      </p>
+      {rows.length > 0 && (
+        <p className="pt-4 text-xs leading-5 text-[#71717b]">
+          Select a team to see its leading batters and bowlers.{updated ? ` Table updated ${updated}.` : ""}
+        </p>
+      )}
     </Container>
   );
 }

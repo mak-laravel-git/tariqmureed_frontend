@@ -38,6 +38,7 @@ import { emptyTeamProfile, mockTeamList, mockTeamProfiles } from "@/lib/mocks/te
 import { builtInLegalPage } from "@/lib/legal-content";
 
 import { apiGet } from "./client";
+import { apiConfig } from "./config";
 import type {
   AdMap,
   Article,
@@ -432,20 +433,24 @@ export async function getTeamsDirectory(): Promise<Directory> {
 
 /**
  * GET /rankings - the official team rankings for every format, men's and women's.
- * The sample table is used until the first ranking sync has stored the real one.
+ * Sample figures are only shown when the site runs without an API; with one, a missing table is reported as
+ * not available, never filled with made-up numbers.
  */
 export async function getRankings(): Promise<RankingsData> {
   "use cache";
-  cacheLife("hours");
+  cacheLife("minutes");
   cacheTag("teams");
 
-  return apiGet<RankingsData>("rankings", { fallback: () => buildMockRankings() });
+  return apiGet<RankingsData>("rankings", {
+    fallback: () => (apiConfig.useMocks ? buildMockRankings() : { formats: [], updatedAt: null, tables: {} }),
+  });
 }
 
 /** GET /teams/{slug} - team profile with rankings and featured players. */
 export async function getTeamPage(slug: string): Promise<TeamPage | null> {
   "use cache";
-  cacheLife("hours");
+  // Minutes, not hours: a squad or ranking brought in by the data sync should show up soon after.
+  cacheLife("minutes");
   cacheTag("teams", "players");
 
   return apiGet<TeamPage | null>(`teams/${encodeURIComponent(slug)}`, {
