@@ -20,6 +20,8 @@ interface ApiGetOptions<T> {
   query?: Record<string, QueryValue>;
   /** Data used when no API is configured (or the request fails and fallback is enabled). */
   fallback: () => T | Promise<T>;
+  /** What a 404 means for this resource. Without it a 404 is treated like any other failure. */
+  notFound?: () => T;
 }
 
 function buildUrl(path: string, query?: Record<string, QueryValue>): string {
@@ -69,6 +71,10 @@ export async function apiGet<T>(path: string, options: ApiGetOptions<T>): Promis
 
     return body as T;
   } catch (error) {
+    if (options.notFound && error instanceof ApiError && error.status === 404) {
+      return options.notFound();
+    }
+
     if (apiConfig.fallbackToMocks) {
       console.warn(`[api] ${url} failed, using mock data:`, error);
       return options.fallback();

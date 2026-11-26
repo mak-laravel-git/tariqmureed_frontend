@@ -251,6 +251,8 @@ export async function getArticle(slug: string): Promise<ArticleDetail | null> {
 
   return apiGet<ArticleDetail | null>(`articles/${encodeURIComponent(slug)}`, {
     fallback: () => buildMockArticleDetail(slug),
+    // A story the newsroom does not have must not be filled in with a sample one.
+    notFound: () => null,
   });
 }
 

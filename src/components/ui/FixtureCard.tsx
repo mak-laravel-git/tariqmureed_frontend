@@ -49,8 +49,8 @@ function SideRow({ side, upcoming }: { side: MatchSide; upcoming: boolean }) {
       {/* Before the start there is no score to show, so the row stays empty instead of showing a dash. */}
       {!upcoming && (
         <p className="shrink-0 text-right text-base leading-5 font-bold text-[#09090b] sm:text-xl sm:leading-7">
-          {side.score ? <ScoreText score={side.score} /> : <span className="text-sm leading-5 font-semibold text-[#71717b]">{side.note ?? "Yet to bat"}</span>}
-          {side.score && side.overs && <span className="block text-xs leading-4 font-normal text-[#71717b] sm:inline sm:pl-1.5">({side.overs})</span>}
+          {side.score ? <ScoreText score={side.score} inlineFrom="xl" /> : <span className="text-sm leading-5 font-semibold text-[#71717b]">{side.note ?? "Yet to bat"}</span>}
+          {side.score && side.overs && <span className="block text-xs leading-4 font-normal text-[#71717b] xl:inline xl:pl-1.5">({side.overs})</span>}
         </p>
       )}
     </div>

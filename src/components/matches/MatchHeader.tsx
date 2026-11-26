@@ -21,7 +21,7 @@ function ScorePanel({ side }: { side: MatchSide }) {
         {hasScore ? (
           <>
             <p className="text-xl leading-7 font-bold text-ink sm:text-[30px] sm:leading-9">
-              <ScoreText score={side.score ?? ""} />
+              <ScoreText score={side.score ?? ""} inlineFrom="xl" />
             </p>
             {side.overs && <p className="text-xs leading-4 text-[#9f9fa9]">{side.overs} overs</p>}
           </>
