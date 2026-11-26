@@ -274,12 +274,33 @@ export interface ScorecardRow {
   strikeRate: string;
 }
 
+export interface BowlingRow {
+  bowler: string;
+  overs: string;
+  maidens: number;
+  runs: number;
+  wickets: number;
+  economy: string;
+  wides: number;
+  noBalls: number;
+}
+
 export interface Innings {
   team: string;
+  /** 2 for a side's second innings of a first-class match. */
+  number?: number;
   rows: ScorecardRow[];
+  total?: { runs: number; wickets: number; overs: string; runRate: string | null } | null;
+  extras?: { total: number; wides: number; noBalls: number; byes: number; legByes: number; penalty: number } | null;
+  bowling?: BowlingRow[];
+  fallOfWickets?: { wicket: number; score: number; over: string; batter: string }[];
+  yetToBat?: string[];
 }
 
 export interface CommentaryEntry {
+  id?: number;
+  /** "England innings" */
+  innings?: string;
   over: string;
   /** "1", "4", "6", "W" or "•" for a dot ball. */
   outcome: string;
@@ -314,6 +335,12 @@ export interface MatchStatRow {
   away: string | null;
 }
 
+export interface AwardWinner {
+  name: string;
+  image?: string | null;
+  slug?: string | null;
+}
+
 export interface MatchDetail extends Match {
   title: string;
   /** "12th Match · Gaddafi Stadium, Lahore" */
@@ -325,7 +352,21 @@ export interface MatchDetail extends Match {
     currentRunRate?: string | null;
     projectedScore?: string | null;
     partnership?: string | null;
-    atCrease: { name: string; runs: number; balls: number }[];
+    requiredRunRate?: string | null;
+    target?: string | null;
+    atCrease: { name: string; runs: number; balls: number; fours?: number; sixes?: number }[];
+    bowler?: { name: string; figures: string } | null;
+    /** Marks of the latest deliveries, oldest first. */
+    recentBalls?: string[];
+    result?: string | null;
+    toss?: string | null;
+    playerOfMatch?: AwardWinner | null;
+    playerOfSeries?: AwardWinner | null;
+    officials?: { role: string; name: string }[];
+    /** "England tour of Australia · 2026" */
+    series?: string | null;
+    /** The leading batter and bowler of each innings. */
+    performers?: { team: string; batter: string | null; bowler: string | null }[];
   };
   innings: Innings[];
   commentary: CommentaryEntry[];

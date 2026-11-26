@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 
 import { NewsCard } from "@/components/news/NewsCard";
 import { AdSlot } from "@/components/ui/AdSlot";
@@ -7,7 +7,7 @@ import { Container } from "@/components/ui/Container";
 import { EmptyNote as Empty } from "@/components/ui/Panel";
 import { Photo } from "@/components/ui/Photo";
 import { UnderlineTabs } from "@/components/ui/UnderlineTabs";
-import type { MatchDetail, SquadPlayer } from "@/lib/api/types";
+import type { AwardWinner, Innings, MatchDetail, SquadPlayer } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 import { formatLongDate, formatMatchTime12 } from "@/lib/format";
 
@@ -40,55 +40,159 @@ export function MatchTabBar({ slug, active }: { slug: string; active: MatchTabKe
   );
 }
 
+function OverviewCard({ title, children, className }: { title: string; children: ReactNode; className?: string }) {
+  return (
+    <section className={cn("rounded-[4px] border border-[#e4e4e7] bg-white p-6", className)}>
+      <h3 className="text-base leading-6 font-black text-[#09090b]">{title}</h3>
+      <div className="pt-4">{children}</div>
+    </section>
+  );
+}
+
+function Figures({ items }: { items: { label: string; value?: string | null }[] }) {
+  const known = items.filter((item) => item.value);
+
+  if (known.length === 0) {
+    return null;
+  }
+
+  return (
+    <dl className="grid gap-4 sm:grid-cols-3">
+      {known.map((item) => (
+        <div key={item.label} className="rounded-[4px] border border-[#e4e4e7] bg-white p-5">
+          <dt className="text-xs leading-4 text-[#71717b]">{item.label}</dt>
+          <dd className="pt-2 text-2xl leading-8 font-bold text-[#09090b]">{item.value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+/** One delivery's mark: boundaries in gold, wickets in red. */
+function BallMark({ mark }: { mark: string }) {
+  return (
+    <span
+      className={cn(
+        "flex size-8 shrink-0 items-center justify-center rounded-full text-sm leading-5 font-black",
+        mark === "4" || mark === "6" ? "bg-[#fdc700] text-[#09090b]" : mark === "W" ? "bg-[#e7000b] text-white" : "bg-[#f4f4f5] text-[#09090b]",
+      )}
+    >
+      {mark}
+    </span>
+  );
+}
+
+function Award({ title, winner }: { title: string; winner: AwardWinner }) {
+  const name = <span className="text-base leading-6 font-bold text-[#09090b]">{winner.name}</span>;
+
+  return (
+    <div className="flex items-center gap-3 rounded-[4px] border border-[#e4e4e7] bg-white p-4">
+      <span className="relative size-12 shrink-0 overflow-hidden rounded-full bg-[#f4f4f5]">
+        {winner.image && <Photo src={winner.image} alt="" sizes="48px" />}
+      </span>
+      <div className="min-w-0">
+        <p className="text-xs leading-4 text-[#71717b]">{title}</p>
+        {winner.slug ? (
+          <Link href={`/players/${winner.slug}`} className="hover:underline">
+            {name}
+          </Link>
+        ) : (
+          name
+        )}
+      </div>
+    </div>
+  );
+}
+
 function Overview({ match }: { match: MatchDetail }) {
-  const stats = [
-    { label: "Current run rate", value: match.overview.currentRunRate },
-    { label: "Projected score", value: match.overview.projectedScore },
-    { label: "Partnership", value: match.overview.partnership },
-  ];
+  const overview = match.overview;
+  const recent = overview.recentBalls ?? [];
+  const performers = overview.performers ?? [];
+  const officials = overview.officials ?? [];
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_300px]">
-      <div>
+      <div className="flex min-w-0 flex-col gap-6">
         <div className="border-b border-[#e4e4e7] pb-4">
           <h2 className="text-[30px] leading-9 font-bold text-[#09090b]">Match summary</h2>
         </div>
 
-        {stats.every((stat) => !stat.value) && match.overview.atCrease.length === 0 ? (
-          <Empty>Match details will appear once play starts.</Empty>
-        ) : (
-          <>
-            <dl className="grid gap-4 pt-6 sm:grid-cols-3">
-              {stats.map((stat) => (
-                <div key={stat.label} className="rounded-[4px] border border-[#e4e4e7] bg-white p-5">
-                  <dt className="text-xs leading-4 text-[#71717b]">{stat.label}</dt>
-                  <dd className="pt-2 text-2xl leading-8 font-bold text-[#09090b]">{stat.value ?? "—"}</dd>
-                </div>
-              ))}
-            </dl>
-
-            <section
-              aria-labelledby="crease-title"
-              className="mt-8 rounded-[4px] border border-[#e4e4e7] bg-white p-6"
-            >
-              <h3 id="crease-title" className="text-base leading-6 font-black text-[#09090b]">
-                At the crease
-              </h3>
-              <div className="pt-4">
-                {match.overview.atCrease.map((batter) => (
-                  <div
-                    key={batter.name}
-                    className="grid grid-cols-3 border-t border-[#f4f4f5] py-3 text-sm leading-5"
-                  >
-                    <p className="font-bold text-[#09090b]">{batter.name}</p>
-                    <p className="text-right font-bold text-[#09090b]">{batter.runs}</p>
-                    <p className="text-right text-[#71717b]">{batter.balls} balls</p>
-                  </div>
-                ))}
-              </div>
-            </section>
-          </>
+        {overview.result && (
+          <p className="border-l-4 border-[#fdc700] bg-[#fefce8] p-4 text-base leading-6 font-bold text-[#09090b]">{overview.result}</p>
         )}
+
+        <Figures
+          items={[
+            { label: "Current run rate", value: overview.currentRunRate },
+            { label: "Required run rate", value: overview.requiredRunRate },
+            { label: "Target", value: overview.target },
+            { label: "Projected score (at this rate)", value: overview.projectedScore },
+            { label: "Partnership", value: overview.partnership },
+          ]}
+        />
+
+        {overview.atCrease.length > 0 && (
+          <OverviewCard title="At the crease">
+            {overview.atCrease.map((batter) => (
+              <div key={batter.name} className="grid grid-cols-[minmax(0,2fr)_1fr_1fr_1fr] gap-2 border-t border-[#f4f4f5] py-3 text-sm leading-5">
+                <p className="font-bold text-[#09090b]">{batter.name}</p>
+                <p className="text-right font-bold text-[#09090b]">{batter.runs}</p>
+                <p className="text-right text-[#71717b]">{batter.balls} balls</p>
+                <p className="text-right text-[#71717b]">
+                  {batter.fours ?? 0}×4 {batter.sixes ?? 0}×6
+                </p>
+              </div>
+            ))}
+            {overview.bowler && (
+              <p className="border-t border-[#f4f4f5] pt-3 text-sm leading-5 text-[#52525c]">
+                Bowling: <span className="font-bold text-[#09090b]">{overview.bowler.name}</span> {overview.bowler.figures}
+              </p>
+            )}
+          </OverviewCard>
+        )}
+
+        {recent.length > 0 && (
+          <OverviewCard title="Recent balls">
+            <ol aria-label="Latest deliveries, oldest first" className="flex flex-wrap gap-2">
+              {recent.map((mark, index) => (
+                <li key={`${index}-${mark}`}>
+                  <BallMark mark={mark} />
+                </li>
+              ))}
+            </ol>
+          </OverviewCard>
+        )}
+
+        {(overview.playerOfMatch || overview.playerOfSeries) && (
+          <div className="grid gap-4 sm:grid-cols-2">
+            {overview.playerOfMatch && <Award title="Player of the match" winner={overview.playerOfMatch} />}
+            {overview.playerOfSeries && <Award title="Player of the series" winner={overview.playerOfSeries} />}
+          </div>
+        )}
+
+        {performers.length > 0 && (
+          <OverviewCard title="Leading performers">
+            {performers.map((row, index) => (
+              <div key={`${row.team}-${index}`} className="grid gap-1 border-t border-[#f4f4f5] py-3 text-sm leading-5 sm:grid-cols-[1fr_1.5fr_1.5fr]">
+                <p className="font-bold text-[#09090b]">{row.team} innings</p>
+                <p className="text-[#52525c]">{row.batter && <>Bat: {row.batter}</>}</p>
+                <p className="text-[#52525c]">{row.bowler && <>Bowl: {row.bowler}</>}</p>
+              </div>
+            ))}
+          </OverviewCard>
+        )}
+
+        <div>
+          <h3 className="text-base leading-6 font-black text-[#09090b]">Match details</h3>
+          <MatchFacts
+            match={match}
+            extra={[
+              { label: "Tour", value: overview.series },
+              { label: "Toss", value: overview.toss },
+              ...officials.map((official, index) => ({ label: official.role, value: official.name, key: `${official.role}-${index}` })),
+            ]}
+          />
+        </div>
       </div>
 
       <AdSlot placement="match-sidebar" className="w-full lg:self-start" />
@@ -101,6 +205,134 @@ function TabHeading({ children, className }: { children: ReactNode; className?: 
     <div className="border-b border-[#e4e4e7] pb-4">
       <h2 className={cn("text-[30px] leading-9 font-bold text-[#09090b]", className)}>{children}</h2>
     </div>
+  );
+}
+
+const tableClass = "w-full border-collapse overflow-hidden rounded-[4px] border border-[#e4e4e7] bg-white text-left text-sm leading-[21px]";
+const tableHeadClass = "bg-[#18181b] text-[10px] leading-[15px] font-bold tracking-[1px] text-white uppercase";
+
+function inningsName(innings: Innings): string {
+  const nth = innings.number && innings.number > 1 ? ` ${innings.number === 2 ? "2nd" : `${innings.number}th`}` : "";
+
+  return `${innings.team}${nth} innings`;
+}
+
+function InningsScorecard({ innings }: { innings: Innings }) {
+  const { total, extras } = innings;
+  const bowling = innings.bowling ?? [];
+  const wickets = innings.fallOfWickets ?? [];
+  const yetToBat = innings.yetToBat ?? [];
+
+  return (
+    <section aria-label={inningsName(innings)}>
+      <TabHeading>{inningsName(innings)}</TabHeading>
+
+      <div className="overflow-x-auto pt-6">
+        <table className={cn(tableClass, "min-w-[700px]")}>
+          <thead>
+            <tr className={tableHeadClass}>
+              {["Batter", "Dismissal", "R", "B", "4s", "6s", "SR"].map((heading) => (
+                <th key={heading} scope="col" className="px-4 py-[14.4px] font-bold">
+                  {heading}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {innings.rows.map((row) => (
+              <tr key={row.batter} className="border-b border-[#e4e4e7] text-[#09090b] last:border-b-0">
+                <th scope="row" className="px-4 py-4 font-bold">
+                  {row.batter}
+                </th>
+                <td className="px-4 py-4 font-normal">{row.dismissal}</td>
+                <td className="px-4 py-4 font-normal">{row.runs}</td>
+                <td className="px-4 py-4 font-normal">{row.balls}</td>
+                <td className="px-4 py-4 font-normal">{row.fours}</td>
+                <td className="px-4 py-4 font-normal">{row.sixes}</td>
+                <td className="px-4 py-4 font-normal">{row.strikeRate}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {(extras || total) && (
+        <dl className="mt-3 flex flex-col gap-2 rounded-[4px] border border-[#e4e4e7] bg-white p-4 text-sm leading-5 text-[#09090b]">
+          {extras && (
+            <div className="flex flex-wrap gap-x-3">
+              <dt className="font-bold">Extras {extras.total}</dt>
+              <dd className="text-[#71717b]">
+                wides {extras.wides}, no balls {extras.noBalls}, byes {extras.byes}, leg byes {extras.legByes}, penalty {extras.penalty}
+              </dd>
+            </div>
+          )}
+          {total && (
+            <div className="flex flex-wrap gap-x-3">
+              <dt className="font-black">
+                Total {total.runs}/{total.wickets}
+              </dt>
+              <dd className="text-[#71717b]">
+                {total.overs} overs{total.runRate ? `, run rate ${total.runRate}` : ""}
+              </dd>
+            </div>
+          )}
+        </dl>
+      )}
+
+      {yetToBat.length > 0 && (
+        <p className="pt-3 text-sm leading-6 text-[#52525c]">
+          <span className="font-bold text-[#09090b]">Did not bat:</span> {yetToBat.join(", ")}
+        </p>
+      )}
+
+      {wickets.length > 0 && (
+        <div className="pt-5">
+          <h3 className="text-base leading-6 font-black text-[#09090b]">Fall of wickets</h3>
+          <ol className="flex flex-wrap gap-2 pt-3">
+            {wickets.map((entry) => (
+              <li key={entry.wicket} className="rounded-[4px] border border-[#e4e4e7] bg-white px-3 py-2 text-xs leading-4 text-[#52525c]">
+                <span className="font-bold text-[#09090b]">
+                  {entry.wicket}-{entry.score}
+                </span>{" "}
+                {entry.batter}, {entry.over} ov
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+
+      {bowling.length > 0 && (
+        <div className="overflow-x-auto pt-5">
+          <table className={cn(tableClass, "min-w-[600px]")}>
+            <thead>
+              <tr className={tableHeadClass}>
+                {["Bowler", "O", "M", "R", "W", "Econ", "Wd", "Nb"].map((heading) => (
+                  <th key={heading} scope="col" className="px-4 py-[14.4px] font-bold">
+                    {heading}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {bowling.map((row) => (
+                <tr key={row.bowler} className="border-b border-[#e4e4e7] text-[#09090b] last:border-b-0">
+                  <th scope="row" className="px-4 py-4 font-bold">
+                    {row.bowler}
+                  </th>
+                  <td className="px-4 py-4">{row.overs}</td>
+                  <td className="px-4 py-4">{row.maidens}</td>
+                  <td className="px-4 py-4">{row.runs}</td>
+                  <td className="px-4 py-4 font-bold">{row.wickets}</td>
+                  <td className="px-4 py-4">{row.economy}</td>
+                  <td className="px-4 py-4">{row.wides}</td>
+                  <td className="px-4 py-4">{row.noBalls}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -117,78 +349,43 @@ function Scorecard({ match }: { match: MatchDetail }) {
   return (
     <div className="flex flex-col gap-12">
       {match.innings.map((innings) => (
-        <section key={innings.team} aria-label={`${innings.team} innings`}>
-          <TabHeading>{innings.team} innings</TabHeading>
-
-          <div className="overflow-x-auto pt-6">
-            <table className="w-full min-w-[700px] border-collapse overflow-hidden rounded-[4px] border border-[#e4e4e7] bg-white text-left text-sm leading-[21px]">
-              <thead>
-                <tr className="bg-[#18181b] text-[10px] leading-[15px] font-bold tracking-[1px] text-white uppercase">
-                  {["Batter", "Dismissal", "R", "B", "4s", "6s", "SR"].map((heading) => (
-                    <th key={heading} scope="col" className="px-4 py-[14.4px] font-bold">
-                      {heading}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {innings.rows.map((row) => (
-                  <tr key={row.batter} className="border-b border-[#e4e4e7] text-[#09090b] last:border-b-0">
-                    <th scope="row" className="px-4 py-4 font-bold">
-                      {row.batter}
-                    </th>
-                    <td className="px-4 py-4 font-normal">{row.dismissal}</td>
-                    <td className="px-4 py-4 font-normal">{row.runs}</td>
-                    <td className="px-4 py-4 font-normal">{row.balls}</td>
-                    <td className="px-4 py-4 font-normal">{row.fours}</td>
-                    <td className="px-4 py-4 font-normal">{row.sixes}</td>
-                    <td className="px-4 py-4 font-normal">{row.strikeRate}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        <InningsScorecard key={inningsName(innings)} innings={innings} />
       ))}
     </div>
   );
 }
 
 function Commentary({ match }: { match: MatchDetail }) {
+  const empty =
+    match.state === "upcoming"
+      ? "Ball-by-ball updates will start when the match begins."
+      : "Ball-by-ball data is not available for this match.";
+
   return (
     <div className="max-w-[768px]">
       <TabHeading>Ball-by-ball</TabHeading>
 
       <div className="pt-6">
         <p className="border-l-4 border-[#fdc700] bg-[#fefce8] p-4 text-xs leading-4 text-[#52525c]">
-          Commentary is available from the official data provider. Updates may be delayed.
+          Every delivery from the official data provider, latest first. Updates may be delayed.
         </p>
       </div>
 
       {match.commentary.length === 0 ? (
-        <Empty>Commentary will start when the match begins.</Empty>
+        <Empty>{empty}</Empty>
       ) : (
         <ol className="pt-5">
-          {match.commentary.map((entry) => (
-            <li
-              key={entry.over}
-              className="grid grid-cols-[50px_40px_minmax(0,1fr)] items-center gap-4 border-b border-[#f4f4f5] py-5"
-            >
-              <span className="text-sm leading-5 font-bold text-[#09090b]">{entry.over}</span>
-              <span
-                className={cn(
-                  "flex size-8 items-center justify-center rounded-full text-sm leading-5 font-black text-[#09090b]",
-                  entry.outcome === "4" || entry.outcome === "6"
-                    ? "bg-[#fdc700]"
-                    : entry.outcome === "W"
-                      ? "bg-[#e7000b] text-white"
-                      : "bg-[#f4f4f5]",
-                )}
-              >
-                {entry.outcome}
-              </span>
-              <span className="text-sm leading-5 text-[#09090b]">{entry.text}</span>
-            </li>
+          {match.commentary.map((entry, index) => (
+            <Fragment key={entry.id ?? `${entry.over}-${index}`}>
+              {entry.innings && entry.innings !== match.commentary[index - 1]?.innings && (
+                <li className="pt-4 pb-1 text-xs leading-4 font-black tracking-[0.6px] text-[#71717b] uppercase">{entry.innings}</li>
+              )}
+              <li className="grid grid-cols-[50px_40px_minmax(0,1fr)] items-center gap-4 border-b border-[#f4f4f5] py-4">
+                <span className="text-sm leading-5 font-bold text-[#09090b]">{entry.over}</span>
+                <BallMark mark={entry.outcome} />
+                <span className="text-sm leading-5 text-[#09090b]">{entry.text}</span>
+              </li>
+            </Fragment>
           ))}
         </ol>
       )}
@@ -240,6 +437,15 @@ function playerSummary(player: SquadPlayer): string {
 }
 
 function Teams({ match }: { match: MatchDetail }) {
+  if (match.squads.length === 0) {
+    return (
+      <>
+        <TabHeading>Playing XI</TabHeading>
+        <Empty>The line-ups are announced around the toss.</Empty>
+      </>
+    );
+  }
+
   return (
     <>
       <TabHeading className="tracking-[-1px]">Playing XI</TabHeading>
@@ -289,8 +495,8 @@ function Teams({ match }: { match: MatchDetail }) {
   );
 }
 
-/** What is already known before a ball is bowled, so the Statistics tab is never an empty page. */
-function MatchFacts({ match }: { match: MatchDetail }) {
+/** Competition, date and venue (known before a ball is bowled), plus anything more the caller passes. */
+function MatchFacts({ match, extra = [] }: { match: MatchDetail; extra?: { label: string; value?: string | null; key?: string }[] }) {
   const place = [match.venue, match.city?.trim()].filter(Boolean).join(", ");
   const facts = [
     { label: "Competition", value: match.competition.name },
@@ -299,12 +505,13 @@ function MatchFacts({ match }: { match: MatchDetail }) {
     { label: "Date", value: formatLongDate(match.startsAt) },
     { label: "Start time", value: formatMatchTime12(match.startsAt) },
     { label: "Venue", value: place },
-  ].filter((fact): fact is { label: string; value: string } => Boolean(fact.value));
+    ...extra,
+  ].filter((fact): fact is { label: string; value: string; key?: string } => Boolean(fact.value));
 
   return (
     <dl className="grid gap-3 pt-6 sm:grid-cols-2">
       {facts.map((fact) => (
-        <div key={fact.label} className="rounded-[4px] border border-[#e4e4e7] bg-white p-4">
+        <div key={"key" in fact && fact.key ? fact.key : fact.label} className="rounded-[4px] border border-[#e4e4e7] bg-white p-4">
           <dt className="text-xs leading-4 text-[#71717b]">{fact.label}</dt>
           <dd className="pt-1 text-base leading-6 font-bold text-[#09090b]">{fact.value}</dd>
         </div>
@@ -322,7 +529,7 @@ function Statistics({ match }: { match: MatchDetail }) {
         <>
           <p className="pt-4 text-sm leading-6 text-[#52525c]">
             {match.state === "upcoming"
-              ? "This match has not started yet. Runs, wickets, fours and sixes for both teams appear here as soon as play begins."
+              ? "This match has not started yet. Both teams' numbers appear here as soon as play begins."
               : "Detailed statistics are not available for this match yet."}
           </p>
           <MatchFacts match={match} />
