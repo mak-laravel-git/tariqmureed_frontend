@@ -88,7 +88,7 @@ async function StatsBody({ searchParams }: { searchParams: Promise<SearchParams>
       crumb="Stats"
       eyebrow="Statistics centre"
       title="Statistics"
-      description="Batting and bowling tables by format and scope. Every figure is taken from the data feed — nothing is estimated or extrapolated."
+      description="Batting and bowling tables by format and scope. Every figure comes from the data feed; nothing is estimated."
       badge={[`${data.metricCount} ${data.metricCount === 1 ? "metric" : "metrics"}`, `${scope} · ${format ?? "All"}`]}
       filters={
         <>
@@ -105,7 +105,7 @@ async function StatsBody({ searchParams }: { searchParams: Promise<SearchParams>
             variant="stats"
             label="Format"
             items={[
-              { label: "All formats", active: !format, href: href({ format: null }) },
+              { label: "All internationals", active: !format, href: href({ format: null }) },
               ...formats.map((entry) => ({ label: entry, active: entry === format, href: href({ format: entry }) })),
             ]}
           />
@@ -124,8 +124,9 @@ async function StatsBody({ searchParams }: { searchParams: Promise<SearchParams>
           <section className="rounded-xl border border-[#e2e8f0]/90 bg-[#f8fafc]/70 p-[25px] shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
             <h2 className="text-sm leading-5 font-bold text-[#0f172a]">How we present statistics</h2>
             <p className="mt-[11px] max-w-[640px] text-xs leading-[19.5px] text-[#64748b]">
-              Player tables add up the career figures the data feed holds for the players we follow, so they grow as more
-              players are synced. Team tables use the official rankings and the matches stored on TMN Sport; tournament
+              Player tables add up the career figures our data provider holds for the players we follow. Its records start
+              from recent seasons, so career totals are lower than all-time figures on sites such as ESPNcricinfo, and the
+              tables grow as more players are synced. All internationals means Tests, ODIs and T20Is together. Team tables use the official rankings and the matches stored on TMN Sport; tournament
               tables use the current league standings. A metric with no figures is left out — we never fill gaps with estimates.
             </p>
             <Link href="/records" className="mt-[11px] inline-block pt-1.5 text-xs leading-4 font-bold text-[#d97706] hover:underline">
