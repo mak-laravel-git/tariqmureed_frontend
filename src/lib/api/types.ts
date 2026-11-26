@@ -415,6 +415,8 @@ export interface TournamentDetail {
   name: string;
   /** Short mark inside the yellow circle, e.g. "BPL". */
   abbreviation: string;
+  /** The competition's logo from the data feed, shown instead of the short mark when there is one. */
+  image?: string | null;
   status: string;
   /** "2 January — 7 February 2026 · Bangladesh" */
   dateline: string;

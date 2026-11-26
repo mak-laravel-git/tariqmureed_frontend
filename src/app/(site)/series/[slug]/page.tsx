@@ -86,12 +86,19 @@ function TournamentHeader({ tournament }: { tournament: TournamentDetail }) {
   return (
     <section className="bg-surface">
       <Container className="flex flex-wrap items-center gap-6 py-12">
-        <span
-          aria-hidden="true"
-          className="flex size-24 shrink-0 items-center justify-center rounded-full bg-[#fdc700] text-xl leading-7 font-black text-black"
-        >
-          {tournament.abbreviation}
-        </span>
+        {tournament.image ? (
+          <span aria-hidden="true" className="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.08)]">
+            {/* eslint-disable-next-line @next/next/no-img-element -- competition logo from the data feed CDN */}
+            <img src={tournament.image} alt="" width={80} height={80} className="size-20 object-contain" />
+          </span>
+        ) : (
+          <span
+            aria-hidden="true"
+            className="flex size-24 shrink-0 items-center justify-center rounded-full bg-[#fdc700] text-xl leading-7 font-black text-black"
+          >
+            {tournament.abbreviation}
+          </span>
+        )}
         <div className="min-w-0">
           <span
             className={cn(

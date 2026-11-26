@@ -124,12 +124,12 @@ async function StatsBody({ searchParams }: { searchParams: Promise<SearchParams>
           <section className="rounded-xl border border-[#e2e8f0]/90 bg-[#f8fafc]/70 p-[25px] shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
             <h2 className="text-sm leading-5 font-bold text-[#0f172a]">How we present statistics</h2>
             <p className="mt-[11px] max-w-[640px] text-xs leading-[19.5px] text-[#64748b]">
-              Tables only include metrics the data feed provides. Where a season, format or competition is not covered
-              by the subscription, the metric is omitted and the page explains why — we never fill gaps with estimates.
-              Comparison bars are scaled to the maximum value within each metric.
+              Player tables add up the career figures the data feed holds for the players we follow, so they grow as more
+              players are synced. Team tables use the official rankings and the matches stored on TMN Sport; tournament
+              tables use the current league standings. A metric with no figures is left out — we never fill gaps with estimates.
             </p>
             <Link href="/records" className="mt-[11px] inline-block pt-1.5 text-xs leading-4 font-bold text-[#d97706] hover:underline">
-              Looking for all-time records? Visit the records centre →
+              Looking for record holders? Visit the records centre →
             </Link>
           </section>
         </>

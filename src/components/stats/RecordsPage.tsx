@@ -19,7 +19,7 @@ const formats = ["Test", "ODI", "T20I", "T20"];
 const notes = [
   {
     title: "Where these records come from",
-    text: "Records are sourced from the TMN Sport records database and the competition data feed. Historical records are verified against published match data before publication.",
+    text: "Each record is the best mark among the players, matches and league tables in the TMN Sport data feed. It covers the squads and competitions we follow, so it is not an all-time list, and it updates as new figures arrive.",
   },
   {
     title: "Spot an error?",
@@ -130,7 +130,7 @@ async function RecordsBody({ searchParams }: { searchParams: Promise<SearchParam
               </div>
             ) : (
               <p className="rounded-xl border border-[#e2e8f0] bg-white px-5 py-14 text-center text-sm text-[#64748b]">
-                No records match these filters.
+                No records for these filters yet. They appear as soon as the data feed has figures for them.
               </p>
             )}
           </section>

@@ -478,9 +478,10 @@ export async function getStatsPage(scope: StatsScope, format?: string): Promise<
   cacheLife("hours");
   cacheTag("stats");
 
+  // Sample figures only without an API; a live site with no data says so instead of showing made-up numbers.
   return apiGet<StatsPageData>("stats", {
     query: { scope, format },
-    fallback: () => buildMockStatsPage(scope, format),
+    fallback: () => (apiConfig.useMocks ? buildMockStatsPage(scope, format) : { scope, format: format ?? null, metricCount: 0, tables: [] }),
   });
 }
 
@@ -495,7 +496,10 @@ export async function getRecordsPage(group?: RecordGroup, format?: string): Prom
 
   return apiGet<RecordsPageData>("records", {
     query: { group, format },
-    fallback: () => buildMockRecordsPage(group, format),
+    fallback: () =>
+      apiConfig.useMocks
+        ? buildMockRecordsPage(group, format)
+        : { group: group ?? null, format: format ?? null, total: 0, groupCounts: { batting: 0, bowling: 0, team: 0, tournament: 0 }, records: [] },
   });
 }
 

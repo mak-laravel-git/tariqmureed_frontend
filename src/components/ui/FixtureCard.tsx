@@ -33,19 +33,25 @@ function StatusPill({ match }: { match: Match }) {
   );
 }
 
-function SideRow({ side }: { side: MatchSide }) {
+/** "TBC" is the feed's name for a side not decided yet, such as a finalist. */
+function sideName(name: string): string {
+  return ["TBC", "TBA"].includes(name.trim().toUpperCase()) ? "To be decided" : name;
+}
+
+function SideRow({ side, upcoming }: { side: MatchSide; upcoming: boolean }) {
   return (
     <div className="flex items-center justify-between gap-3">
       <div className="flex min-w-0 items-center gap-3">
         <TeamBadge team={side.team} size={32} />
-        <p className="truncate text-base leading-6 font-bold text-[#09090b]">{side.team.name}</p>
+        <p className="truncate text-base leading-6 font-bold text-[#09090b]">{sideName(side.team.name)}</p>
       </div>
-      <p className="shrink-0 text-right text-xl leading-7 font-bold text-[#09090b]">
-        {side.score ?? <span aria-label="Yet to bat">—</span>}
-        {side.score && side.overs && (
-          <span className="pl-1.5 text-xs leading-4 font-normal text-[#71717b]">({side.overs})</span>
-        )}
-      </p>
+      {/* Before the start there is no score to show, so the row stays empty instead of showing a dash. */}
+      {!upcoming && (
+        <p className="shrink-0 text-right text-xl leading-7 font-bold text-[#09090b]">
+          {side.score ?? <span className="text-sm leading-5 font-semibold text-[#71717b]">{side.note ?? "Yet to bat"}</span>}
+          {side.score && side.overs && <span className="pl-1.5 text-xs leading-4 font-normal text-[#71717b]">({side.overs})</span>}
+        </p>
+      )}
     </div>
   );
 }
@@ -70,8 +76,8 @@ export function FixtureCard({ match }: { match: Match }) {
         </div>
 
         <div className="flex flex-col gap-3 pt-5">
-          <SideRow side={match.home} />
-          <SideRow side={match.away} />
+          <SideRow side={match.home} upcoming={upcoming} />
+          <SideRow side={match.away} upcoming={upcoming} />
         </div>
 
         <p className="mt-5 border-t border-[#f4f4f5] pt-4 text-xs leading-4 font-bold text-[#52525c]">
