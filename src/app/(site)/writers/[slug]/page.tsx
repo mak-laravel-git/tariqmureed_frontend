@@ -4,10 +4,11 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { NewsCard } from "@/components/news/NewsCard";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { Container } from "@/components/ui/Container";
 import { Photo } from "@/components/ui/Photo";
 import { getSeo, getWriter, getWriterArticles } from "@/lib/api/endpoints";
-import { sharingMetadata } from "@/lib/seo";
+import { absoluteUrl, breadcrumbSchema, getSiteUrl, sharingMetadata } from "@/lib/seo";
 import { firstParam, pageHref, type SearchParams } from "@/lib/url";
 
 const PAGE_SIZE = 12;
@@ -80,8 +81,29 @@ async function WriterView({ params, searchParams }: { params: Promise<{ slug: st
     notFound();
   }
 
+  const site = await getSiteUrl();
+  const path = `/writers/${writer.slug}`;
+
   return (
     <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "ProfilePage",
+          url: `${site}${path}`,
+          mainEntity: {
+            "@type": "Person",
+            "@id": `${site}${path}#person`,
+            name: writer.name,
+            url: `${site}${path}`,
+            ...(writer.title ? { jobTitle: writer.title } : {}),
+            ...(writer.bio ? { description: writer.bio } : {}),
+            ...(writer.avatar ? { image: absoluteUrl(site, writer.avatar) } : {}),
+            worksFor: { "@type": "Organization", name: "TMN Sport", url: site },
+          },
+        }}
+      />
+      <JsonLd data={breadcrumbSchema(site, [{ name: "Home", path: "/" }, { name: "News", path: "/news" }, { name: writer.name, path }])} />
       <section className="bg-[#2d2d2d] text-white">
         <Container className="grid items-center gap-8 py-12 md:grid-cols-[200px_minmax(0,1fr)]">
           <div className="relative size-[200px] overflow-hidden rounded-full bg-[#09090b]">

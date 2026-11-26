@@ -247,6 +247,8 @@ export interface ArticleBlock {
 
 export interface ArticleDetail extends Article {
   subtitle?: string | null;
+  /** When the story was last edited; search engines read it as the "modified" date. */
+  updatedAt?: string | null;
   /** Trail shown after "News /", e.g. ["International", "Match analysis"]. */
   breadcrumb: string[];
   /** Search and social sharing details set in the dashboard. */

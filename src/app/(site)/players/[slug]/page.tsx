@@ -1,11 +1,30 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { NewsCard } from "@/components/news/NewsCard";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { Container } from "@/components/ui/Container";
 import { DataTable } from "@/components/ui/DataTable";
 import { Photo } from "@/components/ui/Photo";
 import { getPlayerPage } from "@/lib/api/endpoints";
+import { absoluteUrl, breadcrumbSchema, getSiteUrl, profileMetadata } from "@/lib/seo";
+
+export async function generateMetadata(props: PageProps<"/players/[slug]">): Promise<Metadata> {
+  const { slug } = await props.params;
+  const player = await getPlayerPage(slug);
+
+  if (!player) {
+    return {};
+  }
+
+  return profileMetadata({
+    path: `/players/${player.slug}`,
+    title: `${player.name}: career stats and profile`,
+    description: `${player.name}${player.teamAndRole ? `, ${player.teamAndRole}` : ""}. Career statistics by format, profile details and the latest news on TMN Sport.`,
+    image: player.image,
+  });
+}
 
 function SectionTitle({ children, eyebrow }: { children: string; eyebrow?: string }) {
   return (
@@ -40,9 +59,24 @@ async function PlayerView({ params }: { params: Promise<{ slug: string }> }) {
   }
 
   const { first, last } = splitDisplayName(player.name);
+  const site = await getSiteUrl();
+  const path = `/players/${player.slug}`;
 
   return (
     <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "Person",
+          "@id": `${site}${path}#person`,
+          name: player.name,
+          url: `${site}${path}`,
+          ...(player.image ? { image: absoluteUrl(site, player.image) } : {}),
+          ...(player.teamAndRole ? { description: player.teamAndRole } : {}),
+          jobTitle: "Cricketer",
+        }}
+      />
+      <JsonLd data={breadcrumbSchema(site, [{ name: "Home", path: "/" }, { name: "Players", path: "/players" }, { name: player.name, path }])} />
       <section className="bg-[#2d2d2d] text-white">
         <Container className="grid items-end gap-8 py-10 md:grid-cols-[300px_minmax(0,1fr)]">
           <div className="relative h-[375px] w-full max-w-[300px] overflow-hidden rounded-[4px] justify-self-start self-end">

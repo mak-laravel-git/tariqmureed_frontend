@@ -9,6 +9,7 @@ import { Photo } from "@/components/ui/Photo";
 import { UnderlineTabs } from "@/components/ui/UnderlineTabs";
 import type { MatchDetail, SquadPlayer } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
+import { formatLongDate, formatMatchTime12 } from "@/lib/format";
 
 export const matchTabs = [
   { key: "overview", label: "Overview" },
@@ -288,15 +289,51 @@ function Teams({ match }: { match: MatchDetail }) {
   );
 }
 
+/** What is already known before a ball is bowled, so the Statistics tab is never an empty page. */
+function MatchFacts({ match }: { match: MatchDetail }) {
+  const place = [match.venue, match.city?.trim()].filter(Boolean).join(", ");
+  const facts = [
+    { label: "Competition", value: match.competition.name },
+    { label: "Match", value: match.stage },
+    { label: "Format", value: match.competition.format },
+    { label: "Date", value: formatLongDate(match.startsAt) },
+    { label: "Start time", value: formatMatchTime12(match.startsAt) },
+    { label: "Venue", value: place },
+  ].filter((fact): fact is { label: string; value: string } => Boolean(fact.value));
+
+  return (
+    <dl className="grid gap-3 pt-6 sm:grid-cols-2">
+      {facts.map((fact) => (
+        <div key={fact.label} className="rounded-[4px] border border-[#e4e4e7] bg-white p-4">
+          <dt className="text-xs leading-4 text-[#71717b]">{fact.label}</dt>
+          <dd className="pt-1 text-base leading-6 font-bold text-[#09090b]">{fact.value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 function Statistics({ match }: { match: MatchDetail }) {
   return (
     <div className="max-w-[768px]">
       <TabHeading>Match statistics</TabHeading>
 
       {match.stats.length === 0 ? (
-        <Empty>Statistics will appear once the match is under way.</Empty>
+        <>
+          <p className="pt-4 text-sm leading-6 text-[#52525c]">
+            {match.state === "upcoming"
+              ? "This match has not started yet. Runs, wickets, fours and sixes for both teams appear here as soon as play begins."
+              : "Detailed statistics are not available for this match yet."}
+          </p>
+          <MatchFacts match={match} />
+        </>
       ) : (
         <dl className="flex flex-col gap-4 pt-6">
+          <div className="grid grid-cols-[1fr_2fr_1fr] items-center px-4 text-center text-xs leading-4 font-black tracking-[0.6px] text-[#71717b] uppercase">
+            <dt className="truncate">{match.home.team.shortName}</dt>
+            <dd aria-hidden="true" />
+            <dd className="truncate">{match.away.team.shortName}</dd>
+          </div>
           {match.stats.map((stat) => (
             <div
               key={stat.label}

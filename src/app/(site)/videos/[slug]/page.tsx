@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -7,6 +8,23 @@ import { PlayIcon } from "@/components/ui/icons";
 import { Photo } from "@/components/ui/Photo";
 import { TimeAgo } from "@/components/ui/TimeAgo";
 import { getVideo } from "@/lib/api/endpoints";
+import { profileMetadata } from "@/lib/seo";
+
+export async function generateMetadata(props: PageProps<"/videos/[slug]">): Promise<Metadata> {
+  const { slug } = await props.params;
+  const video = await getVideo(slug);
+
+  if (!video) {
+    return {};
+  }
+
+  return profileMetadata({
+    path: `/videos/${video.slug}`,
+    title: video.title,
+    description: video.description || `${video.title}. Watch ${video.category.toLowerCase()} video from TMN Sport.`,
+    image: video.thumbnail,
+  });
+}
 
 async function VideoView({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

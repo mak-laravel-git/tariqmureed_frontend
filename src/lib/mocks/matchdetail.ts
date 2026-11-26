@@ -86,9 +86,9 @@ export function buildMockMatchDetail(slug: string): MatchDetail | null {
     squads,
     stats: live
       ? [
-          { label: "Boundaries", home: "29", away: null },
-          { label: "Dot ball percentage", home: "47%", away: null },
-          { label: "Highest partnership", home: "84", away: null },
+          { label: "Boundaries", home: "29", away: "21" },
+          { label: "Dot ball percentage", home: "47%", away: "39%" },
+          { label: "Highest partnership", home: "84", away: "61" },
         ]
       : [],
     relatedNews: buildMockNewsPage(undefined, 3).articles,

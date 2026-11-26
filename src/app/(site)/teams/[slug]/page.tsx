@@ -1,11 +1,29 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Suspense } from "react";
 
+import { JsonLd } from "@/components/seo/JsonLd";
 import { AdSlot } from "@/components/ui/AdSlot";
 import { Container } from "@/components/ui/Container";
 import { Photo } from "@/components/ui/Photo";
 import { getTeamPage } from "@/lib/api/endpoints";
+import { breadcrumbSchema, getSiteUrl, profileMetadata } from "@/lib/seo";
+
+export async function generateMetadata(props: PageProps<"/teams/[slug]">): Promise<Metadata> {
+  const { slug } = await props.params;
+  const team = await getTeamPage(slug);
+
+  if (!team) {
+    return {};
+  }
+
+  return profileMetadata({
+    path: `/teams/${team.slug}`,
+    title: `${team.name}: squad, players and fixtures`,
+    description: `${team.name}${team.nickname && team.nickname !== team.name ? ` (${team.nickname})` : ""}, ${team.membership}. Featured players, rankings and fixtures on TMN Sport.`,
+  });
+}
 
 function SectionTitle({ children, eyebrow }: { children: string; eyebrow?: string }) {
   return (
@@ -30,8 +48,24 @@ async function TeamView({ params }: { params: Promise<{ slug: string }> }) {
     notFound();
   }
 
+  const site = await getSiteUrl();
+  const path = `/teams/${team.slug}`;
+
   return (
     <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "SportsTeam",
+          "@id": `${site}${path}#team`,
+          name: team.name,
+          url: `${site}${path}`,
+          sport: "Cricket",
+          ...(team.nickname && team.nickname !== team.name ? { alternateName: team.nickname } : {}),
+          athlete: team.players.map((player) => ({ "@type": "Person", name: player.name, url: `${site}/players/${player.slug}` })),
+        }}
+      />
+      <JsonLd data={breadcrumbSchema(site, [{ name: "Home", path: "/" }, { name: "Teams", path: "/teams" }, { name: team.name, path }])} />
       <section className="bg-[#2d2d2d] text-white">
         <Container className="flex flex-wrap items-center gap-6 py-12">
           <span
