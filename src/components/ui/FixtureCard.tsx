@@ -5,6 +5,7 @@ import { cn } from "@/lib/cn";
 import { formatMatchTime12 } from "@/lib/format";
 
 import { Countdown } from "./Countdown";
+import { ScoreText } from "./ScoreText";
 import { TeamBadge } from "./TeamBadge";
 
 function StatusPill({ match }: { match: Match }) {
@@ -41,15 +42,15 @@ function sideName(name: string): string {
 function SideRow({ side, upcoming }: { side: MatchSide; upcoming: boolean }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <div className="flex min-w-0 items-center gap-3">
+      <div className="flex min-w-0 flex-1 items-center gap-3">
         <TeamBadge team={side.team} size={32} />
-        <p className="truncate text-base leading-6 font-bold text-[#09090b]">{sideName(side.team.name)}</p>
+        <p className="line-clamp-2 text-[15px] leading-5 font-bold break-words text-[#09090b] sm:text-base sm:leading-6">{sideName(side.team.name)}</p>
       </div>
       {/* Before the start there is no score to show, so the row stays empty instead of showing a dash. */}
       {!upcoming && (
-        <p className="shrink-0 text-right text-xl leading-7 font-bold text-[#09090b]">
-          {side.score ?? <span className="text-sm leading-5 font-semibold text-[#71717b]">{side.note ?? "Yet to bat"}</span>}
-          {side.score && side.overs && <span className="pl-1.5 text-xs leading-4 font-normal text-[#71717b]">({side.overs})</span>}
+        <p className="shrink-0 text-right text-base leading-5 font-bold text-[#09090b] sm:text-xl sm:leading-7">
+          {side.score ? <ScoreText score={side.score} /> : <span className="text-sm leading-5 font-semibold text-[#71717b]">{side.note ?? "Yet to bat"}</span>}
+          {side.score && side.overs && <span className="block text-xs leading-4 font-normal text-[#71717b] sm:inline sm:pl-1.5">({side.overs})</span>}
         </p>
       )}
     </div>
@@ -61,7 +62,7 @@ export function FixtureCard({ match }: { match: Match }) {
   const upcoming = match.state === "upcoming";
 
   return (
-    <article className="rounded-[4px] border border-[#e4e4e7] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.1)] transition-shadow hover:shadow-[0_4px_14px_rgba(17,17,17,0.08)]">
+    <article className="min-w-0 rounded-[4px] border border-[#e4e4e7] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.1)] transition-shadow hover:shadow-[0_4px_14px_rgba(17,17,17,0.08)]">
       <Link href={`/matches/${match.slug}`} className="block p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">

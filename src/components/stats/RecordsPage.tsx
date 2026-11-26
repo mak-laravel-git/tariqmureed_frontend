@@ -135,7 +135,7 @@ async function RecordsBody({ searchParams }: { searchParams: Promise<SearchParam
             )}
           </section>
 
-          <section className="grid gap-4 sm:grid-cols-2">
+          <section className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {notes.map((note) => (
               <article key={note.title} className="rounded-xl border border-[#e2e8f0] bg-[#f8fafc]/40 px-[21px] py-5">
                 <h3 className="text-[13px] leading-[19.5px] font-bold text-[#0f172a]">{note.title}</h3>

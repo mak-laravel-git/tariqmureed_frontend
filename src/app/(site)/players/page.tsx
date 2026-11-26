@@ -17,7 +17,7 @@ async function PlayersBody() {
   const players = await getTrendingPlayers();
 
   return (
-    <Container className="grid gap-6 pt-8 pb-16 sm:grid-cols-2 lg:grid-cols-4">
+    <Container className="grid grid-cols-1 gap-6 pt-8 pb-16 sm:grid-cols-2 lg:grid-cols-4">
       {players.map((player) => (
         <Link key={player.id} href={`/players/${player.slug}`} className="group block">
           <div className="relative aspect-[314/372] overflow-hidden rounded-[4px]">

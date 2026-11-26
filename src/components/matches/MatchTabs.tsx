@@ -71,7 +71,7 @@ function Figures({ items }: { items: { label: string; value?: string | null }[] 
   }
 
   return (
-    <dl className="grid gap-4 sm:grid-cols-3">
+    <dl className="grid grid-cols-1 gap-4 sm:grid-cols-3">
       {known.map((item) => (
         <div key={item.label} className="rounded-[4px] border border-[#e4e4e7] bg-white p-5">
           <dt className="text-xs leading-4 text-[#71717b]">{item.label}</dt>
@@ -125,7 +125,7 @@ function Overview({ match }: { match: MatchDetail }) {
   const officials = overview.officials ?? [];
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_300px]">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_300px]">
       <div className="flex min-w-0 flex-col gap-6">
         <div className="border-b border-[#e4e4e7] pb-4">
           <h2 className="text-[30px] leading-9 font-bold text-[#09090b]">Match summary</h2>
@@ -184,7 +184,7 @@ function Overview({ match }: { match: MatchDetail }) {
         )}
 
         {(overview.playerOfMatch || overview.playerOfSeries) && (
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {overview.playerOfMatch && <Award title="Player of the match" winner={overview.playerOfMatch} />}
             {overview.playerOfSeries && <Award title="Player of the series" winner={overview.playerOfSeries} />}
           </div>
@@ -193,7 +193,7 @@ function Overview({ match }: { match: MatchDetail }) {
         {performers.length > 0 && (
           <OverviewCard title="Leading performers">
             {performers.map((row, index) => (
-              <div key={`${row.team}-${index}`} className="grid gap-1 border-t border-[#f4f4f5] py-3 text-sm leading-5 sm:grid-cols-[1fr_1.5fr_1.5fr]">
+              <div key={`${row.team}-${index}`} className="grid grid-cols-1 gap-1 border-t border-[#f4f4f5] py-3 text-sm leading-5 sm:grid-cols-[1fr_1.5fr_1.5fr]">
                 <p className="font-bold text-[#09090b]">{row.team} innings</p>
                 <p className="text-[#52525c]">{row.batter && <>Bat: {row.batter}</>}</p>
                 <p className="text-[#52525c]">{row.bowler && <>Bowl: {row.bowler}</>}</p>
@@ -468,7 +468,7 @@ function Teams({ match }: { match: MatchDetail }) {
   return (
     <>
       <TabHeading className="tracking-[-1px]">Playing XI</TabHeading>
-      <div className="grid gap-8 pt-6 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-8 pt-6 md:grid-cols-2">
         {match.squads.map((squad) => (
           <section
             key={squad.team.slug}
@@ -528,7 +528,7 @@ function MatchFacts({ match, extra = [] }: { match: MatchDetail; extra?: { label
   ].filter((fact): fact is { label: string; value: string; key?: string } => Boolean(fact.value));
 
   return (
-    <dl className="grid gap-3 pt-6 sm:grid-cols-2">
+    <dl className="grid grid-cols-1 gap-3 pt-6 sm:grid-cols-2">
       {facts.map((fact) => (
         <div key={"key" in fact && fact.key ? fact.key : fact.label} className="rounded-[4px] border border-[#e4e4e7] bg-white p-4">
           <dt className="text-xs leading-4 text-[#71717b]">{fact.label}</dt>
@@ -582,7 +582,7 @@ function RelatedNews({ match }: { match: MatchDetail }) {
   }
 
   return (
-    <div className="grid gap-8 md:grid-cols-3">
+    <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
       {match.relatedNews.map((article) => (
         <NewsCard key={article.id} article={article} />
       ))}

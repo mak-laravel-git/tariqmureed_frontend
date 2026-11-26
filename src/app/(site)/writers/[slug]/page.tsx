@@ -44,7 +44,7 @@ async function WriterArticles({ slug, name, searchParams }: { slug: string; name
       </div>
 
       {articles.length > 0 ? (
-        <ul className="grid gap-x-6 gap-y-10 pt-8 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-x-6 gap-y-10 pt-8 sm:grid-cols-2 lg:grid-cols-3">
           {articles.map((article) => (
             <li key={article.id}>
               <NewsCard article={article} />
@@ -105,7 +105,7 @@ async function WriterView({ params, searchParams }: { params: Promise<{ slug: st
       />
       <JsonLd data={breadcrumbSchema(site, [{ name: "Home", path: "/" }, { name: "News", path: "/news" }, { name: writer.name, path }])} />
       <section className="bg-[#2d2d2d] text-white">
-        <Container className="grid items-center gap-8 py-12 md:grid-cols-[200px_minmax(0,1fr)]">
+        <Container className="grid grid-cols-1 items-center gap-8 py-12 md:grid-cols-[200px_minmax(0,1fr)]">
           <div className="relative size-[200px] overflow-hidden rounded-full bg-[#09090b]">
             <Photo src={writer.avatar} alt={writer.name} priority sizes="200px" />
           </div>

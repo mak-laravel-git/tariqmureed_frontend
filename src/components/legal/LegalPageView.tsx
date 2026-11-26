@@ -55,7 +55,7 @@ export async function LegalPageView({ slug }: { slug: string }) {
           items={[{ label: "Home", href: "/" }, { label: page.title }]}
         />
 
-        <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_413px]">
+        <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_413px]">
           <div className={cn("flex flex-col", compact ? "gap-9" : "gap-8")}>
             {page.sections.map((section) => (
               <section key={section.heading} aria-labelledby={`legal-${section.heading}`}>

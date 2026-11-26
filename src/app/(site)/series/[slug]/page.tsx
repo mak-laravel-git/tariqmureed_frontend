@@ -120,7 +120,7 @@ function TournamentContent({ tournament, tab }: { tournament: TournamentDetail; 
   switch (tab) {
     case "matches":
       return tournament.matches.length > 0 ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {tournament.matches.map((match) => (
             <FixtureCard key={match.id} match={match} />
           ))}
@@ -175,7 +175,7 @@ function TournamentContent({ tournament, tab }: { tournament: TournamentDetail; 
 
     case "teams":
       return (
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {tournament.teams.map((team) => (
             <li
               key={team}
@@ -210,7 +210,7 @@ function TournamentContent({ tournament, tab }: { tournament: TournamentDetail; 
       return (
         <>
           <SectionTitle>Related news</SectionTitle>
-          <div className="grid gap-8 pt-6 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-8 pt-6 md:grid-cols-3">
             {tournament.news.map((article) => (
               <NewsCard key={article.id} article={article} />
             ))}
@@ -220,14 +220,14 @@ function TournamentContent({ tournament, tab }: { tournament: TournamentDetail; 
 
     default:
       return (
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div>
             <SectionTitle>Tournament overview</SectionTitle>
             <p className="pt-6 text-base leading-7 text-[#52525c]">{tournament.overview}</p>
 
             <div className="pt-8">
               <SectionTitle>Upcoming matches</SectionTitle>
-              <div className="grid gap-4 pt-6 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 pt-6 md:grid-cols-2">
                 {tournament.upcoming.map((match) => (
                   <FixtureCard key={match.id} match={match} />
                 ))}

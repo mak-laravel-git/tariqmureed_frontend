@@ -32,7 +32,7 @@ function PlayButton({ className, iconSize }: { className: string; iconSize: numb
 
 function FeaturedVideo({ video }: { video: Video }) {
   return (
-    <article className="grid overflow-hidden rounded-[4px] bg-[#09090b] md:grid-cols-[minmax(0,1fr)_544px]">
+    <article className="grid grid-cols-1 overflow-hidden rounded-[4px] bg-[#09090b] md:grid-cols-[minmax(0,1fr)_544px]">
       <Link
         href={`/videos/${video.slug}`}
         aria-label={`Play: ${video.title}`}
@@ -116,7 +116,7 @@ async function VideosBody({ searchParams }: { searchParams: Promise<SearchParams
 
       {page.featured && <FeaturedVideo video={page.featured} />}
 
-      <div className="grid gap-8 pt-10 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-8 pt-10 sm:grid-cols-2 lg:grid-cols-3">
         {page.videos.map((video) => (
           <VideoTile key={video.id} video={video} />
         ))}

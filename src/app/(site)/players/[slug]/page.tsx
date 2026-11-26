@@ -78,7 +78,7 @@ async function PlayerView({ params }: { params: Promise<{ slug: string }> }) {
       />
       <JsonLd data={breadcrumbSchema(site, [{ name: "Home", path: "/" }, { name: "Players", path: "/players" }, { name: player.name, path }])} />
       <section className="bg-[#2d2d2d] text-white">
-        <Container className="grid items-end gap-8 py-10 md:grid-cols-[300px_minmax(0,1fr)]">
+        <Container className="grid grid-cols-1 items-end gap-8 py-10 md:grid-cols-[300px_minmax(0,1fr)]">
           <div className="relative h-[375px] w-full max-w-[300px] overflow-hidden rounded-[4px] justify-self-start self-end">
             {player.image ? (
               <Photo src={player.image} alt={player.name} priority sizes="300px" />
@@ -141,7 +141,7 @@ async function PlayerView({ params }: { params: Promise<{ slug: string }> }) {
         {player.news.length > 0 && (
           <div className="pt-12">
             <SectionTitle>Related news</SectionTitle>
-            <div className="grid gap-8 pt-6 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-8 pt-6 md:grid-cols-3">
               {player.news.map((article) => (
                 <NewsCard key={article.id} article={article} />
               ))}

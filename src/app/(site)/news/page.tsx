@@ -59,11 +59,11 @@ async function NewsBody({ searchParams }: { searchParams: Promise<SearchParams> 
         />
       </div>
 
-      <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_300px]">
+      <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div>
           {page.featured && <FeaturedNewsCard article={page.featured} />}
 
-          <div className="mt-10 grid gap-8 sm:grid-cols-2">
+          <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2">
             {page.articles.map((article) => (
               <NewsCard key={article.id} article={article} />
             ))}

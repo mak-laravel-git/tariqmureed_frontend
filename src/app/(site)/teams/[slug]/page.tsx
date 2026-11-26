@@ -84,7 +84,7 @@ async function TeamView({ params, searchParams }: { params: Promise<{ slug: stri
       <Container className="py-12">
         <SectionTitle eyebrow={team.nickname}>Team overview</SectionTitle>
 
-        <div className="grid gap-10 pt-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="grid grid-cols-1 gap-10 pt-6 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div>
             {team.ranks.length > 0 && (
               <dl className="grid grid-cols-2 gap-px border border-[#e4e4e7] bg-[#e4e4e7] sm:grid-cols-4">
@@ -102,7 +102,7 @@ async function TeamView({ params, searchParams }: { params: Promise<{ slug: stri
             <div className="pt-10">
               <SectionTitle>Featured players</SectionTitle>
               {team.players.length > 0 ? (
-                <ul className="grid gap-4 pt-6 sm:grid-cols-2 md:grid-cols-3">
+                <ul className="grid grid-cols-1 gap-4 pt-6 sm:grid-cols-2 md:grid-cols-3">
                   {team.players.map((player) => (
                     <li key={player.slug}>
                       <Link

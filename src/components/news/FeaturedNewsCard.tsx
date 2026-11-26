@@ -5,7 +5,7 @@ import type { Article } from "@/lib/api/types";
 
 export function FeaturedNewsCard({ article }: { article: Article }) {
   return (
-    <article className="grid overflow-hidden rounded-lg bg-[#09090b] md:grid-cols-[minmax(0,1fr)_420px]">
+    <article className="grid grid-cols-1 overflow-hidden rounded-lg bg-[#09090b] md:grid-cols-[minmax(0,1fr)_420px]">
       <Link
         href={`/news/${article.slug}`}
         aria-label={article.title}
