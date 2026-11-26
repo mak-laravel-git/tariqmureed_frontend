@@ -14,6 +14,7 @@ export const mainNav: NavItem[] = [
   { label: "Schedule", href: "/schedule" },
   { label: "Series", href: "/series" },
   { label: "Teams", href: "/teams" },
+  { label: "Rankings", href: "/rankings" },
   { label: "Stats", href: "/stats" },
   { label: "Records", href: "/records" },
   { label: "Videos", href: "/videos" },

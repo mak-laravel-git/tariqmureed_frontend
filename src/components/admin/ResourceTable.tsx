@@ -36,6 +36,17 @@ function Thumbnail({ src, name }: { src?: string | null; name: string }) {
 
 const headings = ["Name / Title", "Category / Email", "Owner / Scope", "Status", "Updated", "Actions"];
 
+/** The series list is filtered by what visitors see, so its tabs say so; every other module keeps the common tabs. */
+const seriesTabs: { key: StatusTab; label: string }[] = [
+  { key: "all", label: "All" },
+  { key: "active", label: "Shown on website" },
+  { key: "archived", label: "Hidden" },
+];
+
+function tabsFor(resource: ResourceKey): { key: StatusTab; label: string }[] {
+  return resource === "series" ? seriesTabs : statusTabs;
+}
+
 /** Filterable, paginated table shared by every admin module. */
 export function ResourceTable({ resource, records, total, tab, query, page, params }: ResourceTableProps) {
   const config = resources[resource];
@@ -48,7 +59,7 @@ export function ResourceTable({ resource, records, total, tab, query, page, para
       <div className="rounded-lg border border-line bg-white">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3.5">
           <nav aria-label="Status filter" className="flex flex-wrap gap-1">
-            {statusTabs.map((entry) => (
+            {tabsFor(resource).map((entry) => (
               <Link
                 key={entry.key}
                 href={pageHref(params, { tab: entry.key === "all" ? null : entry.key, page: null }, undefined, base)}

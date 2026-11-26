@@ -1,11 +1,32 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Suspense } from "react";
 
+import { JsonLd } from "@/components/seo/JsonLd";
+import { PlayerRankings } from "@/components/teams/PlayerRankings";
 import { AdSlot } from "@/components/ui/AdSlot";
 import { Container } from "@/components/ui/Container";
 import { Photo } from "@/components/ui/Photo";
+import { TeamBadge } from "@/components/ui/TeamBadge";
 import { getTeamPage } from "@/lib/api/endpoints";
+import { breadcrumbSchema, getSiteUrl, profileMetadata } from "@/lib/seo";
+import type { SearchParams } from "@/lib/url";
+
+export async function generateMetadata(props: PageProps<"/teams/[slug]">): Promise<Metadata> {
+  const { slug } = await props.params;
+  const team = await getTeamPage(slug);
+
+  if (!team) {
+    return {};
+  }
+
+  return profileMetadata({
+    path: `/teams/${team.slug}`,
+    title: `${team.name}: squad, players and fixtures`,
+    description: `${team.name}${team.nickname && team.nickname !== team.name ? ` (${team.nickname})` : ""}, ${team.membership}. Featured players, rankings and fixtures on TMN Sport.`,
+  });
+}
 
 function SectionTitle({ children, eyebrow }: { children: string; eyebrow?: string }) {
   return (
@@ -22,24 +43,36 @@ function SectionTitle({ children, eyebrow }: { children: string; eyebrow?: strin
   );
 }
 
-async function TeamView({ params }: { params: Promise<{ slug: string }> }) {
+async function TeamView({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<SearchParams> }) {
   const { slug } = await params;
+  const query = await searchParams;
   const team = await getTeamPage(slug);
 
   if (!team) {
     notFound();
   }
 
+  const site = await getSiteUrl();
+  const path = `/teams/${team.slug}`;
+
   return (
     <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "SportsTeam",
+          "@id": `${site}${path}#team`,
+          name: team.name,
+          url: `${site}${path}`,
+          sport: "Cricket",
+          ...(team.nickname && team.nickname !== team.name ? { alternateName: team.nickname } : {}),
+          athlete: team.players.map((player) => ({ "@type": "Person", name: player.name, url: `${site}/players/${player.slug}` })),
+        }}
+      />
+      <JsonLd data={breadcrumbSchema(site, [{ name: "Home", path: "/" }, { name: "Teams", path: "/teams" }, { name: team.name, path }])} />
       <section className="bg-[#2d2d2d] text-white">
         <Container className="flex flex-wrap items-center gap-6 py-12">
-          <span
-            aria-hidden="true"
-            className="flex size-24 shrink-0 items-center justify-center rounded-full bg-white text-lg leading-7 font-black text-[#006045]"
-          >
-            {team.badge}
-          </span>
+          <TeamBadge team={{ name: team.name, shortName: team.badge, colors: team.colors, image: team.image }} size={96} />
           <div>
             <p className="text-xs leading-4 font-bold tracking-[0.6px] text-[#a4f4cf] uppercase">{team.kind}</p>
             <h1 className="pt-2 text-[36px] leading-10 font-bold text-white">{team.name}</h1>
@@ -53,14 +86,18 @@ async function TeamView({ params }: { params: Promise<{ slug: string }> }) {
 
         <div className="grid gap-10 pt-6 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div>
-            <dl className="grid grid-cols-2 gap-px border border-[#e4e4e7] bg-[#e4e4e7] sm:grid-cols-4">
-              {team.ranks.map((rank) => (
-                <div key={rank.label} className="rounded-[4px] bg-white p-5">
-                  <dd className="text-[30px] leading-9 font-bold text-[#09090b]">{rank.value}</dd>
-                  <dt className="pt-2 text-xs leading-4 text-[#71717b]">{rank.label}</dt>
-                </div>
-              ))}
-            </dl>
+            {team.ranks.length > 0 && (
+              <dl className="grid grid-cols-2 gap-px border border-[#e4e4e7] bg-[#e4e4e7] sm:grid-cols-4">
+                {team.ranks.map((rank) => (
+                  <div key={rank.label} className="rounded-[4px] bg-white p-5">
+                    <dd className="text-[30px] leading-9 font-bold text-[#09090b]">{rank.value}</dd>
+                    <dt className="pt-2 text-xs leading-4 text-[#71717b]">{rank.label}</dt>
+                  </div>
+                ))}
+              </dl>
+            )}
+
+            {team.playerRankings && <PlayerRankings rankings={team.playerRankings} teamName={team.name} basePath={path} params={query} />}
 
             <div className="pt-10">
               <SectionTitle>Featured players</SectionTitle>
@@ -114,7 +151,7 @@ async function TeamView({ params }: { params: Promise<{ slug: string }> }) {
 export default function TeamPage(props: PageProps<"/teams/[slug]">) {
   return (
     <Suspense fallback={<div role="status" aria-label="Loading team" className="min-h-[800px]" />}>
-      <TeamView params={props.params} />
+      <TeamView params={props.params} searchParams={props.searchParams} />
     </Suspense>
   );
 }

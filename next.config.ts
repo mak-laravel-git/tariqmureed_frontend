@@ -25,6 +25,10 @@ function buildRemotePatterns(): NonNullable<NextConfig["images"]>["remotePattern
   // Team, league and player images from the SportMonks cricket data feed.
   patterns.push({ protocol: "https", hostname: "cdn.sportmonks.com" });
 
+  // Uploaded and seeded pictures are saved with the live API address, so a copy of the site that talks to a
+  // different API (a local one, for example) must still be allowed to show them.
+  patterns.push({ protocol: "https", hostname: "api.tmnsport.com" });
+
   for (const host of (process.env.IMAGE_HOSTS ?? "").split(",")) {
     const hostname = host.trim();
     if (hostname) {

@@ -2,11 +2,14 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { LegalPageView } from "@/components/legal/LegalPageView";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Terms of Use",
-  description: "The terms that apply when you use the TMN Sport public website.",
-};
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("/terms-of-use", {
+    title: "Terms of Use",
+    description: "The terms that apply when you use the TMN Sport public website.",
+  });
+}
 
 export default function TermsOfUsePage() {
   return (

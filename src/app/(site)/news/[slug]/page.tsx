@@ -16,7 +16,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { getArticle, getSeo } from "@/lib/api/endpoints";
 import type { ArticleBlock } from "@/lib/api/types";
 import { formatPublishedDate } from "@/lib/format";
-import { resolveSiteUrl, sharingMetadata } from "@/lib/seo";
+import { breadcrumbSchema, resolveSiteUrl, sharingMetadata } from "@/lib/seo";
 
 function initials(name: string): string {
   return name
@@ -281,6 +281,14 @@ async function ArticleJsonLd({ params }: { params: Promise<{ slug: string }> }) 
   const absolute = (address: string): string => (address.startsWith("http") ? address : `${site}${address}`);
 
   return (
+    <>
+    <JsonLd
+      data={breadcrumbSchema(site, [
+        { name: "Home", path: "/" },
+        { name: "News", path: "/news" },
+        { name: article.title, path: `/news/${article.slug}` },
+      ])}
+    />
     <JsonLd
       data={{
         "@context": "https://schema.org",
@@ -290,7 +298,7 @@ async function ArticleJsonLd({ params }: { params: Promise<{ slug: string }> }) 
         description: article.seoDescription || article.subtitle || article.excerpt,
         image: [absolute(article.socialImage || article.image)],
         datePublished: article.publishedAt,
-        dateModified: article.publishedAt,
+        dateModified: article.updatedAt || article.publishedAt,
         articleSection: article.category,
         keywords: article.tags.join(", "),
         author: {
@@ -305,6 +313,7 @@ async function ArticleJsonLd({ params }: { params: Promise<{ slug: string }> }) 
         },
       }}
     />
+    </>
   );
 }
 

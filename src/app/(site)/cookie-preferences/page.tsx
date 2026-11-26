@@ -2,11 +2,14 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { LegalPageView } from "@/components/legal/LegalPageView";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Cookie Preferences",
-  description: "How TMN Sport uses cookies and how you can control them.",
-};
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("/cookie-preferences", {
+    title: "Cookie Preferences",
+    description: "How TMN Sport uses cookies and how you can control them.",
+  });
+}
 
 export default function CookiePreferencesPage() {
   return (

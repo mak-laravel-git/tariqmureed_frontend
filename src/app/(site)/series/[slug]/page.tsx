@@ -1,7 +1,9 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { NewsCard } from "@/components/news/NewsCard";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { AdSlot } from "@/components/ui/AdSlot";
 import { Container } from "@/components/ui/Container";
 import { DataTable } from "@/components/ui/DataTable";
@@ -11,7 +13,23 @@ import { UnderlineTabs } from "@/components/ui/UnderlineTabs";
 import { getTournament } from "@/lib/api/endpoints";
 import type { TournamentDetail } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
+import { breadcrumbSchema, getSiteUrl, profileMetadata } from "@/lib/seo";
 import { firstParam } from "@/lib/url";
+
+export async function generateMetadata(props: PageProps<"/series/[slug]">): Promise<Metadata> {
+  const { slug } = await props.params;
+  const tournament = await getTournament(slug);
+
+  if (!tournament) {
+    return {};
+  }
+
+  return profileMetadata({
+    path: `/series/${tournament.slug}`,
+    title: `${tournament.name}: fixtures, results and points table`,
+    description: tournament.overview || `${tournament.name} (${tournament.dateline}): fixtures, results, points table and statistics on TMN Sport.`,
+  });
+}
 
 const tabs = [
   { key: "overview", label: "Overview" },
@@ -225,9 +243,17 @@ async function TournamentView({ params, searchParams }: Pick<PageProps<"/series/
 
   const requested = firstParam((await searchParams).tab);
   const tab = tabs.find((entry) => entry.key === requested)?.key ?? "overview";
+  const site = await getSiteUrl();
 
   return (
     <>
+      <JsonLd
+        data={breadcrumbSchema(site, [
+          { name: "Home", path: "/" },
+          { name: "Series", path: "/series" },
+          { name: tournament.name, path: `/series/${tournament.slug}` },
+        ])}
+      />
       <TournamentHeader tournament={tournament} />
       <UnderlineTabs
         label="Tournament sections"
