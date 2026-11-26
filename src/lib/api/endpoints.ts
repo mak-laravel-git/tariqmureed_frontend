@@ -23,6 +23,7 @@ import {
 import { buildMockMatchday } from "@/lib/mocks/matchday";
 import { buildMockMatchDetail } from "@/lib/mocks/matchdetail";
 import { buildMockArticleDetail, buildMockNewsPage, listMockArticles } from "@/lib/mocks/news";
+import { buildMockRankings } from "@/lib/mocks/rankings";
 import { buildMockSearch } from "@/lib/mocks/search";
 import { buildMockRecordsPage, buildMockStatsPage } from "@/lib/mocks/statistics";
 import {
@@ -73,6 +74,7 @@ import type {
   Tournament,
   TrendingPlayer,
   Video,
+  RankingsData,
   Writer,
   WriterArticles,
 } from "./types";
@@ -426,6 +428,18 @@ export async function getTeamsDirectory(): Promise<Directory> {
   cacheTag("teams");
 
   return apiGet<Directory>("teams/directory", { fallback: () => mockTeamsDirectory });
+}
+
+/**
+ * GET /rankings - the official team rankings for every format, men's and women's.
+ * The sample table is used until the first ranking sync has stored the real one.
+ */
+export async function getRankings(): Promise<RankingsData> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("teams");
+
+  return apiGet<RankingsData>("rankings", { fallback: () => buildMockRankings() });
 }
 
 /** GET /teams/{slug} - team profile with rankings and featured players. */

@@ -12,6 +12,7 @@ const pages: { path: string; changeFrequency: "always" | "hourly" | "daily" | "w
   { path: "/series", changeFrequency: "daily", priority: 0.7 },
   { path: "/teams", changeFrequency: "weekly", priority: 0.6 },
   { path: "/players", changeFrequency: "weekly", priority: 0.6 },
+  { path: "/rankings", changeFrequency: "daily", priority: 0.6 },
   { path: "/stats", changeFrequency: "daily", priority: 0.6 },
   { path: "/records", changeFrequency: "weekly", priority: 0.5 },
   { path: "/videos", changeFrequency: "daily", priority: 0.6 },

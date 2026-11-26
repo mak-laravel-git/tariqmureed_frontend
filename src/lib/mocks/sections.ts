@@ -3,6 +3,7 @@ import type {
   DirectoryItem,
   LegalPage,
   PlayerPage,
+  PlayerRankings,
   TeamPage,
   TournamentDetail,
   Video,
@@ -110,6 +111,28 @@ export function buildMockTournament(slug: string): TournamentDetail | null {
   };
 }
 
+/** Sample leading players of Bangladesh, shown until real career figures have been synced. */
+const sampleBangladeshPlayerRankings: PlayerRankings = {
+  formats: [
+    { key: "ODI", label: "ODI" },
+    { key: "T20I", label: "T20I" },
+  ],
+  batting: {
+    ODI: [
+      { rank: 1, slug: "tamim-iqbal", name: "Tamim Iqbal", image: "", role: "Batter", matches: 243, runs: 8357, average: 36.65, hundreds: 14, highScore: 158 },
+      { rank: 2, slug: "mushfiqur-rahim", name: "Mushfiqur Rahim", image: "", role: "Wicketkeeper batter", matches: 274, runs: 7795, average: 36.42, hundreds: 9, highScore: 144 },
+      { rank: 3, slug: "shakib-al-hasan", name: "Shakib Al Hasan", image: "", role: "All-rounder", matches: 247, runs: 7570, average: 37.54, hundreds: 9, highScore: 134 },
+    ],
+    T20I: [{ rank: 1, slug: "tamim-iqbal", name: "Tamim Iqbal", image: "", role: "Batter", matches: 78, runs: 1758, average: 24.42, hundreds: 0, highScore: 103 }],
+  },
+  bowling: {
+    ODI: [
+      { rank: 1, slug: "shakib-al-hasan", name: "Shakib Al Hasan", image: "", role: "All-rounder", matches: 247, wickets: 317, average: 29.8, fiveWickets: 2 },
+      { rank: 2, slug: "mashrafe-mortaza", name: "Mashrafe Mortaza", image: "", role: "Bowler", matches: 220, wickets: 270, average: 32.5, fiveWickets: 1 },
+    ],
+  },
+};
+
 export function buildMockTeamPage(slug: string): TeamPage | null {
   const entry = mockTeamsDirectory.items.find((candidate) => candidate.slug === slug);
 
@@ -127,6 +150,7 @@ export function buildMockTeamPage(slug: string): TeamPage | null {
     kind: entry.group === "international" ? "International team" : entry.group === "women" ? "Women's team" : "Domestic team",
     membership: entry.group === "international" ? "Full member · ICC" : "Affiliated side",
     nickname: bangladesh ? "The Tigers" : entry.name,
+    playerRankings: bangladesh ? sampleBangladeshPlayerRankings : undefined,
     ranks: bangladesh
       ? [
           { label: "Test rank", value: "13" },

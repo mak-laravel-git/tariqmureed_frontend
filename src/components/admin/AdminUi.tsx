@@ -81,7 +81,7 @@ export function CardHeader({ title, description, action }: { title: string; desc
 
 /** Pill showing a record status (Published, Active, Draft...). */
 export function StatusBadge({ status }: { status: string }) {
-  const archived = status.toLowerCase() === "archived";
+  const archived = ["archived", "hidden from website"].includes(status.toLowerCase());
 
   return (
     <span

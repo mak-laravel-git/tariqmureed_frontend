@@ -401,8 +401,60 @@ export interface TeamPage {
   kind: string;
   membership: string;
   nickname: string;
+  /** The team's logo from the data feed, when it has one. */
+  image?: string | null;
+  /** Match record (played, won, lost); empty until the team has a finished match. */
   ranks: { label: string; value: string }[];
   players: FeaturedPlayerRef[];
+  /** Leading batters and bowlers of the team per format, from the players' career statistics. */
+  playerRankings?: PlayerRankings;
+}
+
+export interface RankedBatter {
+  rank: number;
+  slug: string;
+  name: string;
+  image: string;
+  role: string;
+  matches: number;
+  runs: number;
+  average: number | null;
+  hundreds: number;
+  highScore: number;
+}
+
+export interface RankedBowler {
+  rank: number;
+  slug: string;
+  name: string;
+  image: string;
+  role: string;
+  matches: number;
+  wickets: number;
+  average: number;
+  fiveWickets: number;
+}
+
+export interface PlayerRankings {
+  /** Formats that have figures, e.g. { key: "ODI", label: "ODI" }. */
+  formats: { key: string; label: string }[];
+  batting: Record<string, RankedBatter[]>;
+  bowling: Record<string, RankedBowler[]>;
+}
+
+export interface TeamRankingRow {
+  position: number;
+  team: TeamSummary;
+  matches: number;
+  points: number;
+  rating: number;
+}
+
+/** The official team rankings: one table per gender and format. */
+export interface RankingsData {
+  formats: { key: string; label: string }[];
+  updatedAt?: string | null;
+  tables: Record<string, Record<string, TeamRankingRow[]>>;
 }
 
 export interface PlayerPage {
