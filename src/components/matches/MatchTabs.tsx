@@ -40,6 +40,20 @@ export function MatchTabBar({ slug, active }: { slug: string; active: MatchTabKe
   );
 }
 
+/**
+ * What an empty tab says. The provider covers competitions differently: some send only the totals and the result,
+ * so a finished match must not promise data that will never come.
+ */
+function missingNote(match: MatchDetail, what: string, beforeStart: string): string {
+  if (match.state === "upcoming") {
+    return beforeStart;
+  }
+
+  return match.state === "result"
+    ? `The data provider does not supply ${what} for this match.`
+    : `The data provider has not sent ${what} for this match yet.`;
+}
+
 function OverviewCard({ title, children, className }: { title: string; children: ReactNode; className?: string }) {
   return (
     <section className={cn("rounded-[4px] border border-[#e4e4e7] bg-white p-6", className)}>
@@ -119,6 +133,12 @@ function Overview({ match }: { match: MatchDetail }) {
 
         {overview.result && (
           <p className="border-l-4 border-[#fdc700] bg-[#fefce8] p-4 text-base leading-6 font-bold text-[#09090b]">{overview.result}</p>
+        )}
+
+        {match.state !== "upcoming" && match.innings.length === 0 && (
+          <p className="text-sm leading-6 text-[#52525c]">
+            {missingNote(match, "a detailed scorecard", "")} The team totals{match.state === "result" ? " and the result" : ""} are shown here.
+          </p>
         )}
 
         <Figures
@@ -341,7 +361,7 @@ function Scorecard({ match }: { match: MatchDetail }) {
     return (
       <>
         <TabHeading>Scorecard</TabHeading>
-        <Empty>The scorecard will be available once the first ball is bowled.</Empty>
+        <Empty>{missingNote(match, "a detailed scorecard", "The scorecard will be available once the first ball is bowled.")}</Empty>
       </>
     );
   }
@@ -356,20 +376,19 @@ function Scorecard({ match }: { match: MatchDetail }) {
 }
 
 function Commentary({ match }: { match: MatchDetail }) {
-  const empty =
-    match.state === "upcoming"
-      ? "Ball-by-ball updates will start when the match begins."
-      : "Ball-by-ball data is not available for this match.";
+  const empty = missingNote(match, "ball-by-ball updates", "Ball-by-ball updates will start when the match begins.");
 
   return (
     <div className="max-w-[768px]">
       <TabHeading>Ball-by-ball</TabHeading>
 
-      <div className="pt-6">
-        <p className="border-l-4 border-[#fdc700] bg-[#fefce8] p-4 text-xs leading-4 text-[#52525c]">
-          Every delivery from the official data provider, latest first. Updates may be delayed.
-        </p>
-      </div>
+      {match.commentary.length > 0 && (
+        <div className="pt-6">
+          <p className="border-l-4 border-[#fdc700] bg-[#fefce8] p-4 text-xs leading-4 text-[#52525c]">
+            Every delivery from the official data provider, latest first. Updates may be delayed.
+          </p>
+        </div>
+      )}
 
       {match.commentary.length === 0 ? (
         <Empty>{empty}</Empty>
@@ -441,7 +460,7 @@ function Teams({ match }: { match: MatchDetail }) {
     return (
       <>
         <TabHeading>Playing XI</TabHeading>
-        <Empty>The line-ups are announced around the toss.</Empty>
+        <Empty>{missingNote(match, "the line-ups", "The line-ups are announced around the toss.")}</Empty>
       </>
     );
   }
