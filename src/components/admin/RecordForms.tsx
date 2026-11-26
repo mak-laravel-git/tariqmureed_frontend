@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useActionState, useRef, useState } from "react";
 
 import { saveRecordAction } from "@/app/admin/actions";
+import { adPlacements, type AdPlacement } from "@/lib/ads";
+import { type CropRatio, cropRatios } from "@/lib/admin/crop";
 import { statusOptions } from "@/lib/admin/resources";
 import type { AdminRecord, AdOptions, ArticleOptions, FormState, MediaAsset } from "@/lib/admin/types";
 
@@ -30,7 +32,14 @@ interface FormProps {
 }
 
 /** Shared name / category / owner / status / notes form used by every non-article module. */
-export function GenericRecordForm({ resource, record, cancelHref, imageLabel, media = [] }: FormProps & { imageLabel?: string; media?: MediaAsset[] }) {
+export function GenericRecordForm({
+  resource,
+  record,
+  cancelHref,
+  imageLabel,
+  imageRatio,
+  media = [],
+}: FormProps & { imageLabel?: string; imageRatio?: CropRatio; media?: MediaAsset[] }) {
   const [state, action, pending] = useActionState(saveRecordAction.bind(null, resource, record?.id ?? null), initialState);
 
   return (
@@ -52,7 +61,7 @@ export function GenericRecordForm({ resource, record, cancelHref, imageLabel, me
             ))}
           </SelectInput>
         </Field>
-        {imageLabel && <ImageField name="image" label={imageLabel} initial={record?.image} media={media} hint="Upload a picture, choose one from the Media Library, or paste an image address." />}
+        {imageLabel && <ImageField name="image" label={imageLabel} initial={record?.image} media={media} cropRatio={imageRatio} hint="Upload a picture, choose one from the Media Library, or paste an image address." />}
         <Field label="Internal notes">
           <TextArea name="notes" defaultValue={record?.notes ?? ""} placeholder="Add optional notes for administrators." className="min-h-[120px]" />
         </Field>
@@ -266,7 +275,7 @@ export function ArticleForm({ resource, record, options }: FormProps & { options
           <h2 className="text-xl leading-7 font-medium text-ink">Featured Image</h2>
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <ImageField name="image" label="Featured Image" initial={record?.image} media={options.media} hint="Upload a picture, choose one from the Media Library, or paste an image address." />
+              <ImageField name="image" label="Featured Image" initial={record?.image} media={options.media} cropRatio={cropRatios.featured} hint="Upload a picture, choose one from the Media Library, or paste an image address." />
             </div>            <Field label="Image Caption">
               <TextInput name="imageCaption" defaultValue={record?.imageCaption ?? ""} placeholder="Caption..." />
             </Field>
@@ -279,11 +288,12 @@ export function ArticleForm({ resource, record, options }: FormProps & { options
                 label="Image Gallery"
                 initial={record?.gallery}
                 media={options.media}
+                cropRatio={cropRatios.gallery}
                 hint="More pictures for this story. They appear as a gallery under the article, in the order shown here."
               />
             </div>
             <div className="sm:col-span-2">
-              <ImageField name="socialImage" label="Social Sharing Image" initial={record?.socialImage} media={options.media} hint="Shown when the story is shared on social networks. Leave empty to use the featured image." />
+              <ImageField name="socialImage" label="Social Sharing Image" initial={record?.socialImage} media={options.media} cropRatio={cropRatios.social} hint="Shown when the story is shared on social networks. Leave empty to use the featured image." />
             </div>          </div>
         </Card>
 
@@ -393,6 +403,9 @@ export function ArticleForm({ resource, record, options }: FormProps & { options
 export function AdvertisementForm({ resource, record, cancelHref, options }: FormProps & { options: AdOptions }) {
   const [state, action, pending] = useActionState(saveRecordAction.bind(null, resource, record?.id ?? null), initialState);
   const [adType, setAdType] = useState(record?.adType ?? "image");
+  const [placement, setPlacement] = useState(record?.placement ?? "");
+  // A banner is cropped to the size of the chosen place; before one is chosen the crop is free.
+  const bannerSize = placement in adPlacements ? adPlacements[placement as AdPlacement] : undefined;
 
   return (
     <Card className="p-5">
@@ -404,7 +417,7 @@ export function AdvertisementForm({ resource, record, cancelHref, options }: For
           <TextInput name="subtitle" defaultValue={record?.subtitle} />
         </Field>
         <Field label="Owner or scope" hint="Where on the website the ad appears. Each place shows one ad; the newest running campaign wins.">
-          <SelectInput name="owner" defaultValue={record?.placement ?? ""} required>
+          <SelectInput name="owner" defaultValue={record?.placement ?? ""} onChange={(event) => setPlacement(event.target.value)} required>
             <option value="" disabled>
               Choose a place on the website
             </option>
@@ -437,7 +450,8 @@ export function AdvertisementForm({ resource, record, cancelHref, options }: For
               initial={record?.image}
               media={options.media}
               required
-              hint="Upload the banner here, at the size shown next to the place above, or choose one from the Media Library."
+              cropRatio={bannerSize && { width: bannerSize.width, height: bannerSize.height }}
+              hint="Upload the banner here or choose one from the Media Library, then crop it to the shape of the place chosen above."
             />            <Field label="Link" hint="Where a click on the banner goes (optional).">
               <TextInput name="linkUrl" type="url" defaultValue={record?.linkUrl ?? ""} placeholder="https://advertiser.example/offer" />
             </Field>

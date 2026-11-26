@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 
 import { saveSeoAction } from "@/app/admin/actions";
+import { cropRatios } from "@/lib/admin/crop";
 import type { AdminSeo, AdminSeoPage, FormState, MediaAsset, SiteSettings } from "@/lib/admin/types";
 import { cn } from "@/lib/cn";
 
@@ -107,7 +108,7 @@ function PageCard({ page, siteUrl, siteName, media }: { page: AdminSeoPage; site
             address={page.path === "/" ? host : `${host} › ${page.path.slice(1)}`}
             siteName={siteName}
           />
-          <ImageField name="pageImage" label="Share picture" initial={page.image} media={media} hint="Shown when this page is shared on social networks. Leave empty to use the default picture." />
+          <ImageField name="pageImage" label="Share picture" initial={page.image} media={media} cropRatio={cropRatios.social} hint="Shown when this page is shared on social networks. Leave empty to use the default picture." />
         </div>
       </div>
     </details>
@@ -195,6 +196,7 @@ export function SeoForm({ settings, seo, media }: SeoFormProps) {
               label="Default share picture"
               initial={settings.seoDefaultImage}
               media={media}
+              cropRatio={cropRatios.social}
               hint="Used when a page or story has no picture of its own. 1200 × 630 pixels works best."
             />
 

@@ -10,7 +10,7 @@ export interface NavItem {
 export const mainNav: NavItem[] = [
   { label: "Home", href: "/" },
   { label: "News", href: "/news" },
-  { label: "Live Scores", href: "/live-scores", live: true },
+  // { label: "Live Scores", href: "/live-scores", live: true },
   { label: "Schedule", href: "/schedule" },
   { label: "Series", href: "/series" },
   { label: "Teams", href: "/teams" },

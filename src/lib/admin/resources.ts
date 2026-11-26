@@ -1,3 +1,4 @@
+import { type CropRatio, cropRatios } from "./crop";
 import type { ResourceKey, StatusTab } from "./types";
 
 export interface ResourceConfig {
@@ -17,6 +18,8 @@ export interface ResourceConfig {
   newLabel?: string;
   /** The editor offers a picture (author photo, category image) under this label. */
   imageLabel?: string;
+  /** Shape selected when that picture is cropped. */
+  imageRatio?: CropRatio;
   /** Column heading overrides: [title, subtitle, owner, status, updated]. */
   columns?: [string, string, string, string, string];
 }
@@ -38,6 +41,7 @@ export const resources: Record<ResourceKey, ResourceConfig> = {
     form: "generic",
     apiPath: "categories",
     imageLabel: "Category image",
+    imageRatio: cropRatios.category,
   },
   series: {
     key: "series",
@@ -73,6 +77,7 @@ export const resources: Record<ResourceKey, ResourceConfig> = {
     form: "generic",
     apiPath: "writers",
     imageLabel: "Author photo",
+    imageRatio: cropRatios.avatar,
   },
   activity: {
     key: "activity",

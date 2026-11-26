@@ -44,6 +44,7 @@ export default async function EditRecordPage(props: PageProps<"/admin/[resource]
           record={record}
           cancelHref={`/admin/${resource}/${id}`}
           imageLabel={config.imageLabel}
+          imageRatio={config.imageRatio}
           media={config.imageLabel ? await getMedia() : undefined}
         />
       )}

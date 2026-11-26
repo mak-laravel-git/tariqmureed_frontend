@@ -4,6 +4,7 @@ import { ApiError } from "@/lib/api/client";
 import { apiConfig } from "@/lib/api/config";
 
 import { adminRequest, adminRequestRaw } from "./api";
+import type { CropRect } from "./crop";
 import {
   buildMockPermissions,
   mockDashboard,
@@ -266,6 +267,32 @@ export async function uploadMedia(form: FormData): Promise<MediaAsset> {
     method: "POST",
     form,
     fallback: () => ({ id: `mock-${Date.now()}`, title: "Uploaded image", meta: "Mock · 0 KB", url: null }),
+  });
+}
+
+/** The full picture to crop for an image address; fails for linked pictures and GIFs. */
+export async function getImageSource(url: string): Promise<MediaAsset> {
+  return adminRequest<MediaAsset>("media/source", {
+    query: { url },
+    fallback: () => {
+      const asset = mockMedia.find((entry) => entry.url === url);
+
+      if (!asset) {
+        throw new ApiError("This image cannot be cropped.", 404);
+      }
+
+      return asset;
+    },
+  });
+}
+
+/** Saves a rectangle of a library picture (in its own pixels) as a new file. */
+export async function cropImage(id: string, area: CropRect): Promise<MediaAsset> {
+  return adminRequest<MediaAsset>(`media/${encodeURIComponent(id)}/crop`, {
+    method: "POST",
+    body: area,
+    // Without an API there is no file to cut, so the mock keeps the full picture.
+    fallback: () => mockMedia.find((entry) => entry.id === id) ?? { id, title: "Cropped image", meta: "Mock · 0 KB", url: null },
   });
 }
 

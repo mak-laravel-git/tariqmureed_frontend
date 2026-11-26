@@ -3,11 +3,51 @@
 import Image from "next/image";
 import { type ChangeEvent, useRef, useState, useTransition } from "react";
 
-import { uploadImageAction } from "@/app/admin/actions";
+import { imageSourceAction, uploadImageAction } from "@/app/admin/actions";
+import type { CropRatio } from "@/lib/admin/crop";
 import type { MediaAsset } from "@/lib/admin/types";
 import { cn } from "@/lib/cn";
 
 import { secondaryButtonClass, TextInput } from "./AdminUi";
+import { CropDialog } from "./CropDialog";
+
+/**
+ * Opens the crop window for a picture address. `replace` receives the address that was cropped and the one to use
+ * instead. Linked pictures and GIFs cannot be cropped; the reason is returned in `notice`.
+ */
+function useImageCrop(replace: (from: string, to: string) => void, preset?: CropRatio) {
+  const [target, setTarget] = useState<{ from: string; asset: MediaAsset & { url: string } } | null>(null);
+  const [notice, setNotice] = useState("");
+  const [opening, startOpening] = useTransition();
+
+  const open = (from: string) => {
+    setNotice("");
+
+    startOpening(async () => {
+      const { asset, error } = await imageSourceAction(from);
+
+      if (asset?.url) {
+        setTarget({ from, asset: { ...asset, url: asset.url } });
+      } else {
+        setNotice(error ?? "This image cannot be cropped.");
+      }
+    });
+  };
+
+  const dialog = target && (
+    <CropDialog
+      asset={target.asset}
+      preset={preset}
+      onClose={() => setTarget(null)}
+      onDone={(url) => {
+        replace(target.from, url);
+        setTarget(null);
+      }}
+    />
+  );
+
+  return { open, opening, notice, clearNotice: () => setNotice(""), dialog };
+}
 
 interface ImageFieldProps {
   /** Form field that carries the chosen image address. */
@@ -19,24 +59,30 @@ interface ImageFieldProps {
   /** Text under the field, e.g. the size an ad banner should have. */
   hint?: string;
   required?: boolean;
+  /** Shape selected when the crop window opens. */
+  cropRatio?: CropRatio;
 }
 
 /**
  * Picture chooser used by every editor: shows a preview, uploads a new file straight into the media library,
- * lets the editor pick an existing image from the library with thumbnails, or paste an image address.
+ * lets the editor pick an existing image from the library with thumbnails, or paste an image address. An uploaded
+ * or picked picture can be cropped; the library keeps the full-size original.
  */
-export function ImageField({ name, label, initial, media, hint, required }: ImageFieldProps) {
+export function ImageField({ name, label, initial, media, hint, required, cropRatio }: ImageFieldProps) {
   const [value, setValue] = useState(initial ?? "");
   const [library, setLibrary] = useState(media);
   const [browsing, setBrowsing] = useState(false);
   const [error, setError] = useState("");
   const [uploading, startUpload] = useTransition();
   const fileInput = useRef<HTMLInputElement>(null);
+  // The address may have been changed while the crop window was opening; only replace the one that was cropped.
+  const crop = useImageCrop((from, to) => setValue((current) => (current === from ? to : current)), cropRatio);
 
   const pick = (url: string) => {
     setValue(url);
     setBrowsing(false);
     setError("");
+    crop.open(url);
   };
 
   const upload = (event: ChangeEvent<HTMLInputElement>) => {
@@ -57,6 +103,7 @@ export function ImageField({ name, label, initial, media, hint, required }: Imag
       if (result.asset?.url) {
         setLibrary((current) => [result.asset as MediaAsset, ...current]);
         setValue(result.asset.url);
+        crop.open(result.asset.url);
       } else {
         setError(result.error ?? "The image could not be uploaded.");
       }
@@ -72,7 +119,7 @@ export function ImageField({ name, label, initial, media, hint, required }: Imag
 
       <div className="flex items-start gap-4">
         <div className="relative flex h-24 w-36 shrink-0 items-center justify-center overflow-hidden rounded-md border border-line bg-surface text-[11px] text-muted">
-          {value ? <Image src={value} alt="Preview of the chosen image" fill unoptimized sizes="144px" className="object-cover" /> : "No image"}
+          {value ? <Image src={value} alt="Preview of the chosen image" fill unoptimized sizes="144px" className="object-contain" /> : "No image"}
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col gap-2.5">
@@ -89,9 +136,21 @@ export function ImageField({ name, label, initial, media, hint, required }: Imag
               Choose from Media Library
             </button>
             {value && (
-              <button type="button" onClick={() => setValue("")} className={secondaryButtonClass("h-9 px-3 text-xs text-live hover:border-live")}>
-                Remove
-              </button>
+              <>
+                <button type="button" onClick={() => crop.open(value)} disabled={uploading || crop.opening} className={secondaryButtonClass("h-9 px-3 text-xs")}>
+                  {crop.opening ? "Opening…" : "Crop"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setValue("");
+                    crop.clearNotice();
+                  }}
+                  className={secondaryButtonClass("h-9 px-3 text-xs text-live hover:border-live")}
+                >
+                  Remove
+                </button>
+              </>
             )}
           </div>
           <input ref={fileInput} type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={upload} className="sr-only" tabIndex={-1} aria-label="Upload an image file" />
@@ -99,7 +158,10 @@ export function ImageField({ name, label, initial, media, hint, required }: Imag
           <TextInput
             aria-label="Image address"
             value={value}
-            onChange={(event) => setValue(event.target.value)}
+            onChange={(event) => {
+              setValue(event.target.value);
+              crop.clearNotice();
+            }}
             placeholder="…or paste an image address (https://…)"
             required={required && !value}
           />
@@ -111,6 +173,14 @@ export function ImageField({ name, label, initial, media, hint, required }: Imag
           {error}
         </p>
       )}
+
+      {crop.notice && (
+        <p role="status" className="text-xs text-muted">
+          {crop.notice}
+        </p>
+      )}
+
+      {crop.dialog}
 
       {browsing && (
         <div className="rounded-md border border-line bg-surface p-3">
@@ -153,13 +223,16 @@ interface GalleryFieldProps {
   initial?: string[];
   media: MediaAsset[];
   hint?: string;
+  /** Shape selected when the crop window opens. */
+  cropRatio?: CropRatio;
 }
 
 /**
  * Several pictures for one story: upload files (many at once), tick images in the Media Library or paste an address.
- * The order shown here is the order of the gallery on the story page. The field sends the list as JSON.
+ * Each picture can be cropped. The order shown here is the order of the gallery on the story page. The field sends
+ * the list as JSON.
  */
-export function GalleryField({ name, label, initial = [], media, hint }: GalleryFieldProps) {
+export function GalleryField({ name, label, initial = [], media, hint, cropRatio }: GalleryFieldProps) {
   const [images, setImages] = useState<string[]>(initial);
   const [library, setLibrary] = useState(media);
   const [browsing, setBrowsing] = useState(false);
@@ -167,6 +240,9 @@ export function GalleryField({ name, label, initial = [], media, hint }: Gallery
   const [error, setError] = useState("");
   const [uploading, startUpload] = useTransition();
   const fileInput = useRef<HTMLInputElement>(null);
+
+  // The cropped picture takes the place of the one it was cut from.
+  const crop = useImageCrop((from, to) => setImages((current) => [...new Set(current.map((url) => (url === from ? to : url)))]), cropRatio);
 
   const add = (urls: string[]) => setImages((current) => [...new Set([...current, ...urls.filter(Boolean)])]);
   const remove = (url: string) => setImages((current) => current.filter((entry) => entry !== url));
@@ -243,7 +319,7 @@ export function GalleryField({ name, label, initial = [], media, hint }: Gallery
           {images.map((url, index) => (
             <li key={url} className="overflow-hidden rounded-md border border-line bg-white">
               <div className="relative aspect-[1.5] bg-surface">
-                <Image src={url} alt={`Gallery image ${index + 1}`} fill unoptimized sizes="200px" className="object-cover" />
+                <Image src={url} alt={`Gallery image ${index + 1}`} fill unoptimized sizes="200px" className="object-contain" />
                 <button
                   type="button"
                   onClick={() => remove(url)}
@@ -253,6 +329,16 @@ export function GalleryField({ name, label, initial = [], media, hint }: Gallery
                   ×
                 </button>
               </div>
+              {/* Its own row: the thumbnails are too narrow to fit it beside the order arrows. */}
+              <button
+                type="button"
+                onClick={() => crop.open(url)}
+                disabled={crop.opening}
+                aria-label={`Crop gallery image ${index + 1}`}
+                className="block w-full border-b border-line py-1.5 text-[11px] font-medium text-ink hover:bg-surface disabled:opacity-30"
+              >
+                Crop
+              </button>
               <div className="flex items-center justify-between px-2 py-1.5 text-[11px] text-muted">
                 <span>{index + 1}</span>
                 <span className="flex gap-1">
@@ -270,6 +356,14 @@ export function GalleryField({ name, label, initial = [], media, hint }: Gallery
       ) : (
         <p className="rounded-md border border-dashed border-line px-4 py-6 text-center text-xs text-muted">No gallery images yet.</p>
       )}
+
+      {crop.notice && (
+        <p role="status" className="text-xs text-muted">
+          {crop.notice}
+        </p>
+      )}
+
+      {crop.dialog}
 
       <div className="flex gap-2">
         <TextInput
