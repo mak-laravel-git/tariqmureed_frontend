@@ -36,7 +36,7 @@ export function UnderlineTabs({ tabs, label }: { tabs: UnderlineTab[]; label: st
                 aria-hidden="true"
                 className={cn(
                   "absolute inset-x-0 bottom-0 h-1",
-                  tab.active ? "bg-[#fdc700]" : "bg-transparent",
+                  tab.active ? "bg-brand" : "bg-transparent",
                 )}
               />
             </Link>

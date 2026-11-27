@@ -79,7 +79,7 @@ export function MatchHeader({ match }: { match: MatchDetail }) {
         </div>
 
         {(match.tossNote ?? match.summary) && (
-          <p className="mt-5 border-l-4 border-[#fdc700] pl-4 text-sm leading-5 font-bold text-ink">
+          <p className="mt-5 border-l-4 border-brand pl-4 text-sm leading-5 font-bold text-ink">
             {match.tossNote ?? match.summary}
           </p>
         )}

@@ -32,7 +32,7 @@ function SectionTitle({ children, eyebrow }: { children: string; eyebrow?: strin
   return (
     <div className="border-b border-[#e4e4e7] pb-4">
       {eyebrow && (
-        <p className="text-[11px] leading-[16.5px] font-black tracking-[2.42px] text-[#d08700] uppercase">{eyebrow}</p>
+        <p className="text-[11px] leading-[16.5px] font-black tracking-[2.42px] text-brand uppercase">{eyebrow}</p>
       )}
       <h2
         className={`${eyebrow ? "pt-2" : ""} text-[30px] leading-9 font-bold tracking-[-0.75px] text-[#09090b]`}
@@ -137,7 +137,7 @@ async function TeamView({ params, searchParams }: { params: Promise<{ slug: stri
             <AdSlot placement="team-sidebar" />
             <Link
               href="/schedule"
-              className="mt-6 flex items-center justify-center rounded-[4px] bg-[#fdc700] px-6 py-4 text-xs leading-4 font-black text-[#09090b] uppercase transition-colors hover:brightness-95"
+              className="mt-6 flex items-center justify-center rounded-[4px] bg-brand px-6 py-4 text-xs leading-4 font-black text-[#09090b] uppercase transition-colors hover:brightness-95"
             >
               View all fixtures
             </Link>

@@ -88,7 +88,7 @@ function BallMark({ mark }: { mark: string }) {
     <span
       className={cn(
         "flex size-8 shrink-0 items-center justify-center rounded-full text-sm leading-5 font-black",
-        mark === "4" || mark === "6" ? "bg-[#fdc700] text-[#09090b]" : mark === "W" ? "bg-[#e7000b] text-white" : "bg-[#f4f4f5] text-[#09090b]",
+        mark === "4" || mark === "6" ? "bg-brand text-[#09090b]" : mark === "W" ? "bg-[#e7000b] text-white" : "bg-[#f4f4f5] text-[#09090b]",
       )}
     >
       {mark}
@@ -132,7 +132,7 @@ function Overview({ match }: { match: MatchDetail }) {
         </div>
 
         {overview.result && (
-          <p className="border-l-4 border-[#fdc700] bg-[#fefce8] p-4 text-base leading-6 font-bold text-[#09090b]">{overview.result}</p>
+          <p className="border-l-4 border-brand bg-[#fefce8] p-4 text-base leading-6 font-bold text-[#09090b]">{overview.result}</p>
         )}
 
         {match.state !== "upcoming" && match.innings.length === 0 && (
@@ -384,7 +384,7 @@ function Commentary({ match }: { match: MatchDetail }) {
 
       {match.commentary.length > 0 && (
         <div className="pt-6">
-          <p className="border-l-4 border-[#fdc700] bg-[#fefce8] p-4 text-xs leading-4 text-[#52525c]">
+          <p className="border-l-4 border-brand bg-[#fefce8] p-4 text-xs leading-4 text-[#52525c]">
             Every delivery from the official data provider, latest first. Updates may be delayed.
           </p>
         </div>
@@ -436,7 +436,7 @@ function PlayerBadge({ title, muted, children }: { title: string; muted?: boolea
       title={title}
       className={cn(
         "rounded-[3px] px-1.5 py-0.5 text-[10px] leading-[14px] font-black tracking-[0.5px] no-underline",
-        muted ? "bg-[#f4f4f5] text-[#71717b]" : "bg-[#fdc700] text-[#09090b]",
+        muted ? "bg-[#f4f4f5] text-[#71717b]" : "bg-brand text-[#09090b]",
       )}
     >
       {children}

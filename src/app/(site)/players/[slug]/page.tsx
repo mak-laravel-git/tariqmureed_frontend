@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
@@ -6,13 +7,13 @@ import { NewsCard } from "@/components/news/NewsCard";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Container } from "@/components/ui/Container";
 import { DataTable } from "@/components/ui/DataTable";
-import { Photo } from "@/components/ui/Photo";
+import { hasPlayerPhoto, PlayerPhoto } from "@/components/ui/PlayerPhoto";
 import { getPlayerPage } from "@/lib/api/endpoints";
 import { absoluteUrl, breadcrumbSchema, getSiteUrl, profileMetadata } from "@/lib/seo";
 
 export async function generateMetadata(props: PageProps<"/players/[slug]">): Promise<Metadata> {
   const { slug } = await props.params;
-  const player = await getPlayerPage(slug);
+  const player = await getPlayerPage(slug).catch(() => null);
 
   if (!player) {
     return {};
@@ -22,7 +23,7 @@ export async function generateMetadata(props: PageProps<"/players/[slug]">): Pro
     path: `/players/${player.slug}`,
     title: `${player.name}: career stats and profile`,
     description: `${player.name}${player.teamAndRole ? `, ${player.teamAndRole}` : ""}. Career statistics by format, profile details and the latest news on TMN Sport.`,
-    image: player.image,
+    image: hasPlayerPhoto(player.image) ? player.image : undefined,
   });
 }
 
@@ -30,7 +31,7 @@ function SectionTitle({ children, eyebrow }: { children: string; eyebrow?: strin
   return (
     <div className="border-b border-[#e4e4e7] pb-4">
       {eyebrow && (
-        <p className="text-[11px] leading-[16.5px] font-black tracking-[2.42px] text-[#d08700] uppercase">{eyebrow}</p>
+        <p className="text-[11px] leading-[16.5px] font-black tracking-[2.42px] text-brand uppercase">{eyebrow}</p>
       )}
       <h2
         className={`${eyebrow ? "pt-2" : ""} text-[30px] leading-9 font-bold tracking-[-0.75px] text-[#09090b]`}
@@ -52,10 +53,24 @@ function splitDisplayName(name: string) {
 
 async function PlayerView({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const player = await getPlayerPage(slug);
+  // undefined: the request failed. null: there is no such player.
+  const player = await getPlayerPage(slug).catch(() => undefined);
+
+  if (player === null) {
+    notFound();
+  }
 
   if (!player) {
-    notFound();
+    return (
+      <Container className="py-24 text-center">
+        <p role="alert" className="text-base leading-6 text-[#71717b]">
+          This player could not be loaded right now. Please refresh the page in a moment.
+        </p>
+        <Link href="/players" className="mt-6 inline-block text-sm font-bold text-ink hover:underline">
+          ← All players
+        </Link>
+      </Container>
+    );
   }
 
   const { first, last } = splitDisplayName(player.name);
@@ -71,7 +86,7 @@ async function PlayerView({ params }: { params: Promise<{ slug: string }> }) {
           "@id": `${site}${path}#person`,
           name: player.name,
           url: `${site}${path}`,
-          ...(player.image ? { image: absoluteUrl(site, player.image) } : {}),
+          ...(hasPlayerPhoto(player.image) ? { image: absoluteUrl(site, player.image) } : {}),
           ...(player.teamAndRole ? { description: player.teamAndRole } : {}),
           jobTitle: "Cricketer",
         }}
@@ -80,25 +95,11 @@ async function PlayerView({ params }: { params: Promise<{ slug: string }> }) {
       <section className="bg-[#2d2d2d] text-white">
         <Container className="grid grid-cols-1 items-end gap-8 py-10 md:grid-cols-[300px_minmax(0,1fr)]">
           <div className="relative h-[375px] w-full max-w-[300px] overflow-hidden rounded-[4px] justify-self-start self-end">
-            {player.image ? (
-              <Photo src={player.image} alt={player.name} priority sizes="300px" />
-            ) : (
-              <span
-                aria-hidden="true"
-                className="flex size-full items-center justify-center bg-[#3f3f46] text-7xl font-black text-white/40"
-              >
-                {player.name
-                  .split(/\s+/)
-                  .map((part) => part[0])
-                  .join("")
-                  .slice(0, 2)
-                  .toUpperCase()}
-              </span>
-            )}
+            <PlayerPhoto src={player.image} alt={player.name} priority sizes="300px" />
           </div>
 
           <div className="min-w-0 self-end pb-10">
-            <p className="text-xs leading-4 font-black tracking-[0.6px] text-[#fdc700] uppercase">{player.teamAndRole}</p>
+            <p className="text-xs leading-4 font-black tracking-[0.6px] text-[#fed402] capitalize">{player.teamAndRole}</p>
             <h1 className="pt-3 text-[48px] leading-[48px] font-bold text-white">
               {last ? (
                 <>
@@ -122,21 +123,58 @@ async function PlayerView({ params }: { params: Promise<{ slug: string }> }) {
       </section>
 
       <Container className="py-12">
-        <SectionTitle eyebrow="Career">International statistics</SectionTitle>
-        <DataTable
-          className="mt-6"
-          caption={`${player.name} international statistics`}
-          rows={player.career}
-          rowKey={(row) => row.format}
-          columns={[
-            { key: "format", label: "Format", strong: true },
-            { key: "matches", label: "Matches" },
-            { key: "runs", label: "Runs" },
-            { key: "average", label: "Average" },
-            { key: "hundreds", label: "100s" },
-            { key: "highScore", label: "High score" },
-          ]}
-        />
+        <SectionTitle eyebrow="Career">Batting statistics</SectionTitle>
+        {player.career.length > 0 ? (
+          <DataTable
+            className="mt-6"
+            caption={`${player.name} batting statistics by format`}
+            rows={player.career}
+            rowKey={(row) => row.format}
+            columns={[
+              { key: "format", label: "Format", strong: true },
+              { key: "matches", label: "Matches" },
+              { key: "innings", label: "Innings" },
+              { key: "notOuts", label: "Not out" },
+              { key: "runs", label: "Runs" },
+              { key: "average", label: "Average" },
+              { key: "strikeRate", label: "Strike rate" },
+              { key: "hundreds", label: "100s" },
+              { key: "fifties", label: "50s" },
+              { key: "fours", label: "4s" },
+              { key: "sixes", label: "6s" },
+              { key: "highScore", label: "High score" },
+            ]}
+          />
+        ) : (
+          <p className="mt-6 rounded-[4px] border border-line bg-white px-5 py-10 text-center text-sm text-muted">
+            No career statistics are available for {player.name} yet.
+          </p>
+        )}
+
+        {player.bowling && player.bowling.length > 0 && (
+          <div className="pt-12">
+            <SectionTitle eyebrow="Career">Bowling statistics</SectionTitle>
+            <DataTable
+              className="mt-6"
+              caption={`${player.name} bowling statistics by format`}
+              rows={player.bowling}
+              rowKey={(row) => row.format}
+              columns={[
+                { key: "format", label: "Format", strong: true },
+                { key: "matches", label: "Matches" },
+                { key: "innings", label: "Innings" },
+                { key: "overs", label: "Overs" },
+                { key: "runs", label: "Runs" },
+                { key: "wickets", label: "Wickets" },
+                { key: "average", label: "Average" },
+                { key: "economy", label: "Economy" },
+                { key: "strikeRate", label: "Strike rate" },
+                { key: "fourWickets", label: "4w" },
+                { key: "fiveWickets", label: "5w" },
+              ]}
+            />
+          </div>
+        )}
 
         {player.news.length > 0 && (
           <div className="pt-12">

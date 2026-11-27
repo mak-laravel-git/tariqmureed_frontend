@@ -110,7 +110,7 @@ async function WriterView({ params, searchParams }: { params: Promise<{ slug: st
             <Photo src={writer.avatar} alt={writer.name} priority sizes="200px" />
           </div>
           <div className="min-w-0">
-            <p className="text-xs leading-4 font-black tracking-[0.6px] text-[#fdc700] uppercase">{writer.title}</p>
+            <p className="text-xs leading-4 font-black tracking-[0.6px] text-brand uppercase">{writer.title}</p>
             <h1 className="pt-3 text-4xl leading-[1.05] font-bold text-white sm:text-[48px] sm:leading-[48px]">{writer.name}</h1>
             <p className="max-w-[640px] pt-5 text-base leading-7 text-[#d4d4d8]">{writer.bio}</p>
             <dl className="flex flex-wrap gap-8 pt-7">
@@ -123,7 +123,7 @@ async function WriterView({ params, searchParams }: { params: Promise<{ slug: st
                 <dd className="text-sm leading-5 font-bold text-white">{writer.since}</dd>
               </div>
             </dl>
-            <Link href="/news" className="mt-8 inline-block text-sm font-bold text-[#fdc700] hover:underline">
+            <Link href="/news" className="mt-8 inline-block text-sm font-bold text-brand hover:underline">
               Read the latest news →
             </Link>
           </div>

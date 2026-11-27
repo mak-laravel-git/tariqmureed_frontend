@@ -35,9 +35,11 @@ function StateTag({ state }: { state: MatchState }) {
 function SideRow({
   side,
   showProgress,
+  className,
 }: {
   side: MatchSide;
   showProgress: boolean;
+  className?: string;
 }) {
   const subline = showProgress
     ? side.score
@@ -46,7 +48,7 @@ function SideRow({
     : null;
 
   return (
-    <div className="flex items-center gap-3">
+    <div className={cn("flex items-center gap-3", className)}>
       <TeamBadge team={side.team} />
 
       <div className="min-w-0 flex-1">
@@ -84,25 +86,31 @@ function SideRow({
   );
 }
 
+interface MatchCardProps {
+  match: Match;
+  /** Fills the height of its row, so that cards of different kinds end up the same size. */
+  fill?: boolean;
+}
+
 /** Scorecard-style summary of a live, upcoming or completed match. */
-export function MatchCard({ match }: { match: Match }) {
+export function MatchCard({ match, fill }: MatchCardProps) {
   const inPlay = match.state === "live" || match.state === "break";
+  // Room for a name and a score line, so the divider sits at the same height with or without the score.
+  const rowClass = fill ? "min-h-[41px]" : undefined;
 
   return (
-    <article className="min-w-0 self-start overflow-hidden rounded-lg border border-line bg-white transition-shadow focus-within:ring-2 focus-within:ring-ink hover:shadow-[0_4px_14px_rgba(17,17,17,0.08)]">
+    <article
+      className={cn(
+        "min-w-0 overflow-hidden rounded-lg border border-line bg-white transition-shadow focus-within:ring-2 focus-within:ring-ink hover:shadow-[0_4px_14px_rgba(17,17,17,0.08)]",
+        fill ? "flex h-full flex-col" : "self-start",
+      )}
+    >
       <Link
         href={`/matches/${match.slug}`}
         aria-label={`${match.home.team.name} vs ${match.away.team.name} match details`}
-        className="block outline-none"
+        className={cn("outline-none", fill ? "flex flex-1 flex-col" : "block")}
       >
-        <header
-          className={cn(
-            "flex items-center justify-between gap-3 border-b px-4 py-2.5",
-            inPlay
-              ? "border-live/20 bg-live/[0.06]"
-              : "border-line bg-surface/60",
-          )}
-        >
+        <header className="flex items-center justify-between gap-3 border-b-2 border-brand bg-card-header px-4 py-2.5">
           <div className="flex min-w-0 items-center gap-2">
             {inPlay && <LiveDot />}
             <span className="truncate text-xs leading-[18px] font-bold text-charade">
@@ -115,11 +123,11 @@ export function MatchCard({ match }: { match: Match }) {
           <StateTag state={match.state} />
         </header>
 
-        <div className="flex flex-col gap-3 p-4">
-          <SideRow side={match.home} showProgress={inPlay} />
-          <SideRow side={match.away} showProgress={inPlay} />
+        <div className={cn("flex flex-col gap-3 p-4", fill && "flex-1")}>
+          <SideRow side={match.home} showProgress={inPlay} className={rowClass} />
+          <SideRow side={match.away} showProgress={inPlay} className={rowClass} />
 
-          <footer className="flex flex-col gap-1.5 border-t border-line pt-[11px]">
+          <footer className={cn("flex flex-col gap-1.5 border-t border-line pt-[11px]", fill && "flex-1")}>
             {match.summary && (
               <p
                 className={cn(
@@ -130,7 +138,7 @@ export function MatchCard({ match }: { match: Match }) {
                 {match.summary}
               </p>
             )}
-            <p className="flex items-center gap-2 text-xs leading-[18px] text-muted">
+            <p className={cn("flex items-center gap-2 text-xs leading-[18px] text-muted", fill && "mt-auto")}>
               <span>{formatMatchDate(match.startsAt)}</span>
               <span aria-hidden="true">·</span>
               <span>{formatMatchTime(match.startsAt)}</span>

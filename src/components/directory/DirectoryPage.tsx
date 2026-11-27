@@ -25,7 +25,7 @@ function StatusTag({ status }: { status: string }) {
     <span
       className={cn(
         "rounded-[4px] px-2.5 py-1 text-[10px] leading-[15px] font-black tracking-[1.5px] whitespace-nowrap uppercase",
-        active ? "bg-[#fdc700] text-black" : "bg-black text-white",
+        active ? "bg-brand text-black" : "bg-black text-white",
       )}
     >
       {status}

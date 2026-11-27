@@ -68,7 +68,7 @@ async function MatchdayBody({
           <section key={group.competition.slug} aria-labelledby={`group-${group.competition.slug}`} className="pt-8">
             <div className="border-b border-[#e4e4e7] pb-4">
               {group.competition.category && (
-                <p className="text-[11px] leading-[16.5px] font-black tracking-[2.42px] text-[#d08700] uppercase">
+                <p className="text-[11px] leading-[16.5px] font-black tracking-[2.42px] text-brand uppercase">
                   {group.competition.category}
                 </p>
               )}
