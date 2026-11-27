@@ -94,7 +94,7 @@ function TournamentHeader({ tournament }: { tournament: TournamentDetail }) {
         ) : (
           <span
             aria-hidden="true"
-            className="flex size-24 shrink-0 items-center justify-center rounded-full bg-[#fdc700] text-xl leading-7 font-black text-black"
+            className="flex size-24 shrink-0 items-center justify-center rounded-full bg-brand text-xl leading-7 font-black text-black"
           >
             {tournament.abbreviation}
           </span>
@@ -103,7 +103,7 @@ function TournamentHeader({ tournament }: { tournament: TournamentDetail }) {
           <span
             className={cn(
               "inline-flex items-center rounded-[4px] px-2.5 py-1 text-[10px] leading-[15px] font-black tracking-[1.5px] uppercase",
-              live ? "bg-[#fdc700] text-black" : "bg-black text-white",
+              live ? "bg-brand text-black" : "bg-black text-white",
             )}
           >
             {tournament.status}

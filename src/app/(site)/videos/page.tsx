@@ -23,7 +23,7 @@ function PlayButton({ className, iconSize }: { className: string; iconSize: numb
   return (
     <span
       aria-hidden="true"
-      className={`flex items-center justify-center rounded-full bg-[#fdc700] pl-0.5 text-[#09090b] ${className}`}
+      className={`flex items-center justify-center rounded-full bg-brand pl-0.5 text-[#09090b] ${className}`}
     >
       <PlayIcon width={iconSize} height={iconSize} />
     </span>
@@ -49,7 +49,7 @@ function FeaturedVideo({ video }: { video: Video }) {
       </Link>
 
       <div className="flex flex-col justify-end p-8">
-        <span className="inline-flex w-full items-center rounded-[4px] bg-[#fdc700] px-2.5 py-1 text-[10px] leading-[15px] font-black tracking-[1.5px] text-black uppercase">
+        <span className="inline-flex w-full items-center rounded-[4px] bg-brand px-2.5 py-1 text-[10px] leading-[15px] font-black tracking-[1.5px] text-black uppercase">
           Featured video
         </span>
         <h2 className="pt-5 text-[30px] leading-9 font-black text-white">

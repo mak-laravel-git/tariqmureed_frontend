@@ -506,8 +506,49 @@ export interface PlayerPage {
   image: string;
   teamAndRole: string;
   facts: { label: string; value: string }[];
-  career: { format: string; matches: number; runs: string; average: string; hundreds: number; highScore: string }[];
+  career: PlayerBattingRow[];
+  /** Only the formats the player has bowled in. */
+  bowling?: PlayerBowlingRow[];
   news: Article[];
+}
+
+export interface PlayerBattingRow {
+  format: string;
+  matches: number;
+  innings?: number;
+  notOuts?: number;
+  runs: string;
+  average: string;
+  strikeRate?: string;
+  hundreds: number;
+  fifties?: number;
+  fours?: number;
+  sixes?: number;
+  highScore: string;
+}
+
+export interface PlayerBowlingRow {
+  format: string;
+  matches: number;
+  innings: number;
+  overs: string;
+  runs: string;
+  wickets: number;
+  average: string;
+  economy: string;
+  strikeRate: string;
+  fourWickets: number;
+  fiveWickets: number;
+}
+
+/** A player on the Players page. An empty image means there is no picture. */
+export type PlayerCard = Pick<TrendingPlayer, "id" | "slug" | "name" | "image" | "role" | "team" | "country">;
+
+export interface PlayerList {
+  players: PlayerCard[];
+  total: number;
+  page: number;
+  lastPage: number;
 }
 
 export type StatsScope = "player" | "team" | "tournament";

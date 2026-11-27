@@ -20,7 +20,7 @@ export function FeaturedNewsCard({ article }: { article: Article }) {
       </Link>
 
       <div className="flex flex-col justify-end p-6 lg:p-7">
-        <span className="block w-full rounded-[4px] bg-[#fdc700] px-2.5 py-1 text-[10px] leading-[15px] font-black tracking-[1.5px] text-black uppercase">
+        <span className="block w-full rounded-[4px] bg-[#fed402] px-2.5 py-1 text-xs leading-[15px] font-black tracking-[1.5px] text-black capitalize">
           Featured
         </span>
         <h2 className="pt-5 text-[26px] leading-[1.2] font-black text-white lg:text-[30px] lg:leading-[37.5px]">

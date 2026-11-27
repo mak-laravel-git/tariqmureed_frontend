@@ -7,7 +7,7 @@ import type { Article } from "@/lib/api/types";
 
 export function CategoryLabel({ children }: { children: string }) {
   return (
-    <p className="text-[10px] leading-[15px] font-black tracking-[1.6px] text-[#d08700] uppercase">{children}</p>
+    <p className="text-xs leading-[15px] font-black tracking-[1.6px] text-brand capitalize">{children}</p>
   );
 }
 

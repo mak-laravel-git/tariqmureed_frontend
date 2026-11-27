@@ -37,13 +37,14 @@ import {
 import { emptyTeamProfile, mockTeamList, mockTeamProfiles } from "@/lib/mocks/teams";
 import { builtInLegalPage } from "@/lib/legal-content";
 
-import { apiGet } from "./client";
+import { ApiError, apiGet } from "./client";
 import { apiConfig } from "./config";
 import type {
   AdMap,
   Article,
   Directory,
   LegalPage,
+  PlayerList,
   PlayerPage,
   PublicSettings,
   SeoData,
@@ -100,6 +101,7 @@ import type {
  *   GET /stats/highlights          -> getStatHighlights
  *   GET /stats/batting-leaders     -> getBattingLeaders
  *   GET /players/trending          -> getTrendingPlayers
+ *   GET /players?search=&role=&page= -> getPlayers
  *   GET /teams                     -> getTeams
  *   GET /teams/{slug}/fixtures     -> getTeamFixtures
  *   GET /videos/highlights         -> getVideoHighlights
@@ -462,14 +464,45 @@ export async function getTeamPage(slug: string): Promise<TeamPage | null> {
   });
 }
 
-/** GET /players/{slug} - player profile, career statistics and related news. */
+/**
+ * GET /players/{slug} - player profile, career statistics and related news.
+ * Resolves to null only when the player does not exist; a request that fails throws.
+ */
 export async function getPlayerPage(slug: string): Promise<PlayerPage | null> {
   "use cache";
-  cacheLife("hours");
+  cacheLife("minutes");
   cacheTag("players", "articles");
 
   return apiGet<PlayerPage | null>(`players/${encodeURIComponent(slug)}`, {
-    fallback: () => buildMockPlayerPage(slug),
+    // Sample profiles only without an API: a slow or failed request must not turn into a 404 or made-up figures.
+    fallback: () => {
+      if (!apiConfig.useMocks) {
+        throw new ApiError("The player could not be loaded");
+      }
+
+      return buildMockPlayerPage(slug);
+    },
+    notFound: () => null,
+  });
+}
+
+/** GET /players?search=&role=&page= - every player, a page at a time. A request that fails throws. */
+export async function getPlayers(search: string, role: string, page: number): Promise<PlayerList> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("players");
+
+  return apiGet<PlayerList>("players", {
+    query: { search, role, page },
+    fallback: () => {
+      if (!apiConfig.useMocks) {
+        throw new ApiError("The players could not be loaded");
+      }
+
+      const players = mockTrendingPlayers.filter((player) => player.name.toLowerCase().includes(search.toLowerCase()));
+
+      return { players, total: players.length, page: 1, lastPage: 1 };
+    },
   });
 }
 

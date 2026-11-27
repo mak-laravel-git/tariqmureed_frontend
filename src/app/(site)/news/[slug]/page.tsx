@@ -150,7 +150,7 @@ async function ArticleContent({ params }: { params: Promise<{ slug: string }> })
 
       <header className="mt-10">
         <div className="flex pt-[3px]">
-          <span className="inline-flex items-center rounded-[4px] bg-[#fdc700] px-2.5 py-1 text-[10px] leading-[15px] font-black tracking-[1.5px] text-black uppercase">
+          <span className="inline-flex items-center rounded-[4px] bg-brand px-2.5 py-1 text-[10px] leading-[15px] font-black tracking-[1.5px] text-black uppercase">
             <CountryName name={article.category} className="gap-1.5" />
           </span>
         </div>
@@ -163,7 +163,7 @@ async function ArticleContent({ params }: { params: Promise<{ slug: string }> })
           <div className="flex items-center gap-4">
             <span
               aria-hidden="true"
-              className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#fdc700] text-xs leading-4 font-black text-[#09090b]"
+              className="flex size-9 shrink-0 items-center justify-center rounded-full bg-brand text-xs leading-4 font-black text-[#09090b]"
             >
               {initials(article.author.name)}
             </span>

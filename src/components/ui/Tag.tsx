@@ -23,7 +23,7 @@ export function Tag({ children, tone = "gold", className }: TagProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-[4px] px-2 py-1 text-[10px] leading-[15px] font-bold tracking-[1.2px] whitespace-nowrap capitalize",
+        "inline-flex items-center gap-1.5 rounded-[4px] px-2 py-1 text-xs leading-[15px] font-bold tracking-[1.2px] whitespace-nowrap capitalize",
         tones[tone],
         className,
       )}

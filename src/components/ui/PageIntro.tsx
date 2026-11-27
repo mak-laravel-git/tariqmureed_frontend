@@ -16,7 +16,7 @@ export function PageIntro({ title, description, eyebrow = "TMN Sport", uppercase
   return (
     <section className="bg-surface">
       <Container className="py-16">
-        <p className="text-[11px] leading-[16.5px] font-black tracking-[2.42px] text-[#d08700] uppercase">{eyebrow}</p>
+        <p className="text-[11px] leading-[16.5px] font-black tracking-[2.42px] text-brand uppercase">{eyebrow}</p>
         <h1
           className={`pt-3 ${uppercase ? "uppercase tracking-[-1.5px] text-[#151617] " : "text-[#111111] "}text-[40px] leading-[1.1] font-bold sm:text-5xl lg:text-[60px] lg:leading-[60px]`}
         >

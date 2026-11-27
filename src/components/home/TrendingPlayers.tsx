@@ -17,7 +17,7 @@ function PlayerCard({ player }: { player: TrendingPlayer }) {
 
   return (
     <article className="overflow-hidden rounded-lg border border-line bg-white">
-      <Link href={`/players/${player.slug}`} className="relative block aspect-[314/372]">
+      <Link href={`/players/${player.slug}`} prefetch={false} className="relative block aspect-[314/372]">
         <PlayerPhoto
           src={player.image}
           alt={player.name}

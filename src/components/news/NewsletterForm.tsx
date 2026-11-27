@@ -27,7 +27,7 @@ export function NewsletterForm() {
       <button
         type="submit"
         disabled={pending}
-        className="h-12 rounded-[4px] bg-[#fdc700] text-base text-[#09090b] transition-colors hover:bg-brand disabled:opacity-60"
+        className="h-12 rounded-[4px] bg-brand text-base text-[#09090b] transition-colors hover:bg-brand disabled:opacity-60"
       >
         {pending ? "Subscribing…" : "Subscribe"}
       </button>

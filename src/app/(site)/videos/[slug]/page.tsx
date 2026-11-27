@@ -44,7 +44,7 @@ async function VideoView({ params }: { params: Promise<{ slug: string }> }) {
         <Photo src={video.thumbnail} alt="" priority sizes="(min-width: 1320px) 1200px, 100vw" className="grayscale" />
         <span
           aria-hidden="true"
-          className="absolute top-1/2 left-1/2 flex size-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#fdc700] pl-0.5 text-[#09090b]"
+          className="absolute top-1/2 left-1/2 flex size-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-brand pl-0.5 text-[#09090b]"
         >
           <PlayIcon width={20} height={20} />
         </span>
