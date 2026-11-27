@@ -14,5 +14,7 @@ export const apiConfig = {
   fallbackToMocks: process.env.API_FALLBACK_TO_MOCKS === "true",
   token: process.env.API_TOKEN?.trim() || undefined,
   timeoutMs: 8000,
+  /** The admin dashboard waits longer: a slow answer is better there than a failed page or an unsaved change. */
+  adminTimeoutMs: 30_000,
   timezone: process.env.SITE_TIMEZONE?.trim() || "Asia/Dhaka",
 } as const;

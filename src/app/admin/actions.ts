@@ -14,6 +14,7 @@ import {
   pageLabels,
   resetPage,
   runSync,
+  saveHomeTeams,
   saveSeo,
   saveSeriesArrangement,
   savePage,
@@ -101,7 +102,13 @@ export async function loginAction(_previous: FormState, formData: FormData): Pro
       const result = await apiPost<{ token: string; expires_at?: string | null }>(
         "auth/login",
         { email, password, device_name: "tmn-admin" },
-        { fallback: () => ({ token: MOCK_TOKEN }) },
+        {
+          timeoutMs: apiConfig.adminTimeoutMs,
+          // With an API there is no stand-in sign-in: a failed request must not look like a successful one.
+          fallback: (): { token: string; expires_at?: string | null } => {
+            throw new ApiError("The server did not answer.");
+          },
+        },
       );
 
       await setAdminToken(result.token, result.expires_at);
@@ -286,6 +293,31 @@ export async function saveSeriesArrangementAction(_previous: FormState, formData
   return {
     status: "success",
     message: ids.length === 0 ? "Saved. No series is shown on the website now." : `Saved. The website now shows ${ids.length} series, in this order.`,
+  };
+}
+
+/** Saves the teams of the home page's Team Fixtures section, in the listed order. */
+export async function saveHomeTeamsAction(_previous: FormState, formData: FormData): Promise<FormState> {
+  let ids: number[];
+
+  try {
+    const parsed: unknown = JSON.parse(text(formData, "teams") || "[]");
+    ids = Array.isArray(parsed) ? parsed.map(Number).filter((id) => Number.isInteger(id) && id > 0) : [];
+  } catch {
+    return { status: "error", message: "The list could not be read. Reload the page and try again." };
+  }
+
+  try {
+    await saveHomeTeams(ids);
+  } catch (error) {
+    return failure(error);
+  }
+
+  updateTag("teams");
+
+  return {
+    status: "success",
+    message: ids.length === 0 ? "Saved. The home page now picks the teams automatically." : `Saved. The home page now shows ${ids.length} ${ids.length === 1 ? "team" : "teams"}, in this order.`,
   };
 }
 

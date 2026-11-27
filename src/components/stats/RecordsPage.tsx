@@ -69,7 +69,7 @@ async function RecordsBody({ searchParams }: { searchParams: Promise<SearchParam
           <section className="flex flex-col gap-4">
             <header>
               <p className="flex items-center gap-1.5 text-[10px] leading-[15px] font-bold tracking-[0.5px] text-[#64748b] uppercase">
-                <span aria-hidden="true" className="h-3 w-[3px] rounded-[1px] bg-[#f59e0b]" />
+                <span aria-hidden="true" className="h-3 w-[3px] rounded-[1px] bg-brand" />
                 {format ?? "All formats"}
               </p>
               <h2 className="mt-1 text-[22px] leading-[33px] font-bold tracking-[-0.55px] text-[#0f172a]">

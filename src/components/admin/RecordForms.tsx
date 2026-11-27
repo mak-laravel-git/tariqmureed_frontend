@@ -151,7 +151,7 @@ function Toggle({ name, label, defaultChecked }: { name: string; label: string; 
   return (
     <label className="flex cursor-pointer items-center gap-3 text-[13px] text-charade">
       <input type="checkbox" name={name} defaultChecked={defaultChecked} className="peer sr-only" />
-      <span className="relative h-[22px] w-[40px] rounded-full bg-[#e4e4e7] transition-colors peer-checked:bg-[#f59e0b] peer-focus-visible:ring-2 peer-focus-visible:ring-ink after:absolute after:top-[2px] after:left-[2px] after:size-[18px] after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:after:translate-x-[18px]" />
+      <span className="relative h-[22px] w-[40px] rounded-full bg-[#e4e4e7] transition-colors peer-checked:bg-brand peer-focus-visible:ring-2 peer-focus-visible:ring-ink after:absolute after:top-[2px] after:left-[2px] after:size-[18px] after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:after:translate-x-[18px]" />
       {label}
     </label>
   );

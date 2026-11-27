@@ -249,6 +249,26 @@ export interface SeriesArrangement {
   hidden: SeriesRow[];
 }
 
+/** One team in the admin "Team Fixtures" screen. */
+export interface HomeTeamRow {
+  id: string;
+  name: string;
+  /** "International" or "Domestic" */
+  detail: string;
+  /** Matches of the team in the synced fixtures. */
+  matches: number;
+}
+
+/** The teams chosen for the home page's Team Fixtures section, in order, and all the others. */
+export interface HomeTeamChoice {
+  /** Most teams that can be chosen. */
+  limit: number;
+  selected: HomeTeamRow[];
+  available: HomeTeamRow[];
+  /** Names the website shows by itself while nothing is chosen. */
+  automatic: string[];
+}
+
 export interface AdminSeo {
   pages: AdminSeoPage[];
   health: SeoHealthCheck[];

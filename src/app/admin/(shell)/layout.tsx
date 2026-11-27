@@ -2,7 +2,10 @@ import { redirect } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 
 import { AdminShell } from "@/components/admin/AdminShell";
+import { ServerUnavailable } from "@/components/admin/ServerUnavailable";
 import { getCurrentAdmin, getNotifications } from "@/lib/admin/data";
+import type { AdminUser } from "@/lib/admin/types";
+import { ApiError } from "@/lib/api/client";
 
 /**
  * The admin area is private and always request-time rendered, so it opts out of the
@@ -11,7 +14,19 @@ import { getCurrentAdmin, getNotifications } from "@/lib/admin/data";
 export const instant = false;
 
 async function AdminFrame({ children }: { children: ReactNode }) {
-  const user = await getCurrentAdmin();
+  let user: AdminUser | null;
+
+  try {
+    user = await getCurrentAdmin();
+  } catch (error) {
+    // Only the API's own failures: Next.js signals pass through.
+    if (!(error instanceof ApiError)) {
+      throw error;
+    }
+
+    // error.tsx does not catch what its own layout throws, so the notice is shown from here.
+    return <ServerUnavailable />;
+  }
 
   if (!user) {
     redirect("/admin/login");
