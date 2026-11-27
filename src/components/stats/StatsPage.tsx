@@ -26,8 +26,8 @@ function MetricTable({ metric }: { metric: StatsMetricTable }) {
   return (
     <article className="flex flex-col gap-3">
       <header>
-        <p className="flex items-center gap-1.5 text-[11px] leading-[16.5px] font-bold tracking-[0.55px] text-[#f59e0b] uppercase">
-          <span aria-hidden="true" className="h-3 w-[3px] rounded-[2px] bg-[#f59e0b]" />
+        <p className="flex items-center gap-1.5 text-[11px] leading-[16.5px] font-bold tracking-[0.55px] text-brand uppercase">
+          <span aria-hidden="true" className="h-3 w-[3px] rounded-[2px] bg-brand" />
           {metric.eyebrow}
         </p>
         <h2 className="mt-1 text-xl leading-7 font-bold tracking-[-0.5px] text-[#0f172a]">{metric.title}</h2>
@@ -129,7 +129,7 @@ async function StatsBody({ searchParams }: { searchParams: Promise<SearchParams>
               tables grow as more players are synced. All internationals means Tests, ODIs and T20Is together. Team tables use the official rankings and the matches stored on TMN Sport; tournament
               tables use the current league standings. A metric with no figures is left out — we never fill gaps with estimates.
             </p>
-            <Link href="/records" className="mt-[11px] inline-block pt-1.5 text-xs leading-4 font-bold text-[#d97706] hover:underline">
+            <Link href="/records" className="mt-[11px] inline-block pt-1.5 text-xs leading-4 font-bold text-brand hover:underline">
               Looking for record holders? Visit the records centre →
             </Link>
           </section>

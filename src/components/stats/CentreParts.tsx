@@ -9,7 +9,7 @@ export type CentreVariant = "stats" | "records";
 
 const variants = {
   stats: {
-    eyebrow: "text-[#f59e0b]",
+    eyebrow: "text-brand",
     badge: "rounded-xl border-[rgba(226,232,240,0.8)] bg-[#f8fafc] px-[21px] py-3",
     badgePrimary: "text-sm leading-[19px] font-bold text-[#1e293b]",
     badgeSecondary: "text-xs leading-4 text-[#94a3b8]",
@@ -67,7 +67,7 @@ export function CentreLayout({ variant, crumb, eyebrow, title, description, badg
       <header className={cn("flex items-start justify-between gap-4", variant === "stats" && "border-b border-[#f1f5f9] pb-[25px]")}>
         <div className="min-w-0">
           <p className={cn("flex items-center gap-1.5 text-[11px] leading-[16.5px] font-bold tracking-[0.55px] uppercase", style.eyebrow)}>
-            <span aria-hidden="true" className="h-3 w-[3px] rounded-[1px] bg-[#f59e0b]" />
+            <span aria-hidden="true" className="h-3 w-[3px] rounded-[1px] bg-brand" />
             {eyebrow}
           </p>
           <h1 className="mt-1.5 text-5xl leading-[1.05] font-extrabold text-[#0f172a] sm:text-[60px]">{title}</h1>

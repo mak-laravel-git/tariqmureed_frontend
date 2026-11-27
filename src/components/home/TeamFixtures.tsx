@@ -5,7 +5,7 @@ import { MatchCard } from "@/components/ui/MatchCard";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { TeamBadge } from "@/components/ui/TeamBadge";
-import { getTeamFixtures, getTeams } from "@/lib/api/endpoints";
+import { getHomeTeams, getTeamFixtures } from "@/lib/api/endpoints";
 import type { TeamProfile } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 import { firstParam, pageHref, type SearchParams } from "@/lib/url";
@@ -53,7 +53,7 @@ interface TeamFixturesProps {
 
 export async function TeamFixtures({ searchParams }: TeamFixturesProps) {
   const params = await searchParams;
-  const teams = await getTeams();
+  const teams = await getHomeTeams();
 
   const requested = firstParam(params.team);
   const activeSlug = teams.find((team) => team.slug === requested)?.slug ?? teams[0]?.slug;
@@ -94,6 +94,12 @@ export async function TeamFixtures({ searchParams }: TeamFixturesProps) {
               </Link>
             );
           })}
+          <Link
+            href="/teams"
+            className="shrink-0 rounded-[4px] border border-ink bg-gold px-4 py-2 text-[13px] leading-[19.5px] font-bold whitespace-nowrap text-ink transition-colors hover:bg-ink hover:text-white"
+          >
+            All teams <span aria-hidden="true">→</span>
+          </Link>
         </nav>
 
         {fixtures ? (

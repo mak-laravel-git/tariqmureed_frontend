@@ -69,7 +69,7 @@ function AsideHeading({ children, display }: { children: ReactNode; display?: bo
         className={
           display
             ? "font-display text-lg leading-6 font-bold tracking-[0.5px] text-ink uppercase"
-            : "text-lg leading-6 font-bold tracking-[-0.5px] text-ink uppercase"
+            : "text-lg leading-6 font-bold tracking-[-0.5px] text-ink capitalize"
         }
       >
         {children}

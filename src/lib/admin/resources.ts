@@ -125,6 +125,7 @@ export const adminNav: { heading?: string; items: { label: string; href: string;
       { label: "Media Library", href: "/admin/media", icon: "image", match: "/admin/media" },
       { label: "Authors", href: "/admin/authors", icon: "users", match: "/admin/authors" },
       { label: "Series & Tournaments", href: "/admin/series", icon: "trophy", match: "/admin/series" },
+      { label: "Team Fixtures", href: "/admin/home-teams", icon: "users", match: "/admin/home-teams" },
       { label: "Advertisement Management", href: "/admin/advertisements", icon: "megaphone", match: "/admin/advertisements" },
     ],
   },

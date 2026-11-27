@@ -1,5 +1,7 @@
 import "server-only";
 
+import { cache } from "react";
+
 import { ApiError } from "@/lib/api/client";
 import { apiConfig } from "@/lib/api/config";
 
@@ -21,6 +23,7 @@ import type {
   AdminSeo,
   AdminSeoPage,
   SeriesArrangement,
+  HomeTeamChoice,
   AdOptions,
   AdPlacementOption,
   ArticleOptions,
@@ -58,8 +61,16 @@ function initials(name: string): string {
     .toUpperCase();
 }
 
-/** Signed-in administrator (GET /auth/me), falling back to the mock profile. */
-export async function getCurrentAdmin(): Promise<AdminUser | null> {
+interface MePayload {
+  data: { id: number; name: string; email: string; roles?: string[] };
+}
+
+/**
+ * Signed-in administrator (GET /auth/me), falling back to the mock profile. Null means "not signed in"; an
+ * ApiError means the server could not say, which must not sign anyone out. One request per page view, however
+ * many components ask.
+ */
+export const getCurrentAdmin = cache(async (): Promise<AdminUser | null> => {
   if (apiConfig.useMocks) {
     return (await getAdminToken()) ? mockStore().user : null;
   }
@@ -70,17 +81,29 @@ export async function getCurrentAdmin(): Promise<AdminUser | null> {
     return null;
   }
 
-  const response = await fetch(`${apiConfig.baseUrl}/auth/me`, {
-    headers: { Accept: "application/json", Authorization: `Bearer ${token}` },
-    cache: "no-store",
-    signal: AbortSignal.timeout(apiConfig.timeoutMs),
-  });
+  let payload: MePayload;
 
-  if (!response.ok) {
-    return null;
+  try {
+    const response = await fetch(`${apiConfig.baseUrl}/auth/me`, {
+      headers: { Accept: "application/json", Authorization: `Bearer ${token}` },
+      cache: "no-store",
+      signal: AbortSignal.timeout(apiConfig.adminTimeoutMs),
+    });
+
+    if (response.status === 401 || response.status === 403) {
+      return null;
+    }
+
+    if (!response.ok) {
+      throw new ApiError(`The server responded with ${response.status}.`, response.status);
+    }
+
+    payload = (await response.json()) as MePayload;
+  } catch (error) {
+    throw error instanceof ApiError ? error : new ApiError("The server did not answer.");
   }
 
-  const { data } = (await response.json()) as { data: { id: number; name: string; email: string; roles?: string[] } };
+  const { data } = payload;
   const role = (data.roles?.[0] ?? "admin").replace(/-/g, " ");
 
   return {
@@ -92,7 +115,7 @@ export async function getCurrentAdmin(): Promise<AdminUser | null> {
     jobTitle: "",
     bio: "",
   };
-}
+});
 
 export async function listRecords(
   resource: ResourceKey,
@@ -332,6 +355,27 @@ export async function saveSeriesArrangement(visible: number[]): Promise<void> {
     method: "PUT",
     body: { visible },
     fallback: () => ({ visible: [], hidden: [] }),
+  });
+}
+
+/** Teams of the home page's Team Fixtures section and the ones to choose from (GET /admin/home-teams). */
+export async function getHomeTeamChoice(): Promise<HomeTeamChoice> {
+  return adminRequest<HomeTeamChoice>("home-teams", {
+    fallback: () => ({
+      limit: 10,
+      selected: [{ id: "1", name: "India", detail: "International", matches: 4 }],
+      available: [{ id: "2", name: "Australia", detail: "International", matches: 2 }],
+      automatic: [],
+    }),
+  });
+}
+
+/** Saves which teams the home page shows and in what order; an empty list returns to the automatic choice. */
+export async function saveHomeTeams(teams: number[]): Promise<void> {
+  await adminRequest<HomeTeamChoice>("home-teams", {
+    method: "PUT",
+    body: { teams },
+    fallback: () => ({ limit: 10, selected: [], available: [], automatic: [] }),
   });
 }
 

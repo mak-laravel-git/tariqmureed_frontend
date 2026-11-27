@@ -89,6 +89,8 @@ export async function apiGet<T>(path: string, options: ApiGetOptions<T>): Promis
 interface ApiPostOptions<T> {
   /** Response used while no API is configured (or the request fails and fallback is enabled). */
   fallback: () => T | Promise<T>;
+  /** How long to wait for the answer, when the usual limit is too short. */
+  timeoutMs?: number;
 }
 
 /**
@@ -111,7 +113,7 @@ export async function apiPost<T>(path: string, body: unknown, options: ApiPostOp
         ...(apiConfig.token ? { Authorization: `Bearer ${apiConfig.token}` } : {}),
       },
       body: JSON.stringify(body),
-      signal: AbortSignal.timeout(apiConfig.timeoutMs),
+      signal: AbortSignal.timeout(options.timeoutMs ?? apiConfig.timeoutMs),
       cache: "no-store",
     });
 

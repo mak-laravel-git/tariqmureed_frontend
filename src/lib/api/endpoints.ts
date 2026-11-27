@@ -102,7 +102,7 @@ import type {
  *   GET /stats/batting-leaders     -> getBattingLeaders
  *   GET /players/trending          -> getTrendingPlayers
  *   GET /players?search=&role=&page= -> getPlayers
- *   GET /teams                     -> getTeams
+ *   GET /teams/home                -> getHomeTeams
  *   GET /teams/{slug}/fixtures     -> getTeamFixtures
  *   GET /videos/highlights         -> getVideoHighlights
  *   GET /competitions/spotlight    -> getTournamentSpotlight
@@ -304,12 +304,14 @@ export async function getTrendingPlayers(): Promise<TrendingPlayer[]> {
   return apiGet<TrendingPlayer[]>("players/trending", { fallback: () => mockTrendingPlayers });
 }
 
-export async function getTeams(): Promise<TeamSummary[]> {
+/** GET /teams/home - the few teams of the home page's Team Fixtures section, chosen in the admin dashboard. */
+export async function getHomeTeams(): Promise<TeamSummary[]> {
   "use cache";
-  cacheLife("days");
+  // Minutes: the choice is changed in the admin dashboard and should show up soon.
+  cacheLife("minutes");
   cacheTag("teams");
 
-  return apiGet<TeamSummary[]>("teams", { fallback: () => mockTeamList });
+  return apiGet<TeamSummary[]>("teams/home", { fallback: () => mockTeamList.slice(0, 10) });
 }
 
 export async function getTeamFixtures(slug: string): Promise<TeamFixtures | null> {

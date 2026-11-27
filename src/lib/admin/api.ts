@@ -69,7 +69,7 @@ export async function adminRequestRaw<T>(path: string, options: RequestOptions<T
       ...(options.body !== undefined ? { "Content-Type": "application/json" } : {}),
     },
     body: options.form ?? (options.body !== undefined ? JSON.stringify(options.body) : undefined),
-    signal: AbortSignal.timeout(apiConfig.timeoutMs * 2),
+    signal: AbortSignal.timeout(apiConfig.adminTimeoutMs),
     cache: "no-store",
   });
 
