@@ -1,12 +1,13 @@
 import Link from "next/link";
 
+import { CardCarousel } from "@/components/ui/CardCarousel";
 import { LiveDot } from "@/components/ui/LiveDot";
 import { LiveRefresh } from "@/components/ui/LiveRefresh";
 import { MatchCard } from "@/components/ui/MatchCard";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { getMatches, getMatchSummary } from "@/lib/api/endpoints";
-import type { MatchState } from "@/lib/api/types";
+import type { Match, MatchState } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 import { pageHref, type SearchParams } from "@/lib/url";
 
@@ -23,10 +24,27 @@ function resolveTab(value: string | string[] | undefined): TabKey {
 }
 
 const emptyMessages: Record<TabKey, string> = {
-  live: "No matches are live right now. Check the upcoming fixtures.",
+  live: "No matches are live or scheduled right now.",
   upcoming: "No upcoming matches have been scheduled yet.",
   result: "No recent results to show.",
 };
+
+/** Cards in one row on desktop. */
+const CARDS_IN_VIEW = 3;
+
+/** Every live match, topped up with the next fixtures when fewer than a full row are live. */
+async function getLiveTabMatches(): Promise<Match[]> {
+  const [live, upcoming] = await Promise.all([
+    getMatches("live"),
+    // Only a top-up: if it fails, the live scores still show.
+    getMatches("upcoming", CARDS_IN_VIEW).catch((): Match[] => []),
+  ]);
+  // The two lists are cached separately, so a match that has just started can still be in both.
+  const liveIds = new Set(live.map((match) => match.id));
+  const next = upcoming.filter((match) => !liveIds.has(match.id));
+
+  return [...live, ...next.slice(0, Math.max(0, CARDS_IN_VIEW - live.length))];
+}
 
 interface LiveMatchCentreProps {
   searchParams: Promise<SearchParams>;
@@ -37,7 +55,7 @@ export async function LiveMatchCentre({ searchParams }: LiveMatchCentreProps) {
   const activeTab = resolveTab(params.status);
 
   const [matches, summary] = await Promise.all([
-    getMatches(activeTab satisfies MatchState, 3),
+    activeTab === "live" ? getLiveTabMatches() : getMatches(activeTab satisfies MatchState, CARDS_IN_VIEW),
     getMatchSummary(),
   ]);
 
@@ -90,10 +108,16 @@ export async function LiveMatchCentre({ searchParams }: LiveMatchCentreProps) {
           </p>
         </div>
 
-        {matches.length > 0 ? (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {matches.length > CARDS_IN_VIEW ? (
+          <CardCarousel label="Live matches">
             {matches.map((match) => (
-              <MatchCard key={match.id} match={match} />
+              <MatchCard key={match.id} match={match} fill />
+            ))}
+          </CardCarousel>
+        ) : matches.length > 0 ? (
+          <div className="grid auto-rows-fr grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {matches.map((match) => (
+              <MatchCard key={match.id} match={match} fill />
             ))}
           </div>
         ) : (
@@ -102,14 +126,14 @@ export async function LiveMatchCentre({ searchParams }: LiveMatchCentreProps) {
           </p>
         )}
 
-        <dl className="grid grid-cols-2 gap-3 pt-1 lg:grid-cols-4">
+        {/* <dl className="grid grid-cols-2 gap-3 pt-1 lg:grid-cols-4">
           {stats.map((stat) => (
             <div key={stat.label} className="min-w-0 rounded-lg border border-muted bg-white/85 px-3 py-3 sm:px-4">
               <dd className="order-first text-xl leading-8 font-bold tracking-[0.24px] break-words text-gold sm:text-2xl">{stat.value}</dd>
               <dt className="text-xs leading-[18px] text-coal">{stat.label}</dt>
             </div>
           ))}
-        </dl>
+        </dl> */}
       </div>
     </Section>
   );
