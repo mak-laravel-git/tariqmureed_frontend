@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import { Container } from "@/components/ui/Container";
 import { CountryName } from "@/components/ui/CountryName";
 import { PageIntro } from "@/components/ui/PageIntro";
-import { Photo } from "@/components/ui/Photo";
+import { PlayerPhoto } from "@/components/ui/PlayerPhoto";
 import { getTrendingPlayers } from "@/lib/api/endpoints";
 import { pageMetadata } from "@/lib/seo";
 
@@ -16,15 +16,25 @@ export function generateMetadata(): Promise<Metadata> {
 async function PlayersBody() {
   const players = await getTrendingPlayers();
 
+  if (players.length === 0) {
+    return (
+      <Container className="pt-8 pb-16">
+        <p className="rounded-[4px] border border-line bg-white px-5 py-14 text-center text-sm text-muted">
+          No players to show yet.
+        </p>
+      </Container>
+    );
+  }
+
   return (
     <Container className="grid grid-cols-1 gap-6 pt-8 pb-16 sm:grid-cols-2 lg:grid-cols-4">
       {players.map((player) => (
         <Link key={player.id} href={`/players/${player.slug}`} className="group block">
-          <div className="relative aspect-[314/372] overflow-hidden rounded-[4px]">
-            <Photo src={player.image} alt={player.name} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" />
+          <div className="relative aspect-[314/372] overflow-hidden rounded-[4px] border border-line">
+            <PlayerPhoto src={player.image} alt={player.name} sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" />
           </div>
           <p className="pt-3 text-[10px] leading-[15px] font-black text-[#d08700] uppercase">
-            <CountryName name={player.country} />
+            <CountryName name={player.country || player.team} />
           </p>
           <h2 className="pt-1 text-base leading-6 font-black text-[#09090b] group-hover:underline">{player.name}</h2>
           <p className="text-sm leading-5 text-[#71717b]">{player.role}</p>

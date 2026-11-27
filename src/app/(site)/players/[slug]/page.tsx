@@ -6,7 +6,7 @@ import { NewsCard } from "@/components/news/NewsCard";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Container } from "@/components/ui/Container";
 import { DataTable } from "@/components/ui/DataTable";
-import { Photo } from "@/components/ui/Photo";
+import { PlayerPhoto } from "@/components/ui/PlayerPhoto";
 import { getPlayerPage } from "@/lib/api/endpoints";
 import { absoluteUrl, breadcrumbSchema, getSiteUrl, profileMetadata } from "@/lib/seo";
 
@@ -81,7 +81,7 @@ async function PlayerView({ params }: { params: Promise<{ slug: string }> }) {
         <Container className="grid grid-cols-1 items-end gap-8 py-10 md:grid-cols-[300px_minmax(0,1fr)]">
           <div className="relative h-[375px] w-full max-w-[300px] overflow-hidden rounded-[4px] justify-self-start self-end">
             {player.image ? (
-              <Photo src={player.image} alt={player.name} priority sizes="300px" />
+              <PlayerPhoto src={player.image} alt={player.name} priority sizes="300px" />
             ) : (
               <span
                 aria-hidden="true"

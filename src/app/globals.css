@@ -5,7 +5,7 @@
   --font-display: var(--font-barlow), "Barlow Condensed", ui-sans-serif, system-ui, sans-serif;
 
   --color-brand: #fed402;
-  --color-gold: #f5c400;
+  --color-gold: #fed402;
   --color-ink: #111111;
   --color-coal: #151617;
   --color-charade: #2b3038;
@@ -16,6 +16,7 @@
   --color-line: #e3e6ec;
   --color-surface: #f5f6f8;
   --color-chip: #eceef2;
+  --color-card-header: #edf0f3;
   --color-win: #0f8a4b;
 
   --container-site: 1320px;

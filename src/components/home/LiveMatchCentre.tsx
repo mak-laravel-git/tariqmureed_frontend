@@ -54,7 +54,7 @@ export async function LiveMatchCentre({ searchParams }: LiveMatchCentreProps) {
       <div className="flex flex-col gap-5">
         <SectionHeading
           id="live-match-centre-title"
-          title="Live Match Centre"
+          title="Live Match Center" 
           live
           description="Ball-by-ball scores across every competition covered by TMN Sport."
           descriptionClassName="text-body"

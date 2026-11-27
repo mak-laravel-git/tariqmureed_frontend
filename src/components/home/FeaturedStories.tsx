@@ -30,7 +30,7 @@ function LeadStory({ article }: { article: Article }) {
           <Tag tone="gold" className="px-2.5 py-1 text-[11px] tracking-[0.55px]">
             Top story
           </Tag>
-          <span className="text-xs leading-[18px] font-semibold tracking-[0.6px] text-white/60 uppercase">
+          <span className="text-xs leading-[18px] font-semibold tracking-[0.6px] text-white/60 capitalize">
             {article.category}
           </span>
         </div>

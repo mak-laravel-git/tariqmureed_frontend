@@ -95,14 +95,7 @@ export function MatchCard({ match }: { match: Match }) {
         aria-label={`${match.home.team.name} vs ${match.away.team.name} match details`}
         className="block outline-none"
       >
-        <header
-          className={cn(
-            "flex items-center justify-between gap-3 border-b px-4 py-2.5",
-            inPlay
-              ? "border-live/20 bg-live/[0.06]"
-              : "border-line bg-surface/60",
-          )}
-        >
+        <header className="flex items-center justify-between gap-3 border-b-2 border-brand bg-card-header px-4 py-2.5">
           <div className="flex min-w-0 items-center gap-2">
             {inPlay && <LiveDot />}
             <span className="truncate text-xs leading-[18px] font-bold text-charade">

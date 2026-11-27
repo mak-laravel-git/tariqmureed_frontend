@@ -221,7 +221,7 @@ export async function getLatestNews(perPage = 9): Promise<Article[]> {
 
   return apiGet<Article[]>("articles", {
     query: { per_page: perPage },
-    fallback: () => buildMockArticles().latest.slice(0, perPage),
+    fallback: () => [...buildMockArticles().latest, ...listMockArticles()].slice(0, perPage),
   });
 }
 
@@ -292,9 +292,11 @@ export async function getBattingLeaders(): Promise<BattingLeaders> {
   return apiGet<BattingLeaders>("stats/batting-leaders", { fallback: () => mockBattingLeaders });
 }
 
+/** Players named in recent stories, then the leading run-scorers. The API sends an empty list when it has none. */
 export async function getTrendingPlayers(): Promise<TrendingPlayer[]> {
   "use cache";
-  cacheLife("hours");
+  // "minutes" so the list follows the news, and a failed request is not kept for long.
+  cacheLife("minutes");
   cacheTag("players");
 
   return apiGet<TrendingPlayer[]>("players/trending", { fallback: () => mockTrendingPlayers });

@@ -11,6 +11,11 @@ import { TimeAgo } from "@/components/ui/TimeAgo";
 import { getLatestNews, getStatHighlights, getTopHeadlines } from "@/lib/api/endpoints";
 import type { Article, StatHighlight } from "@/lib/api/types";
 
+import { NewsList } from "./NewsList";
+
+/** Stories shown before "Load more news" is used: four cards and five rows. */
+const SHOWN_STORIES = 9;
+
 function ArticleMeta({ article }: { article: Article }) {
   return (
     <p className="flex flex-wrap items-center gap-x-1.5 text-xs leading-[18px] text-muted">
@@ -52,32 +57,6 @@ function NewsCard({ article }: { article: Article }) {
           <ArticleMeta article={article} />
         </div>
       </div>
-    </article>
-  );
-}
-
-function NewsListItem({ article }: { article: Article }) {
-  return (
-    <article className="flex items-center justify-between gap-4 border-b border-line py-4">
-      <div className="flex min-w-0 flex-col gap-1">
-        <p className="text-[10.5px] leading-[15px] font-bold tracking-[0.6px] text-muted uppercase">
-          {article.category} · <TimeAgo iso={article.publishedAt} />
-        </p>
-        <h3 className="text-base leading-[22px] font-bold text-ink">
-          <Link href={`/news/${article.slug}`} className="hover:underline">
-            {article.title}
-          </Link>
-        </h3>
-        <p className="line-clamp-1 text-[13px] leading-5 text-muted">{article.excerpt}</p>
-      </div>
-
-      <Link
-        href={`/news/${article.slug}`}
-        aria-label={article.title}
-        className="relative block size-[76px] shrink-0 overflow-hidden rounded-[4px] sm:size-24"
-      >
-        <Photo src={article.image} alt={article.imageAlt ?? ""} sizes="96px" />
-      </Link>
     </article>
   );
 }
@@ -140,13 +119,15 @@ function FactCard({ fact }: { fact: StatHighlight }) {
 
 export async function LatestNews() {
   const [articles, headlines, facts] = await Promise.all([
-    getLatestNews(9),
+    // One more than is shown, to know whether "Load more news" has anything to add.
+    getLatestNews(SHOWN_STORIES + 1),
     getTopHeadlines(),
     getStatHighlights(),
   ]);
 
-  const cards = articles.slice(0, 4);
-  const list = articles.slice(4);
+  const shown = articles.slice(0, SHOWN_STORIES);
+  const cards = shown.slice(0, 4);
+  const list = shown.slice(4);
 
   return (
     <Section aria-labelledby="latest-news-title">
@@ -165,20 +146,7 @@ export async function LatestNews() {
             ))}
           </div>
 
-          <div className="border-t border-line">
-            {list.map((article) => (
-              <NewsListItem key={article.id} article={article} />
-            ))}
-          </div>
-
-          <div className="flex justify-center pt-2">
-            <Link
-              href="/news"
-              className="rounded-[4px] border border-line bg-white px-5 py-3 text-sm leading-5 font-semibold text-ink transition-colors hover:border-ink"
-            >
-              Load more news
-            </Link>
-          </div>
+          <NewsList initialArticles={list} shownCount={shown.length} initialHasMore={articles.length > SHOWN_STORIES} />
         </div>
 
         <aside aria-label="Headlines and statistics" className="flex min-w-0 flex-col gap-8">

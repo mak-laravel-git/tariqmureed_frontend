@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { Photo } from "@/components/ui/Photo";
+import { PlayerPhoto } from "@/components/ui/PlayerPhoto";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Tag } from "@/components/ui/Tag";
@@ -18,9 +18,11 @@ function PlayerCard({ player }: { player: TrendingPlayer }) {
   return (
     <article className="overflow-hidden rounded-lg border border-line bg-white">
       <Link href={`/players/${player.slug}`} className="relative block aspect-[314/372]">
-        <Photo
+        <PlayerPhoto
           src={player.image}
           alt={player.name}
+          // The name covers the bottom of the card, so the face is kept at the top.
+          anchor="top"
           sizes="(min-width: 1320px) 314px, (min-width: 1024px) 24vw, (min-width: 640px) 45vw, 100vw"
         />
         <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
@@ -33,7 +35,9 @@ function PlayerCard({ player }: { player: TrendingPlayer }) {
           <p className="text-[11px] leading-4 font-bold tracking-[0.8px] text-gold uppercase">{player.role}</p>
           <h3 className="text-lg leading-6 font-bold text-white">{player.name}</h3>
           <p className="text-[13px] leading-[19.5px] text-white/65">
-            {player.team} · <CountryName name={player.country} className="align-middle" />
+            {player.team}
+            {player.team && player.country && " · "}
+            {player.country && <CountryName name={player.country} className="align-middle" />}
           </p>
         </div>
       </Link>
@@ -54,6 +58,10 @@ function PlayerCard({ player }: { player: TrendingPlayer }) {
 
 export async function TrendingPlayers() {
   const players = await getTrendingPlayers();
+
+  if (players.length === 0) {
+    return null;
+  }
 
   return (
     <Section aria-labelledby="trending-players-title">
