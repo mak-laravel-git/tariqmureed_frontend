@@ -1,12 +1,12 @@
 import Link from "next/link";
 
 import { AdSlot } from "@/components/ui/AdSlot";
+import { MatchTime } from "@/components/ui/MatchTime";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Tag } from "@/components/ui/Tag";
 import { TeamBadge } from "@/components/ui/TeamBadge";
 import { getMatches } from "@/lib/api/endpoints";
-import { formatMatchTime } from "@/lib/format";
 
 export async function ComingUpNext() {
   const matches = await getMatches("upcoming", 3);
@@ -17,7 +17,7 @@ export async function ComingUpNext() {
         <SectionHeading
           id="coming-up-title"
           title="Coming Up Next"
-          description="Today's remaining start times."
+          description="The next start times."
           action={{ href: "/schedule", label: "View all" }}
         />
 
@@ -41,7 +41,7 @@ export async function ComingUpNext() {
                   {match.home.team.name} vs {match.away.team.name}
                 </span>
                 <span className="block truncate text-xs leading-[18px] text-muted">
-                  {formatMatchTime(match.startsAt)}
+                  <MatchTime iso={match.startsAt} show="dayTimeZone" />
                   {match.venue ? ` · ${match.venue}` : ""}
                 </span>
               </span>

@@ -2,9 +2,9 @@ import Link from "next/link";
 
 import type { Match, MatchSide } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
-import { formatMatchTime12 } from "@/lib/format";
 
 import { Countdown } from "./Countdown";
+import { MatchTime } from "./MatchTime";
 import { ScoreText } from "./ScoreText";
 import { TeamBadge } from "./TeamBadge";
 
@@ -84,7 +84,7 @@ export function FixtureCard({ match }: { match: Match }) {
         <p className="mt-5 border-t border-[#f4f4f5] pt-4 text-xs leading-4 font-bold text-[#52525c]">
           {upcoming ? (
             <>
-              Starts at {formatMatchTime12(match.startsAt)}
+              Starts at <MatchTime iso={match.startsAt} show="time12Zone" />
               <Countdown iso={match.startsAt} />
             </>
           ) : (

@@ -104,6 +104,9 @@ export interface TickerItem {
   id: number | string;
   text: string;
   href?: string | null;
+  /** Upcoming matches: when it starts, and `text` without the time, so it can be written for the visitor. */
+  startsAt?: string;
+  lead?: string;
 }
 
 export interface Author {
