@@ -71,6 +71,7 @@ import type {
   NewsPage,
   StatHighlight,
   TeamFixtures,
+  TeamSchedule,
   TeamSummary,
   TickerItem,
   Tournament,
@@ -104,6 +105,7 @@ import type {
  *   GET /players?search=&role=&page= -> getPlayers
  *   GET /teams/home                -> getHomeTeams
  *   GET /teams/{slug}/fixtures     -> getTeamFixtures
+ *   GET /teams/{slug}/schedule     -> getTeamSchedule
  *   GET /videos/highlights         -> getVideoHighlights
  *   GET /competitions/spotlight    -> getTournamentSpotlight
  *   GET /writers                   -> getWriters
@@ -338,6 +340,37 @@ export async function getTeamFixtures(slug: string): Promise<TeamFixtures | null
             );
 
       return { team: { ...team, ...(mockTeamProfiles[slug] ?? emptyTeamProfile) }, matches };
+    },
+  });
+}
+
+/** GET /teams/{slug}/schedule - all of one team's upcoming matches and results. Null when there is no such team. */
+export async function getTeamSchedule(slug: string): Promise<TeamSchedule | null> {
+  "use cache";
+  // Seconds: the page carries live scores.
+  cacheLife("seconds");
+  cacheTag("teams", "matches");
+
+  return apiGet<TeamSchedule | null>(`teams/${encodeURIComponent(slug)}/schedule`, {
+    notFound: () => null,
+    fallback: () => {
+      // Sample matches only without an API: a failed request must not turn into a 404 or made-up fixtures.
+      if (!apiConfig.useMocks) {
+        return { team: null, upcoming: [], results: [] };
+      }
+
+      const team = mockTeamList.find((candidate) => candidate.slug === slug);
+      if (!team) {
+        return null;
+      }
+
+      const matches = mockAllMatches.filter((match) => match.home.team.slug === slug || match.away.team.slug === slug);
+
+      return {
+        team,
+        upcoming: matches.filter((match) => match.state !== "result"),
+        results: matches.filter((match) => match.state === "result"),
+      };
     },
   });
 }

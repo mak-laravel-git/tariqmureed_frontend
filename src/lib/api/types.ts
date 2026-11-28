@@ -163,6 +163,15 @@ export interface TeamFixtures {
   matches: Match[];
 }
 
+/** A team's own fixtures page. `team` is null when the figures could not be loaded. */
+export interface TeamSchedule {
+  team: TeamSummary | null;
+  /** In play or still to come, the nearest first. */
+  upcoming: Match[];
+  /** Over, the newest first. */
+  results: Match[];
+}
+
 export interface Video {
   id: number | string;
   slug: string;
