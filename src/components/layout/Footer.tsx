@@ -3,7 +3,8 @@ import Link from "next/link";
 
 import { PrivacySettingsButton } from "@/components/consent/PrivacySettingsButton";
 import { TikTokIcon } from "@/components/ui/icons";
-import { footerColumns, legalLinks, socialLinks } from "@/lib/site";
+import { getPublicSettings } from "@/lib/api/endpoints";
+import { footerColumns, legalLinks, visibleSocialLinks } from "@/lib/site";
 
 /** Centered 1320px column with 32px side padding, matching the footer grid in the design. */
 const footerInner = "mx-auto w-full max-w-site px-4 sm:px-6 xl:px-8";
@@ -14,7 +15,9 @@ const allLinks: Record<string, { href: string; label: string }> = {
   Teams: { href: "/teams", label: "All Teams →" },
 };
 
-export function Footer() {
+export async function Footer() {
+  const socialLinks = visibleSocialLinks(await getPublicSettings());
+
   return (
     <footer className="mt-auto border-t border-tuna bg-ink text-white">
       <div className="border-t border-tuna pt-8">

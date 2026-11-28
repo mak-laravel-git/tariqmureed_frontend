@@ -1,3 +1,5 @@
+import type { SocialSettings } from "@/lib/site";
+
 /**
  * API contract between this Next.js frontend and the Laravel backend.
  *
@@ -672,7 +674,7 @@ export interface Ad {
 /** The running ads, keyed by placement; a placement with no ad is missing. */
 export type AdMap = Record<string, Ad | undefined>;
 
-export interface PublicSettings {
+export interface PublicSettings extends SocialSettings {
   websiteName: string;
   contactEmail: string;
   contactAddress: string;

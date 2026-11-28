@@ -1,3 +1,5 @@
+import type { SocialSettings } from "@/lib/site";
+
 /**
  * Admin API contract (Laravel). Every endpoint lives under {API_URL}/admin and requires
  * "Authorization: Bearer <token>" from POST /auth/login. Responses use the usual
@@ -217,7 +219,7 @@ export interface IntegrationStatus {
   jobs: SyncJob[];
 }
 
-export interface SiteSettings {
+export interface SiteSettings extends SocialSettings {
   websiteName: string;
   contactEmail: string;
   contactAddress: string;

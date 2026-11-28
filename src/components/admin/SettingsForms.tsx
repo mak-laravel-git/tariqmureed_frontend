@@ -14,6 +14,7 @@ import {
 } from "@/app/admin/actions";
 import type { AdminUser, FormState, PermissionMatrix, SiteSettings } from "@/lib/admin/types";
 import { cn } from "@/lib/cn";
+import { socialLinks } from "@/lib/site";
 
 import {
   Card,
@@ -108,6 +109,20 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
               <input type="checkbox" name="notifyEditors" defaultChecked={settings.notifyEditors} className="size-4 accent-[#f5c400]" />
               Notify editors about new drafts
             </label>
+          </div>
+        </Card>
+
+        <Card className="lg:col-span-2">
+          <CardHeader
+            title="Social media links"
+            description="The icons in the top bar and the footer. Once you save any link, only the icons that have one are shown."
+          />
+          <div className="grid gap-5 p-5 md:grid-cols-2">
+            {socialLinks.map((link) => (
+              <Field key={link.key} label={`${link.label} link`} hint={link.key === "socialWhatsapp" ? "For a number use https://wa.me/ followed by it, with the country code." : undefined}>
+                <TextInput name={link.key} type="url" defaultValue={settings[link.key]} placeholder={link.key === "socialWhatsapp" ? "https://wa.me/8801XXXXXXXXX" : `${link.href}/your-page`} autoComplete="off" spellCheck={false} />
+              </Field>
+            ))}
           </div>
         </Card>
 

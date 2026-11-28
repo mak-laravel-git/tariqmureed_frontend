@@ -629,6 +629,12 @@ export async function getPublicSettings(): Promise<PublicSettings> {
     gaMeasurementId: stored.gaMeasurementId || env("GA_MEASUREMENT_ID"),
     adsenseClientId: stored.adsenseClientId || env("ADSENSE_CLIENT_ID"),
     consentMode: (stored.consentMode || env("CONSENT_MODE")) === "google" ? "google" : "builtin",
+    socialX: stored.socialX || "",
+    socialFacebook: stored.socialFacebook || "",
+    socialInstagram: stored.socialInstagram || "",
+    socialYoutube: stored.socialYoutube || "",
+    socialTiktok: stored.socialTiktok || "",
+    socialWhatsapp: stored.socialWhatsapp || "",
   };
 }
 
