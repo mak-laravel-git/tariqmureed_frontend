@@ -283,15 +283,19 @@ export async function getStatHighlights(): Promise<StatHighlight[]> {
   cacheLife("minutes");
   cacheTag("stats");
 
-  return apiGet<StatHighlight[]>("stats/highlights", { fallback: () => mockStatHighlights });
+  // Sample figures only without an API: a failed request shows nothing rather than made-up numbers.
+  return apiGet<StatHighlight[]>("stats/highlights", { fallback: () => (apiConfig.useMocks ? mockStatHighlights : []) });
 }
 
 export async function getBattingLeaders(): Promise<BattingLeaders> {
   "use cache";
-  cacheLife("hours");
+  // Minutes, so a failed request is not kept for long.
+  cacheLife("minutes");
   cacheTag("stats");
 
-  return apiGet<BattingLeaders>("stats/batting-leaders", { fallback: () => mockBattingLeaders });
+  return apiGet<BattingLeaders>("stats/batting-leaders", {
+    fallback: () => (apiConfig.useMocks ? mockBattingLeaders : { seasonLabel: "", note: "", rows: [] }),
+  });
 }
 
 /** Players named in recent stories, then the leading run-scorers. The API sends an empty list when it has none. */
@@ -311,7 +315,7 @@ export async function getHomeTeams(): Promise<TeamSummary[]> {
   cacheLife("minutes");
   cacheTag("teams");
 
-  return apiGet<TeamSummary[]>("teams/home", { fallback: () => mockTeamList.slice(0, 10) });
+  return apiGet<TeamSummary[]>("teams/home", { fallback: () => mockTeamList.slice(0, 15) });
 }
 
 export async function getTeamFixtures(slug: string): Promise<TeamFixtures | null> {
