@@ -15,7 +15,7 @@ async function LoginBody({ searchParams }: Pick<PageProps<"/admin/login">, "sear
 
   return (
     <div className="w-full max-w-[400px] rounded-xl border border-line bg-white p-7 shadow-[0_8px_30px_rgba(17,17,17,0.06)] sm:p-9">
-      <Image src="/images/brand/logo-white.png" alt="TMN Sport" width={150} height={22} style={{ width: 150, height: "auto" }} className="invert" priority />
+      <Image src="/images/brand/logo-black.svg" alt="TMN Sport" width={150} height={18} style={{ width: 150, height: "auto" }} priority />
       <h1 className="mt-7 text-2xl leading-8 font-normal tracking-[-0.01em] text-ink">Sign in to the newsroom</h1>
       <p className="mt-1 text-[13px] leading-5 text-muted">Use your administrator account to manage content.</p>
 

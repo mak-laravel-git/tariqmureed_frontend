@@ -144,6 +144,16 @@ export interface AdminUser {
   role: string;
   jobTitle: string;
   bio: string;
+  /** What the account's role allows, e.g. "articles.index"; missing when the server does not say. */
+  permissions?: string[];
+  /** A super admin may do everything. */
+  isSuperAdmin?: boolean;
+}
+
+/** A role the staff form may offer. */
+export interface StaffRole {
+  value: string;
+  label: string;
 }
 
 export interface DashboardStat {
@@ -339,6 +349,8 @@ export interface RoleSummary {
   name: string;
   description: string;
   system: boolean;
+  /** Made in the dashboard, so it can be deleted. */
+  custom?: boolean;
 }
 
 export interface PermissionMatrix {
@@ -347,6 +359,8 @@ export interface PermissionMatrix {
   actions: string[];
   modules: PermissionModule[];
   updatedAt: string;
+  /** Whether the signed-in account may create and delete roles. */
+  can?: { create: boolean; delete: boolean };
 }
 
 export interface FormState {

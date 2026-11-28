@@ -4,6 +4,7 @@ import { connection } from "next/server";
 
 import { AdminIcon } from "@/components/admin/icons";
 import { PageHeader } from "@/components/admin/AdminUi";
+import { CreateRoleForm, DeleteRoleButton } from "@/components/admin/RoleForms";
 import { PermissionsForm } from "@/components/admin/SettingsForms";
 import { getPermissions } from "@/lib/admin/data";
 import { cn } from "@/lib/cn";
@@ -17,11 +18,24 @@ export const instant = false;
 export default async function RolesPage(props: PageProps<"/admin/roles">) {
   await connection();
 
-  const matrix = await getPermissions(firstParam((await props.searchParams).role));
+  const params = await props.searchParams;
+  const matrix = await getPermissions(firstParam(params.role));
+  const selected = matrix.roles.find((role) => role.slug === matrix.selected);
+  const notice = firstParam(params.created)
+    ? "Role created. Tick what it may do, then press Save permissions."
+    : firstParam(params.deleted)
+      ? "Role deleted."
+      : null;
 
   return (
     <>
       <PageHeader title="Roles & Permissions" description="Control module-level access for every administration role." />
+
+      {notice && (
+        <p role="status" className="mb-4 rounded-lg border border-[#bfe3cb] bg-[#e8f7ee] px-4 py-3 text-xs leading-4 text-[#1c6b39]">
+          {notice}
+        </p>
+      )}
 
       <div className="grid gap-4 md:grid-cols-2">
         {matrix.roles.map((role) => {
@@ -54,9 +68,21 @@ export default async function RolesPage(props: PageProps<"/admin/roles">) {
         })}
       </div>
 
+      {matrix.can?.create && (
+        <div className="mt-4">
+          <CreateRoleForm />
+        </div>
+      )}
+
       <div className="mt-5">
         <PermissionsForm matrix={matrix} />
       </div>
+
+      {selected?.custom && matrix.can?.delete && (
+        <div className="mt-3">
+          <DeleteRoleButton key={selected.slug} role={selected.slug} name={selected.name} />
+        </div>
+      )}
 
       <div className="mt-5 flex items-start gap-3 rounded-lg border border-line bg-[#eef1f6] px-5 py-4">
         <AdminIcon name="shield" width={15} height={15} className="mt-0.5 text-charade" />

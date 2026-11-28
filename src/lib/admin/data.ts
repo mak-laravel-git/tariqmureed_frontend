@@ -9,6 +9,9 @@ import { adminRequest, adminRequestRaw } from "./api";
 import type { CropRect } from "./crop";
 import {
   buildMockPermissions,
+  createMockRole,
+  deleteMockRole,
+  mockStaffRoles,
   mockDashboard,
   mockIntegration,
   mockMedia,
@@ -34,6 +37,7 @@ import type {
   AdminUser,
   Dashboard,
   StaffInput,
+  StaffRole,
   IntegrationStatus,
   MediaAsset,
   PermissionMatrix,
@@ -63,7 +67,20 @@ function initials(name: string): string {
 }
 
 interface MePayload {
-  data: { id: number; name: string; email: string; roles?: string[] };
+  data: { id: number; name: string; email: string; roles?: string[]; permissions?: string[]; is_super_admin?: boolean };
+}
+
+/** A list a form can do without: empty when the account's role may not read it. */
+async function optional<T>(request: () => Promise<T>, empty: T): Promise<T> {
+  try {
+    return await request();
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 403) {
+      return empty;
+    }
+
+    throw error;
+  }
 }
 
 /**
@@ -115,6 +132,8 @@ export const getCurrentAdmin = cache(async (): Promise<AdminUser | null> => {
     role: role.replace(/\b\w/g, (letter) => letter.toUpperCase()),
     jobTitle: "",
     bio: "",
+    permissions: data.permissions,
+    isSuperAdmin: data.is_super_admin ?? data.roles?.includes("super-admin"),
   };
 });
 
@@ -242,7 +261,7 @@ export async function getNotifications(): Promise<AdminNotification[]> {
 }
 
 export async function getMedia(): Promise<MediaAsset[]> {
-  return adminRequest<MediaAsset[]>("media", { fallback: () => mockMedia });
+  return optional(() => adminRequest<MediaAsset[]>("media", { fallback: () => mockMedia }), []);
 }
 
 export async function deleteMedia(id: string): Promise<void> {
@@ -280,10 +299,14 @@ export async function getAdOptions(): Promise<AdOptions> {
 /** Categories, authors and images the article editor offers. */
 export async function getArticleOptions(): Promise<ArticleOptions> {
   const names = async (apiPath: string, mocked: string[]): Promise<string[]> => {
-    const body = (await adminRequestRaw(apiPath, {
-      query: { per_page: 100 },
-      fallback: () => mocked.map((title) => ({ title })),
-    })) as { data: { title: string }[] };
+    const body = await optional(
+      async () =>
+        (await adminRequestRaw(apiPath, {
+          query: { per_page: 100 },
+          fallback: () => mocked.map((title) => ({ title })),
+        })) as { data: { title: string }[] },
+      { data: [] },
+    );
 
     return body.data.map((entry) => entry.title);
   };
@@ -493,6 +516,28 @@ export async function savePermissions(role: string, granted: Record<string, stri
     body: { permissions: granted },
     fallback: () => null,
   });
+}
+
+export async function createRole(name: string): Promise<{ slug: string }> {
+  return adminRequest<{ slug: string }>("roles", { method: "POST", body: { name }, fallback: () => createMockRole(name) });
+}
+
+export async function deleteRole(role: string): Promise<void> {
+  await adminRequest<null>(`roles/${encodeURIComponent(role)}`, { method: "DELETE", fallback: () => deleteMockRole(role) });
+}
+
+/** The roles the signed-in account may give to a staff member. */
+export async function getStaffRoles(): Promise<StaffRole[]> {
+  try {
+    return await adminRequest<StaffRole[]>("staff/roles", { fallback: mockStaffRoles });
+  } catch (error) {
+    // An API that does not list them yet has only the built-in roles.
+    if (error instanceof ApiError && error.status === 404) {
+      return mockStaffRoles().slice(0, 3);
+    }
+
+    throw error;
+  }
 }
 
 export async function updateProfile(input: { name: string; email: string; jobTitle: string; bio: string }): Promise<void> {

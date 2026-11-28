@@ -1,15 +1,17 @@
 "use server";
 
-import { updateTag } from "next/cache";
+import { refresh, updateTag } from "next/cache";
 import { redirect, unstable_rethrow } from "next/navigation";
 
 import { ApiError, apiPost } from "@/lib/api/client";
 import { apiConfig } from "@/lib/api/config";
 import type { CropRect } from "@/lib/admin/crop";
 import {
+  createRole,
   cropImage,
   deleteMedia,
   deleteRecord,
+  deleteRole,
   getImageSource,
   pageLabels,
   resetPage,
@@ -433,10 +435,47 @@ export async function savePermissionsAction(role: string, _previous: FormState, 
   try {
     await savePermissions(role, granted);
   } catch (error) {
+    unstable_rethrow(error);
+
     return failure(error);
   }
 
+  // The form goes back to the page's values after saving: load the saved ones, or the old ticks would return.
+  refresh();
+
   return { status: "success", message: "Permissions saved." };
+}
+
+export async function createRoleAction(_previous: FormState, formData: FormData): Promise<FormState> {
+  const name = text(formData, "name");
+
+  if (!name) {
+    return { status: "error", message: "Enter a name for the role." };
+  }
+
+  let slug: string;
+
+  try {
+    ({ slug } = await createRole(name));
+  } catch (error) {
+    unstable_rethrow(error);
+
+    return failure(error);
+  }
+
+  redirect(`/admin/roles?role=${encodeURIComponent(slug)}&created=1`);
+}
+
+export async function deleteRoleAction(role: string): Promise<FormState> {
+  try {
+    await deleteRole(role);
+  } catch (error) {
+    unstable_rethrow(error);
+
+    return failure(error);
+  }
+
+  redirect("/admin/roles?deleted=1");
 }
 
 export async function updateProfileAction(_previous: FormState, formData: FormData): Promise<FormState> {

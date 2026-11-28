@@ -343,7 +343,7 @@ export function PermissionsForm({ matrix }: { matrix: PermissionMatrix }) {
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
             <h2 className="text-[15px] leading-5 font-medium text-ink">{role?.name} permissions</h2>
-            <p className="mt-0.5 text-xs text-muted">Changes apply to staff using the default role. Individual overrides remain unchanged.</p>
+            <p className="mt-0.5 text-xs text-muted">Changes apply to every staff member with this role.</p>
           </div>
           <span className="rounded-full bg-surface px-2.5 py-1 text-[10.5px] text-charade">{matrix.updatedAt}</span>
         </div>

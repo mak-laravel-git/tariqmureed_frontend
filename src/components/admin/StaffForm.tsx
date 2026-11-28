@@ -4,18 +4,18 @@ import Link from "next/link";
 import { startTransition, useActionState, useState, type FormEvent } from "react";
 
 import { saveStaffAction } from "@/app/admin/actions";
-import type { AdminRecord, FormState } from "@/lib/admin/types";
+import type { AdminRecord, FormState, StaffRole } from "@/lib/admin/types";
 
 import { Card, Field, FormMessage, primaryButtonClass, secondaryButtonClass, SelectInput, TextInput } from "./AdminUi";
 
 const initialState: FormState = { status: "idle", message: "" };
 
-/** The roles of the Laravel app (RoleEnum), with what each one can do. */
-const roles = [
-  { value: "super-admin", label: "Super Admin", about: "Can do everything, including managing other super admins." },
-  { value: "admin", label: "Admin", about: "Can use the dashboard as allowed under Roles & Permissions." },
-  { value: "user", label: "User", about: "Sees nothing in the dashboard until Roles & Permissions gives this role access." },
-];
+/** What the built-in roles can do. Roles made in the dashboard share one description. */
+const about: Record<string, string> = {
+  "super-admin": "Can do everything, including managing other super admins.",
+  admin: "Can use the dashboard as allowed under Roles & Permissions.",
+  user: "Sees nothing in the dashboard until Roles & Permissions gives this role access.",
+};
 
 interface StaffFormProps {
   /** The account being edited; none while creating one. */
@@ -23,21 +23,27 @@ interface StaffFormProps {
   cancelHref: string;
   /** The signed-in account is the one being edited. */
   isSelf?: boolean;
-  /** Only a super admin may give the super admin role. */
-  canGrantSuperAdmin: boolean;
+  /** The roles the signed-in account may give. */
+  roles: StaffRole[];
 }
 
 /** Creates a staff account or edits one: name, email, role and password. */
-export function StaffForm({ record, cancelHref, isSelf = false, canGrantSuperAdmin }: StaffFormProps) {
+export function StaffForm({ record, cancelHref, isSelf = false, roles }: StaffFormProps) {
   const [state, action, pending] = useActionState(saveStaffAction.bind(null, record?.id ?? null), initialState);
   const [name, setName] = useState(record?.title ?? "");
   const [email, setEmail] = useState(record?.subtitle ?? "");
-  const [role, setRole] = useState(record ? (record.role ?? record.owner.toLowerCase().replace(/\s+/g, "-")) : "admin");
+  const [role, setRole] = useState(() => {
+    if (record) {
+      return record.role ?? record.owner.toLowerCase().replace(/\s+/g, "-");
+    }
+
+    return (roles.find((entry) => entry.value === "admin") ?? roles[0])?.value ?? "";
+  });
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
 
-  const offered = roles.filter((entry) => entry.value !== "super-admin" || canGrantSuperAdmin || entry.value === role);
-  const about = roles.find((entry) => entry.value === role)?.about;
+  // The account's current role stays in the list even when the signed-in account could not give it.
+  const offered = !record || roles.some((entry) => entry.value === role) ? roles : [...roles, { value: role, label: record.owner }];
 
   // Sent by hand: a form's `action` clears the fields afterwards, which would lose the typing after an error.
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -57,7 +63,7 @@ export function StaffForm({ record, cancelHref, isSelf = false, canGrantSuperAdm
           <TextInput name="subtitle" type="email" required maxLength={190} autoComplete="off" value={email} onChange={(event) => setEmail(event.target.value)} />
         </Field>
 
-        <Field label="Role" hint={isSelf ? "You cannot change your own role. Ask another administrator." : about}>
+        <Field label="Role" hint={isSelf ? "You cannot change your own role. Ask another administrator." : (about[role] ?? "Can use the dashboard as allowed for this role under Roles & Permissions.")}>
           <SelectInput name="owner" value={role} disabled={isSelf} onChange={(event) => setRole(event.target.value)}>
             {offered.map((entry) => (
               <option key={entry.value} value={entry.value}>
