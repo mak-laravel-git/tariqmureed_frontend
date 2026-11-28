@@ -71,6 +71,7 @@ import type {
   NewsPage,
   StatHighlight,
   TeamFixtures,
+  TeamSchedule,
   TeamSummary,
   TickerItem,
   Tournament,
@@ -104,6 +105,7 @@ import type {
  *   GET /players?search=&role=&page= -> getPlayers
  *   GET /teams/home                -> getHomeTeams
  *   GET /teams/{slug}/fixtures     -> getTeamFixtures
+ *   GET /teams/{slug}/schedule     -> getTeamSchedule
  *   GET /videos/highlights         -> getVideoHighlights
  *   GET /competitions/spotlight    -> getTournamentSpotlight
  *   GET /writers                   -> getWriters
@@ -133,14 +135,17 @@ export async function getFeaturedSeries(): Promise<CompetitionRef[]> {
   });
 }
 
-/** Matches filtered by state. "live" includes innings breaks. */
-export async function getMatches(state: MatchState | "all", limit?: number): Promise<Match[]> {
+/**
+ * Matches filtered by state. "live" includes innings breaks. They come in order of time; with `order: "priority"`
+ * live matches and results put the competitions arranged in the admin dashboard and then the internationals first.
+ */
+export async function getMatches(state: MatchState | "all", limit?: number, order?: "priority"): Promise<Match[]> {
   "use cache";
   cacheLife("seconds");
   cacheTag("matches");
 
   return apiGet<Match[]>("matches", {
-    query: { state: state === "all" ? null : state, limit },
+    query: { state: state === "all" ? null : state, limit, order },
     fallback: () => {
       const pool: Match[] =
         state === "live"
@@ -157,16 +162,17 @@ export async function getMatches(state: MatchState | "all", limit?: number): Pro
 }
 
 /**
- * Fixtures grouped by competition for the Live Scores and Schedule pages.
- * GET /matchday?view=live|upcoming|result|yesterday|today|tomorrow|week&competition=<slug>
+ * Fixtures for the Live Scores and Schedule pages: grouped by competition, except the month and year views,
+ * which are grouped by date and hold the first `limit` matches (60 unless told otherwise).
+ * GET /matchday?view=live|upcoming|result|yesterday|today|tomorrow|week|month|year&competition=<slug>&team=<slug>
  */
-export async function getMatchday(view: MatchdayView, competition?: string, timezone?: string): Promise<Matchday> {
+export async function getMatchday(view: MatchdayView, competition?: string, timezone?: string, team?: string, limit?: number): Promise<Matchday> {
   "use cache";
   cacheLife("seconds");
   cacheTag("matches");
 
   return apiGet<Matchday>("matchday", {
-    query: { view, competition, tz: timezone },
+    query: { view, competition, tz: timezone, team, limit },
     fallback: () => {
       const day = buildMockMatchday(view);
 
@@ -338,6 +344,37 @@ export async function getTeamFixtures(slug: string): Promise<TeamFixtures | null
             );
 
       return { team: { ...team, ...(mockTeamProfiles[slug] ?? emptyTeamProfile) }, matches };
+    },
+  });
+}
+
+/** GET /teams/{slug}/schedule - all of one team's upcoming matches and results. Null when there is no such team. */
+export async function getTeamSchedule(slug: string): Promise<TeamSchedule | null> {
+  "use cache";
+  // Seconds: the page carries live scores.
+  cacheLife("seconds");
+  cacheTag("teams", "matches");
+
+  return apiGet<TeamSchedule | null>(`teams/${encodeURIComponent(slug)}/schedule`, {
+    notFound: () => null,
+    fallback: () => {
+      // Sample matches only without an API: a failed request must not turn into a 404 or made-up fixtures.
+      if (!apiConfig.useMocks) {
+        return { team: null, upcoming: [], results: [] };
+      }
+
+      const team = mockTeamList.find((candidate) => candidate.slug === slug);
+      if (!team) {
+        return null;
+      }
+
+      const matches = mockAllMatches.filter((match) => match.home.team.slug === slug || match.away.team.slug === slug);
+
+      return {
+        team,
+        upcoming: matches.filter((match) => match.state !== "result"),
+        results: matches.filter((match) => match.state === "result"),
+      };
     },
   });
 }

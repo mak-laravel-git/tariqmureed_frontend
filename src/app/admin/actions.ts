@@ -17,6 +17,7 @@ import {
   resetPage,
   runSync,
   saveHomeTeams,
+  saveLiveCentreOrder,
   saveSeo,
   saveSeriesArrangement,
   savePage,
@@ -366,6 +367,31 @@ export async function saveHomeTeamsAction(_previous: FormState, formData: FormDa
   return {
     status: "success",
     message: ids.length === 0 ? "Saved. The home page now picks the teams automatically." : `Saved. The home page now shows ${ids.length} ${ids.length === 1 ? "team" : "teams"}, in this order.`,
+  };
+}
+
+/** Saves which competitions the home page's Live Match Center puts first, in the listed order. */
+export async function saveLiveCentreAction(_previous: FormState, formData: FormData): Promise<FormState> {
+  let ids: number[];
+
+  try {
+    const parsed: unknown = JSON.parse(text(formData, "leagues") || "[]");
+    ids = Array.isArray(parsed) ? parsed.map(Number).filter((id) => Number.isInteger(id) && id > 0) : [];
+  } catch {
+    return { status: "error", message: "The list could not be read. Reload the page and try again." };
+  }
+
+  try {
+    await saveLiveCentreOrder(ids);
+  } catch (error) {
+    return failure(error);
+  }
+
+  updateTag("matches");
+
+  return {
+    status: "success",
+    message: ids.length === 0 ? "Saved. Live matches and results show internationals first, then league matches." : `Saved. ${ids.length} ${ids.length === 1 ? "competition goes" : "competitions go"} first in live matches and results, in this order.`,
   };
 }
 

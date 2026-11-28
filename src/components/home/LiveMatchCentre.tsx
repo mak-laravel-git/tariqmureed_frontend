@@ -29,13 +29,22 @@ const emptyMessages: Record<TabKey, string> = {
   result: "No recent results to show.",
 };
 
+const carouselLabels: Record<TabKey, string> = {
+  live: "Live matches",
+  upcoming: "Upcoming matches",
+  result: "Match results",
+};
+
 /** Cards in one row on desktop. */
 const CARDS_IN_VIEW = 3;
+
+/** Matches of the Upcoming and Results tabs; those beyond one row are reached by sliding. */
+const SLIDER_LIMIT = 10;
 
 /** Every live match, topped up with the next fixtures when fewer than a full row are live. */
 async function getLiveTabMatches(): Promise<Match[]> {
   const [live, upcoming] = await Promise.all([
-    getMatches("live"),
+    getMatches("live", undefined, "priority"),
     // Only a top-up: if it fails, the live scores still show.
     getMatches("upcoming", CARDS_IN_VIEW).catch((): Match[] => []),
   ]);
@@ -55,7 +64,10 @@ export async function LiveMatchCentre({ searchParams }: LiveMatchCentreProps) {
   const activeTab = resolveTab(params.status);
 
   const [matches, summary] = await Promise.all([
-    activeTab === "live" ? getLiveTabMatches() : getMatches(activeTab satisfies MatchState, CARDS_IN_VIEW),
+    activeTab === "live"
+      ? getLiveTabMatches()
+      : // Upcoming matches go by date and time; results put the important competitions first.
+        getMatches(activeTab satisfies MatchState, SLIDER_LIMIT, activeTab === "result" ? "priority" : undefined),
     getMatchSummary(),
   ]);
 
@@ -109,7 +121,8 @@ export async function LiveMatchCentre({ searchParams }: LiveMatchCentreProps) {
         </div>
 
         {matches.length > CARDS_IN_VIEW ? (
-          <CardCarousel label="Live matches">
+          // The key starts each tab's slider at its first card.
+          <CardCarousel key={activeTab} label={carouselLabels[activeTab]}>
             {matches.map((match) => (
               <MatchCard key={match.id} match={match} fill />
             ))}

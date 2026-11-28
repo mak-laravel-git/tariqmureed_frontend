@@ -8,6 +8,11 @@ export function formatCalendarDate(date: string): string {
   return formatMoment(date, "longDate", "UTC");
 }
 
+/** "June 2026", from an ISO date. */
+export function formatCalendarMonth(date: string): string {
+  return new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(date));
+}
+
 /** "18 June 2026" */
 export function formatPublishedDate(iso: string): string {
   return new Intl.DateTimeFormat("en-GB", {

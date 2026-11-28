@@ -298,6 +298,23 @@ export interface HomeTeamChoice {
   automatic: string[];
 }
 
+/** One competition in the admin "Live Match Center" screen. */
+export interface LiveCentreRow {
+  id: string;
+  name: string;
+  /** Category and format, e.g. "International · ODI". */
+  detail: string;
+  /** Matches live, or starting within `windowDays` days before or after today. */
+  matches: number;
+}
+
+/** The competitions put first in the home page's Live Match Center, in order, and all the others. */
+export interface LiveCentreChoice {
+  windowDays: number;
+  selected: LiveCentreRow[];
+  available: LiveCentreRow[];
+}
+
 export interface AdminSeo {
   pages: AdminSeoPage[];
   health: SeoHealthCheck[];

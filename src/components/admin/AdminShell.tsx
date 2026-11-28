@@ -29,6 +29,7 @@ const standalone: Record<string, string> = {
   "/admin/seo": "SEO Management",
   "/admin/series/arrange": "Arrange Series Strip",
   "/admin/home-teams": "Team Fixtures",
+  "/admin/live-centre": "Live Match Center",
   "/admin/pages": "Legal Pages",
   "/admin/roles": "Roles & Permissions",
   "/admin/profile": "Admin Profile",
