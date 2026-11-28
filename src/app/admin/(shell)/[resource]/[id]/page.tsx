@@ -2,9 +2,9 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 
-import { deleteRecordAction } from "@/app/admin/actions";
-import { Card, CardHeader, PageHeader, PrimaryLink, secondaryButtonClass, StatusBadge } from "@/components/admin/AdminUi";
-import { buildHistory, getCurrentAdmin, getRecord } from "@/lib/admin/data";
+import { Card, CardHeader, PageHeader, PrimaryLink, StatusBadge } from "@/components/admin/AdminUi";
+import { DeleteRecordButton } from "@/components/admin/DeleteRecordButton";
+import { getCurrentAdmin, getRecord } from "@/lib/admin/data";
 import { isResourceKey, resources } from "@/lib/admin/resources";
 
 /** Private, request-time page: allowed to block during navigation. */
@@ -26,10 +26,12 @@ export default async function RecordDetailPage(props: PageProps<"/admin/[resourc
   }
 
   const config = resources[resource];
+  const [titleLabel, subtitleLabel, ownerLabel] = config.columns ?? ["Name / Title", "Category / Email", "Owner / Scope"];
+  const ownAccount = resource === "staff" && String(user?.id) === record.id;
   const rows: [string, React.ReactNode][] = [
-    ["Name / Title", record.title],
-    ["Category / Email", record.subtitle],
-    ["Owner / Scope", record.owner],
+    [titleLabel, record.title],
+    [subtitleLabel, record.subtitle],
+    [ownerLabel, record.owner],
     ["Status", <StatusBadge key="status" status={record.status} />],
     ["Last updated", record.updatedAt],
   ];
@@ -62,18 +64,14 @@ export default async function RecordDetailPage(props: PageProps<"/admin/[resourc
         actions={
           !config.readOnly && (
             <>
-              <form action={deleteRecordAction.bind(null, resource, record.id)}>
-                <button type="submit" className={secondaryButtonClass("text-live hover:border-live")}>
-                  Delete
-                </button>
-              </form>
+              {!ownAccount && <DeleteRecordButton resource={resource} id={record.id} />}
               <PrimaryLink href={`/admin/${resource}/${record.id}/edit`}>Edit record</PrimaryLink>
             </>
           )
         }
       />
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className={record.history ? "grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]" : "grid gap-5"}>
         <Card className="self-start">
           <CardHeader title="Record details" description="Current saved information" />
           <dl>
@@ -92,20 +90,26 @@ export default async function RecordDetailPage(props: PageProps<"/admin/[resourc
           </dl>
         </Card>
 
-        <Card className="self-start">
-          <CardHeader title="Recent history" description="Latest changes to this record" />
-          <ol className="px-5 py-2">
-            {buildHistory(record, user?.name ?? "Administrator").map((entry) => (
-              <li key={entry.title} className="flex gap-3 border-b border-line py-3.5 last:border-b-0">
-                <span aria-hidden="true" className="mt-1.5 size-1.5 shrink-0 rounded-full bg-gold" />
-                <div>
-                  <p className="text-xs leading-4 font-semibold text-ink">{entry.title}</p>
-                  <p className="mt-0.5 text-[11px] leading-4 text-muted">{entry.meta}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </Card>
+        {record.history && (
+          <Card className="self-start">
+            <CardHeader title="Recent history" description="Latest changes to this record" />
+            {record.history.length === 0 ? (
+              <p className="px-5 py-8 text-center text-xs text-muted">No changes have been recorded yet.</p>
+            ) : (
+              <ol className="px-5 py-2">
+                {record.history.map((entry, index) => (
+                  <li key={`${index}-${entry.title}`} className="flex gap-3 border-b border-line py-3.5 last:border-b-0">
+                    <span aria-hidden="true" className="mt-1.5 size-1.5 shrink-0 rounded-full bg-gold" />
+                    <div>
+                      <p className="text-xs leading-4 font-semibold text-ink">{entry.title}</p>
+                      <p className="mt-0.5 text-[11px] leading-4 text-muted">{entry.meta}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </Card>
+        )}
       </div>
     </>
   );

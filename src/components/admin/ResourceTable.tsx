@@ -94,7 +94,7 @@ export function ResourceTable({ resource, records, total, tab, query, page, para
             <caption className="sr-only">{config.label}</caption>
             <thead>
               <tr className="bg-surface text-[10.5px] leading-4 font-bold tracking-[0.08em] text-charade uppercase">
-                {headings.map((heading) => (
+                {(config.columns ? [...config.columns, "Actions"] : headings).map((heading) => (
                   <th key={heading} scope="col" className="px-4 py-3 font-bold first:pl-5">
                     {heading}
                   </th>
@@ -179,7 +179,7 @@ export function ResourceActions({ resource }: { resource: ResourceKey }) {
           Arrange series strip
         </PrimaryLink>
       )}
-      {!config.readOnly && !config.noCreate && (
+      {!config.readOnly && (
         <PrimaryLink href={`/admin/${resource}/new`}>
           <AdminIcon name="plus" width={14} height={14} />
           Add new

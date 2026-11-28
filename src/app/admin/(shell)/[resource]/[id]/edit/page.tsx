@@ -3,7 +3,8 @@ import { connection } from "next/server";
 
 import { PageHeader } from "@/components/admin/AdminUi";
 import { AdvertisementForm, ArticleForm, GenericRecordForm } from "@/components/admin/RecordForms";
-import { getAdOptions, getArticleOptions, getMedia, getRecord } from "@/lib/admin/data";
+import { StaffForm } from "@/components/admin/StaffForm";
+import { getAdOptions, getArticleOptions, getCurrentAdmin, getMedia, getRecord } from "@/lib/admin/data";
 import { isResourceKey, resources } from "@/lib/admin/resources";
 
 /** Private, request-time page: allowed to block during navigation. */
@@ -25,6 +26,26 @@ export default async function EditRecordPage(props: PageProps<"/admin/[resource]
   }
 
   const config = resources[resource];
+
+  if (config.form === "staff") {
+    const user = await getCurrentAdmin();
+
+    return (
+      <>
+        <PageHeader
+          back={{ href: `/admin/${resource}`, label: `Back to ${config.label.toLowerCase()}` }}
+          title={`Edit ${record.title}`}
+          description="Change the name, email, role or password and save."
+        />
+        <StaffForm
+          record={record}
+          cancelHref={`/admin/${resource}/${id}`}
+          isSelf={String(user?.id) === record.id}
+          canGrantSuperAdmin={user?.role === "Super Admin"}
+        />
+      </>
+    );
+  }
 
   return (
     <>

@@ -8,13 +8,11 @@ export interface ResourceConfig {
   /** Singular noun used in buttons and breadcrumbs. */
   singular: string;
   description: string;
-  /** "article" renders the rich article editor, "generic" the shared record form. */
-  form: "article" | "advertisement" | "generic";
+  /** "article" renders the rich article editor, "staff" the account editor, "generic" the shared record form. */
+  form: "article" | "advertisement" | "staff" | "generic";
   /** Path segment below /admin/api on the Laravel side. */
   apiPath: string;
   readOnly?: boolean;
-  /** Rows can be viewed and edited but not created here (staff accounts need a password). */
-  noCreate?: boolean;
   newLabel?: string;
   /** The editor offers a picture (author photo, category image) under this label. */
   imageLabel?: string;
@@ -64,10 +62,10 @@ export const resources: Record<ResourceKey, ResourceConfig> = {
     key: "staff",
     label: "Staff Management",
     singular: "staff member",
-    description: "Manage newsroom accounts, roles and account status.",
-    form: "generic",
+    description: "Create newsroom accounts and manage their roles and passwords.",
+    form: "staff",
     apiPath: "staff",
-    noCreate: true,
+    columns: ["Name", "Email", "Role", "Status", "Updated"],
   },
   authors: {
     key: "authors",

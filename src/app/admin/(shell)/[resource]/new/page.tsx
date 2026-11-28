@@ -3,7 +3,8 @@ import { connection } from "next/server";
 
 import { PageHeader } from "@/components/admin/AdminUi";
 import { AdvertisementForm, ArticleForm, GenericRecordForm } from "@/components/admin/RecordForms";
-import { getAdOptions, getArticleOptions, getMedia } from "@/lib/admin/data";
+import { StaffForm } from "@/components/admin/StaffForm";
+import { getAdOptions, getArticleOptions, getCurrentAdmin, getMedia } from "@/lib/admin/data";
 import { isResourceKey, resources } from "@/lib/admin/resources";
 
 /** Private, request-time page: allowed to block during navigation. */
@@ -14,12 +15,27 @@ export default async function NewRecordPage(props: PageProps<"/admin/[resource]/
 
   const { resource } = await props.params;
 
-  if (!isResourceKey(resource) || resources[resource].readOnly || resources[resource].noCreate) {
+  if (!isResourceKey(resource) || resources[resource].readOnly) {
     notFound();
   }
 
   const config = resources[resource];
   const article = config.form === "article";
+
+  if (config.form === "staff") {
+    const user = await getCurrentAdmin();
+
+    return (
+      <>
+        <PageHeader
+          back={{ href: `/admin/${resource}`, label: `Back to ${config.label.toLowerCase()}` }}
+          title="Add staff member"
+          description="Create an account, choose its role and password, and give the password to the person."
+        />
+        <StaffForm cancelHref={`/admin/${resource}`} canGrantSuperAdmin={user?.role === "Super Admin"} />
+      </>
+    );
+  }
 
   return (
     <>
