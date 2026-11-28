@@ -124,7 +124,7 @@ export function AdminShell({ user, notifications, children }: AdminShellProps) {
       >
         <div className="flex h-[50px] items-center justify-between border-b border-line px-4">
           <Link href="/admin" aria-label="TMN Sport admin home">
-            <Image src="/images/brand/logo-white.png" alt="TMN Sport" width={134} height={20} style={{ width: 134, height: "auto" }} className="invert" priority />
+            <Image src="/images/brand/logo-black.svg" alt="TMN Sport" width={134} height={16} style={{ width: 134, height: "auto" }} priority />
           </Link>
           <button
             type="button"
