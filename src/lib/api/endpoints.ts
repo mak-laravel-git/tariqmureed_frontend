@@ -162,16 +162,17 @@ export async function getMatches(state: MatchState | "all", limit?: number, orde
 }
 
 /**
- * Fixtures grouped by competition for the Live Scores and Schedule pages.
- * GET /matchday?view=live|upcoming|result|yesterday|today|tomorrow|week&competition=<slug>
+ * Fixtures for the Live Scores and Schedule pages: grouped by competition, except the month and year views,
+ * which are grouped by date and hold the first `limit` matches (60 unless told otherwise).
+ * GET /matchday?view=live|upcoming|result|yesterday|today|tomorrow|week|month|year&competition=<slug>&team=<slug>
  */
-export async function getMatchday(view: MatchdayView, competition?: string, timezone?: string): Promise<Matchday> {
+export async function getMatchday(view: MatchdayView, competition?: string, timezone?: string, team?: string, limit?: number): Promise<Matchday> {
   "use cache";
   cacheLife("seconds");
   cacheTag("matches");
 
   return apiGet<Matchday>("matchday", {
-    query: { view, competition, tz: timezone },
+    query: { view, competition, tz: timezone, team, limit },
     fallback: () => {
       const day = buildMockMatchday(view);
 

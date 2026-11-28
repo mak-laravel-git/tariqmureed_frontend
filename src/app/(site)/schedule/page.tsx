@@ -15,11 +15,14 @@ export default function SchedulePage(props: PageProps<"/schedule">) {
       basePath="/schedule"
       defaultView="today"
       searchParams={props.searchParams}
+      teamFilter
       tabs={[
         { key: "yesterday", label: "Yesterday" },
         { key: "today", label: "Today" },
         { key: "tomorrow", label: "Tomorrow" },
         { key: "week", label: "This week" },
+        { key: "month", label: "This month" },
+        { key: "year", label: "This year" },
       ]}
     />
   );

@@ -78,7 +78,7 @@ export interface Match {
   isToday?: boolean;
 }
 
-export type MatchdayView = "live" | "upcoming" | "result" | "yesterday" | "today" | "tomorrow" | "week";
+export type MatchdayView = "live" | "upcoming" | "result" | "yesterday" | "today" | "tomorrow" | "week" | "month" | "year";
 
 export interface MatchGroup {
   competition: CompetitionRef;
@@ -90,7 +90,13 @@ export interface Matchday {
   date: string;
   /** Competitions available in the filter drop-down. */
   competitions: CompetitionRef[];
+  /** Teams available in the filter drop-down. */
+  teams?: { slug: string; name: string }[];
   groups: MatchGroup[];
+  /** The month and year views list their matches by date instead of by competition. */
+  days?: { date: string; matches: Match[] }[];
+  /** With `days`: all the matches of the selection, of which `days` holds the first ones. */
+  total?: number;
 }
 
 export interface MatchSummaryStats {
