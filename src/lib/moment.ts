@@ -57,6 +57,13 @@ export function formatMoment(iso: string, style: MomentStyle, timeZone?: string)
   }
 }
 
+/** "2026-11-27": the calendar day the moment falls on in the time zone. */
+export function calendarDay(iso: string, timeZone: string): string {
+  const day = parts(new Date(iso), { year: "numeric", month: "2-digit", day: "2-digit" }, timeZone);
+
+  return `${day.year}-${day.month}-${day.day}`;
+}
+
 export function isTimeZone(value: string): boolean {
   try {
     new Intl.DateTimeFormat("en-GB", { timeZone: value });

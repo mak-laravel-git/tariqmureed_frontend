@@ -141,6 +141,12 @@ async function TeamView({ params, searchParams }: { params: Promise<{ slug: stri
             >
               View all fixtures
             </Link>
+            <Link
+              href={`/teams/${team.slug}/schedule`}
+              className="mt-3 flex items-center justify-center rounded-[4px] bg-brand px-6 py-4 text-xs leading-4 font-black text-[#09090b] uppercase transition-colors hover:brightness-95"
+            >
+              View all schedule
+            </Link>
           </aside>
         </div>
       </Container>
