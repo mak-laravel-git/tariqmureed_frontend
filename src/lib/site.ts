@@ -20,14 +20,30 @@ export const mainNav: NavItem[] = [
   { label: "Videos", href: "/videos" },
 ];
 
+/** The social media icons, each with the Website Settings field that holds its link. */
 export const socialLinks = [
-  { label: "X (Twitter)", glyph: "X", href: "https://x.com" },
-  { label: "Facebook", glyph: "f", href: "https://facebook.com" },
-  { label: "Instagram", glyph: "◎", href: "https://instagram.com" },
-  { label: "YouTube", glyph: "▶", href: "https://youtube.com" },
-  { label: "TikTok", glyph: "♪", href: "https://tiktok.com" },
-  { label: "WhatsApp", glyph: "✆", href: "https://whatsapp.com" },
+  { key: "socialX", label: "X (Twitter)", glyph: "X", href: "https://x.com" },
+  { key: "socialFacebook", label: "Facebook", glyph: "f", href: "https://facebook.com" },
+  { key: "socialInstagram", label: "Instagram", glyph: "◎", href: "https://instagram.com" },
+  { key: "socialYoutube", label: "YouTube", glyph: "▶", href: "https://youtube.com" },
+  { key: "socialTiktok", label: "TikTok", glyph: "♪", href: "https://tiktok.com" },
+  { key: "socialWhatsapp", label: "WhatsApp", glyph: "✆", href: "https://whatsapp.com" },
 ] as const;
+
+export type SocialKey = (typeof socialLinks)[number]["key"];
+
+/** The links saved in Website Settings; an empty one has no link. */
+export type SocialSettings = Record<SocialKey, string>;
+
+/**
+ * The icons to draw. Once any link is saved in the dashboard, only the icons with a link show and they open it;
+ * until then all of them show with the sites' own home pages, as designed.
+ */
+export function visibleSocialLinks(settings: SocialSettings) {
+  const saved = socialLinks.filter((link) => settings[link.key]).map((link) => ({ ...link, href: settings[link.key] }));
+
+  return saved.length > 0 ? saved : socialLinks.map((link) => ({ ...link, href: link.href as string }));
+}
 
 export const footerColumns: { title: string; links: NavItem[] }[] = [
   {

@@ -257,6 +257,12 @@ export async function saveSettingsAction(_previous: FormState, formData: FormDat
       gaMeasurementId: text(formData, "gaMeasurementId"),
       adsenseClientId: text(formData, "adsenseClientId"),
       consentMode: text(formData, "consentMode") === "google" ? "google" : "builtin",
+      socialX: text(formData, "socialX"),
+      socialFacebook: text(formData, "socialFacebook"),
+      socialInstagram: text(formData, "socialInstagram"),
+      socialYoutube: text(formData, "socialYoutube"),
+      socialTiktok: text(formData, "socialTiktok"),
+      socialWhatsapp: text(formData, "socialWhatsapp"),
     });
   } catch (error) {
     return failure(error);
