@@ -66,6 +66,7 @@ export const mockUser: AdminUser = {
   email: "superadmin@tmnsports.com",
   initials: "BA",
   role: "Super Admin",
+  isSuperAdmin: true,
   jobTitle: "Head of Digital Operations",
   bio: "Leading digital publishing operations and platform strategy for TMN Sport.",
 };
@@ -127,18 +128,45 @@ function module(key: string, label: string, restricted: boolean, grants: string[
   };
 }
 
+/** Roles created while the dashboard runs on sample data: slug to name. */
+const mockCustomRoles = new Map<string, string>();
+
+export function createMockRole(name: string): { slug: string } {
+  const slug = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  mockCustomRoles.set(slug, name.trim());
+
+  return { slug };
+}
+
+export function deleteMockRole(slug: string): null {
+  mockCustomRoles.delete(slug);
+
+  return null;
+}
+
+export function mockStaffRoles(): { value: string; label: string }[] {
+  return [
+    { value: "super-admin", label: "Super Admin" },
+    { value: "admin", label: "Admin" },
+    { value: "user", label: "User" },
+    ...[...mockCustomRoles].map(([value, label]) => ({ value, label })),
+  ];
+}
+
 export function buildMockPermissions(selected: string): PermissionMatrix {
   const isSuper = selected === "super-admin";
+  const isCustom = mockCustomRoles.has(selected);
   const full = allActions;
-
-  return {
+  const matrix: PermissionMatrix = {
     roles: [
       { slug: "super-admin", name: "Super Admin", description: "Full, permanent platform access", system: true },
       { slug: "staff-admin", name: "Staff Admin", description: "18 assigned staff members", system: false },
+      ...[...mockCustomRoles].map(([slug, name]) => ({ slug, name, description: "0 staff accounts", system: false, custom: true })),
     ],
-    selected: isSuper ? "super-admin" : "staff-admin",
+    selected: isSuper || isCustom ? selected : "staff-admin",
     actions: allActions,
     updatedAt: "Last updated 3 days ago",
+    can: { create: true, delete: true },
     modules: isSuper
       ? [
           module("articles", "Articles", false, full),
@@ -165,6 +193,12 @@ export function buildMockPermissions(selected: string): PermissionMatrix {
           module("api", "API integration", true, ["view"]),
         ],
   };
+
+  if (isCustom) {
+    matrix.modules = matrix.modules.map((entry) => ({ ...entry, granted: Object.fromEntries(allActions.map((action) => [action, false])) }));
+  }
+
+  return matrix;
 }
 
 interface Store {

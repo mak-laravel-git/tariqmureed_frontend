@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 
+import { canOpen } from "@/lib/admin/access";
 import { adminNav, isResourceKey, resources } from "@/lib/admin/resources";
 import type { AdminNotification, AdminUser } from "@/lib/admin/types";
 import { cn } from "@/lib/cn";
@@ -77,10 +78,26 @@ function isActive(pathname: string, match: string): boolean {
   return match === "/admin" ? pathname === "/admin" : pathname === match || pathname.startsWith(`${match}/`);
 }
 
+/** Shown in place of a screen the account's role does not include. */
+function NoAccess() {
+  return (
+    <div role="alert" className="flex min-h-[60vh] flex-col items-center justify-center gap-3 px-4 text-center">
+      <h1 className="text-lg font-bold text-ink">Your role does not include this page</h1>
+      <p className="max-w-[420px] text-sm leading-6 text-muted">
+        Choose a page from the menu, or ask an administrator to give your role access under Roles &amp; Permissions.
+      </p>
+    </div>
+  );
+}
+
 export function AdminShell({ user, notifications, children }: AdminShellProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const { crumb, title } = describeRoute(pathname);
+  // The menu offers only what the account's role includes.
+  const menu = adminNav
+    .map((group) => ({ ...group, items: group.items.filter((item) => canOpen(user, item.href)) }))
+    .filter((group) => group.items.length > 0);
 
   useEffect(() => {
     // Close the mobile drawer after navigating.
@@ -120,7 +137,7 @@ export function AdminShell({ user, notifications, children }: AdminShellProps) {
         </div>
 
         <nav aria-label="Admin" className="flex-1 overflow-y-auto px-2.5 py-4">
-          {adminNav.map((group, index) => (
+          {menu.map((group, index) => (
             <div key={group.heading ?? index} className={index === 0 ? "" : "mt-6"}>
               {group.heading && (
                 <p className="px-2.5 pb-2 text-[10px] leading-4 font-bold tracking-[0.14em] text-muted uppercase">
@@ -183,24 +200,26 @@ export function AdminShell({ user, notifications, children }: AdminShellProps) {
             <p className="truncate text-[13px] leading-4 font-semibold text-ink">{title}</p>
           </div>
 
-          <form action="/admin/content" className="hidden md:block">
-            <label className="relative flex items-center">
-              <span className="sr-only">Search</span>
-              <AdminIcon name="search" width={14} height={14} className="absolute left-3 text-muted" />
-              <input
-                name="q"
-                type="search"
-                placeholder="Search articles, media, authors..."
-                className="h-9 w-[250px] rounded-md border border-line bg-surface pr-3 pl-9 text-xs text-ink outline-none placeholder:text-muted focus-visible:border-ink lg:w-[290px]"
-              />
-            </label>
-          </form>
+          {canOpen(user, "/admin/content") && (
+            <form action="/admin/content" className="hidden md:block">
+              <label className="relative flex items-center">
+                <span className="sr-only">Search</span>
+                <AdminIcon name="search" width={14} height={14} className="absolute left-3 text-muted" />
+                <input
+                  name="q"
+                  type="search"
+                  placeholder="Search articles, media, authors..."
+                  className="h-9 w-[250px] rounded-md border border-line bg-surface pr-3 pl-9 text-xs text-ink outline-none placeholder:text-muted focus-visible:border-ink lg:w-[290px]"
+                />
+              </label>
+            </form>
+          )}
 
           <NotificationsMenu notifications={notifications} />
           <UserMenu user={user} />
         </header>
 
-        <main className="px-4 py-6 sm:px-6 lg:py-8">{children}</main>
+        <main className="px-4 py-6 sm:px-6 lg:py-8">{canOpen(user, pathname) ? children : <NoAccess />}</main>
       </div>
     </div>
   );
