@@ -24,6 +24,7 @@ import type {
   AdminSeoPage,
   SeriesArrangement,
   HomeTeamChoice,
+  LiveCentreChoice,
   AdOptions,
   AdPlacementOption,
   ArticleOptions,
@@ -389,6 +390,26 @@ export async function saveHomeTeams(teams: number[]): Promise<void> {
     method: "PUT",
     body: { teams },
     fallback: () => ({ limit: 15, selected: [], available: [], automatic: [] }),
+  });
+}
+
+/** Competitions put first in the home page's Live Match Center and the others (GET /admin/live-centre). */
+export async function getLiveCentreChoice(): Promise<LiveCentreChoice> {
+  return adminRequest<LiveCentreChoice>("live-centre", {
+    fallback: () => ({
+      windowDays: 7,
+      selected: [{ id: "1", name: "One Day International", detail: "International · ODI", matches: 4 }],
+      available: [{ id: "2", name: "Big Bash League", detail: "Domestic · T20", matches: 2 }],
+    }),
+  });
+}
+
+/** Saves which competitions go first and in what order; an empty list leaves only "internationals first". */
+export async function saveLiveCentreOrder(leagues: number[]): Promise<void> {
+  await adminRequest<LiveCentreChoice>("live-centre", {
+    method: "PUT",
+    body: { leagues },
+    fallback: () => ({ windowDays: 7, selected: [], available: [] }),
   });
 }
 

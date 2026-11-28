@@ -135,14 +135,17 @@ export async function getFeaturedSeries(): Promise<CompetitionRef[]> {
   });
 }
 
-/** Matches filtered by state. "live" includes innings breaks. */
-export async function getMatches(state: MatchState | "all", limit?: number): Promise<Match[]> {
+/**
+ * Matches filtered by state. "live" includes innings breaks. They come in order of time; with `order: "priority"`
+ * live matches and results put the competitions arranged in the admin dashboard and then the internationals first.
+ */
+export async function getMatches(state: MatchState | "all", limit?: number, order?: "priority"): Promise<Match[]> {
   "use cache";
   cacheLife("seconds");
   cacheTag("matches");
 
   return apiGet<Match[]>("matches", {
-    query: { state: state === "all" ? null : state, limit },
+    query: { state: state === "all" ? null : state, limit, order },
     fallback: () => {
       const pool: Match[] =
         state === "live"
