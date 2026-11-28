@@ -375,7 +375,7 @@ export async function saveSeriesArrangement(visible: number[]): Promise<void> {
 export async function getHomeTeamChoice(): Promise<HomeTeamChoice> {
   return adminRequest<HomeTeamChoice>("home-teams", {
     fallback: () => ({
-      limit: 10,
+      limit: 15,
       selected: [{ id: "1", name: "India", detail: "International", matches: 4 }],
       available: [{ id: "2", name: "Australia", detail: "International", matches: 2 }],
       automatic: [],
@@ -388,7 +388,7 @@ export async function saveHomeTeams(teams: number[]): Promise<void> {
   await adminRequest<HomeTeamChoice>("home-teams", {
     method: "PUT",
     body: { teams },
-    fallback: () => ({ limit: 10, selected: [], available: [], automatic: [] }),
+    fallback: () => ({ limit: 15, selected: [], available: [], automatic: [] }),
   });
 }
 

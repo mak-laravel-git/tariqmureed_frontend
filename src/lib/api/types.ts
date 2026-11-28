@@ -194,15 +194,23 @@ export interface BattingRow {
   matches: number;
   runs: number;
   highScore: string;
-  average: number;
-  strikeRate: number;
+  /** Null without a dismissal. */
+  average: number | null;
+  /** Null when the balls faced are unknown. */
+  strikeRate: number | null;
   hundreds: number;
 }
 
-export interface BattingLeaders {
+export interface BattingTable {
   seasonLabel: string;
   note: string;
   rows: BattingRow[];
+}
+
+/** The season's leading run-scorers; empty `rows` when there are no figures. */
+export interface BattingLeaders extends BattingTable {
+  /** One table per format that has figures; the first is the one above. */
+  formats?: (BattingTable & { key: string })[];
 }
 
 export interface Writer {

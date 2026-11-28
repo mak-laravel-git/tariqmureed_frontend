@@ -161,17 +161,19 @@ export async function LatestNews() {
 
           <AdSlot placement="home-sidebar-top" />
 
-          <section aria-label="Number crunching">
-            <AsideHeading>Number Crunching</AsideHeading>
-            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
-              {facts.map((fact) => (
-                <FactCard key={fact.label} fact={fact} />
-              ))}
-            </div>
-            <Link href="/stats" className="mt-4 inline-block text-[13px] leading-[19.5px] font-bold text-ink hover:underline">
-              Full statistics centre →
-            </Link>
-          </section>
+          {facts.length > 0 && (
+            <section aria-label="Number crunching">
+              <AsideHeading>Number Crunching</AsideHeading>
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                {facts.map((fact) => (
+                  <FactCard key={fact.label} fact={fact} />
+                ))}
+              </div>
+              <Link href="/stats" className="mt-4 inline-block text-[13px] leading-[19.5px] font-bold text-ink hover:underline">
+                Full statistics centre →
+              </Link>
+            </section>
+          )}
 
           <AdSlot placement="home-sidebar-bottom" />
         </aside>
