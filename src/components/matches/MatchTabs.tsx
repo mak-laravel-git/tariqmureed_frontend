@@ -4,12 +4,12 @@ import { Fragment, type ReactNode } from "react";
 import { NewsCard } from "@/components/news/NewsCard";
 import { AdSlot } from "@/components/ui/AdSlot";
 import { Container } from "@/components/ui/Container";
+import { MatchTime } from "@/components/ui/MatchTime";
 import { EmptyNote as Empty } from "@/components/ui/Panel";
 import { Photo } from "@/components/ui/Photo";
 import { UnderlineTabs } from "@/components/ui/UnderlineTabs";
 import type { AwardWinner, Innings, MatchDetail, SquadPlayer } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
-import { formatLongDate, formatMatchTime12 } from "@/lib/format";
 
 export const matchTabs = [
   { key: "overview", label: "Overview" },
@@ -517,20 +517,20 @@ function Teams({ match }: { match: MatchDetail }) {
 /** Competition, date and venue (known before a ball is bowled), plus anything more the caller passes. */
 function MatchFacts({ match, extra = [] }: { match: MatchDetail; extra?: { label: string; value?: string | null; key?: string }[] }) {
   const place = [match.venue, match.city?.trim()].filter(Boolean).join(", ");
-  const facts = [
+  const facts: { label: string; value?: ReactNode; key?: string }[] = [
     { label: "Competition", value: match.competition.name },
     { label: "Match", value: match.stage },
     { label: "Format", value: match.competition.format },
-    { label: "Date", value: formatLongDate(match.startsAt) },
-    { label: "Start time", value: formatMatchTime12(match.startsAt) },
+    { label: "Date", value: <MatchTime iso={match.startsAt} show="longDate" /> },
+    { label: "Start time", value: <MatchTime iso={match.startsAt} show="time12Zone" /> },
     { label: "Venue", value: place },
     ...extra,
-  ].filter((fact): fact is { label: string; value: string; key?: string } => Boolean(fact.value));
+  ].filter((fact) => Boolean(fact.value));
 
   return (
     <dl className="grid grid-cols-1 gap-3 pt-6 sm:grid-cols-2">
       {facts.map((fact) => (
-        <div key={"key" in fact && fact.key ? fact.key : fact.label} className="rounded-[4px] border border-[#e4e4e7] bg-white p-4">
+        <div key={fact.key ?? fact.label} className="rounded-[4px] border border-[#e4e4e7] bg-white p-4">
           <dt className="text-xs leading-4 text-[#71717b]">{fact.label}</dt>
           <dd className="pt-1 text-base leading-6 font-bold text-[#09090b]">{fact.value}</dd>
         </div>

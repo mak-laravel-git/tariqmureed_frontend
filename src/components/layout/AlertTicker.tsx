@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { MatchTime } from "@/components/ui/MatchTime";
 import { getTicker } from "@/lib/api/endpoints";
 
 function TickerEntry({ children, href }: { children: ReactNode; href?: string | null }) {
@@ -48,7 +49,15 @@ export async function AlertTicker() {
             >
               {items.map((item) => (
                 <li key={item.id}>
-                  <TickerEntry href={item.href}>{item.text}</TickerEntry>
+                  <TickerEntry href={item.href}>
+                    {item.lead && item.startsAt ? (
+                      <>
+                        {item.lead} · <MatchTime iso={item.startsAt} show="dayTimeZone" />
+                      </>
+                    ) : (
+                      item.text
+                    )}
+                  </TickerEntry>
                 </li>
               ))}
             </ul>

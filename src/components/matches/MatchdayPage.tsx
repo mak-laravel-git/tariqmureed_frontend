@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 
+import { TimezoneSync } from "@/components/matches/TimezoneSync";
 import { CalendarIcon } from "@/components/ui/icons";
 import { CompetitionSelect } from "@/components/ui/CompetitionSelect";
 import { Container } from "@/components/ui/Container";
@@ -9,8 +10,9 @@ import { LiveRefresh } from "@/components/ui/LiveRefresh";
 import { PageIntro } from "@/components/ui/PageIntro";
 import { getMatchday } from "@/lib/api/endpoints";
 import type { MatchdayView } from "@/lib/api/types";
-import { formatLongDate } from "@/lib/format";
+import { formatCalendarDate } from "@/lib/format";
 import { firstParam, pageHref, type SearchParams } from "@/lib/url";
+import { visitorTimezone } from "@/lib/visitor-timezone";
 
 export interface MatchdayTab {
   key: MatchdayView;
@@ -38,11 +40,14 @@ async function MatchdayBody({
   const view = tabs.find((tab) => tab.key === requested)?.key ?? defaultView;
   const competition = firstParam(params.competition);
 
-  const day = await getMatchday(view, competition);
+  // "Today" and "Tomorrow" are the visitor's, not the server's.
+  const timezone = await visitorTimezone();
+  const day = await getMatchday(view, competition, timezone);
   const anyLive = day.groups.some((group) => group.matches.some((match) => match.state === "live" || match.state === "break"));
 
   return (
     <Container className="pb-16">
+      <TimezoneSync used={timezone} />
       {/* Scores move every few seconds while a match is on; the Live tab also watches for a match starting. */}
       {(anyLive || view === "live") && <LiveRefresh seconds={anyLive ? 10 : 30} />}
       <FilterTabs
@@ -58,7 +63,7 @@ async function MatchdayBody({
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-[4px] border border-[#e4e4e7] bg-white p-4">
         <p className="flex items-center gap-3 text-sm leading-5 font-bold text-[#09090b]">
           <CalendarIcon width={20} height={20} />
-          {formatLongDate(day.date)}
+          {formatCalendarDate(day.date)}
         </p>
         <CompetitionSelect competitions={day.competitions} value={competition} />
       </div>

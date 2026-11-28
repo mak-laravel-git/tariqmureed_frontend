@@ -32,7 +32,7 @@ import type {
   AdminRecord,
   AdminUser,
   Dashboard,
-  HistoryEntry,
+  StaffInput,
   IntegrationStatus,
   MediaAsset,
   PermissionMatrix,
@@ -205,13 +205,26 @@ export async function deleteRecord(resource: ResourceKey, id: string): Promise<v
   });
 }
 
-/** Recent history timeline on the record detail page (GET {resource}/{id}/history). */
-export function buildHistory(record: AdminRecord, actor: string): HistoryEntry[] {
-  return [
-    { title: "Record updated", meta: `${actor} · ${record.updatedAt}` },
-    { title: `Status changed to ${record.status}`, meta: "Nadia Rahman · Yesterday" },
-    { title: "Record created", meta: "Omar Siddiqui · 12 Jun 2025" },
-  ];
+/** Creates a staff account (POST /admin/staff) or saves changes to one (PUT /admin/staff/{id}). */
+export async function saveStaff(id: string | null, input: StaffInput): Promise<void> {
+  await adminRequest<AdminRecord | null>(id ? `staff/${encodeURIComponent(id)}` : "staff", {
+    method: id ? "PUT" : "POST",
+    body: input,
+    fallback: () => {
+      const store = mockStore();
+      const details = { title: input.title, subtitle: input.subtitle, owner: input.owner, role: input.owner, updatedAt: "Just now" };
+      const existing = id ? store.records.staff.find((entry) => entry.id === id) : undefined;
+
+      if (existing) {
+        Object.assign(existing, details);
+      } else {
+        store.nextId += 1;
+        store.records.staff.unshift({ id: String(store.nextId), status: "Active", ...details });
+      }
+
+      return null;
+    },
+  });
 }
 
 export async function getDashboard(): Promise<Dashboard> {

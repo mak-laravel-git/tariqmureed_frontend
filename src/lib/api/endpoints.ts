@@ -95,7 +95,7 @@ import type {
  *   GET /articles?per_page=        -> getLatestNews
  *   GET /news?category=&team=&limit= -> getNewsPage
  *   GET /articles/{slug}           -> getArticle
- *   GET /matchday?view=&competition= -> getMatchday
+ *   GET /matchday?view=&competition=&tz= -> getMatchday
  *   GET /articles/top-headlines    -> getTopHeadlines
  *   GET /articles/most-read        -> getMostRead
  *   GET /stats/highlights          -> getStatHighlights
@@ -160,13 +160,13 @@ export async function getMatches(state: MatchState | "all", limit?: number): Pro
  * Fixtures grouped by competition for the Live Scores and Schedule pages.
  * GET /matchday?view=live|upcoming|result|yesterday|today|tomorrow|week&competition=<slug>
  */
-export async function getMatchday(view: MatchdayView, competition?: string): Promise<Matchday> {
+export async function getMatchday(view: MatchdayView, competition?: string, timezone?: string): Promise<Matchday> {
   "use cache";
   cacheLife("seconds");
   cacheTag("matches");
 
   return apiGet<Matchday>("matchday", {
-    query: { view, competition },
+    query: { view, competition, tz: timezone },
     fallback: () => {
       const day = buildMockMatchday(view);
 

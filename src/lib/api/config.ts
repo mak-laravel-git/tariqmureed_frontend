@@ -13,8 +13,9 @@ export const apiConfig = {
   /** Fall back to mock data when a request fails (development convenience). */
   fallbackToMocks: process.env.API_FALLBACK_TO_MOCKS === "true",
   token: process.env.API_TOKEN?.trim() || undefined,
-  timeoutMs: 8000,
+  /** How long a request may take. Raise it (API_TIMEOUT_MS) where the API is slow, such as on a developer computer. */
+  timeoutMs: Number(process.env.API_TIMEOUT_MS) || 8000,
   /** The admin dashboard waits longer: a slow answer is better there than a failed page or an unsaved change. */
-  adminTimeoutMs: 30_000,
+  adminTimeoutMs: Math.max(30_000, Number(process.env.API_TIMEOUT_MS) || 0),
   timezone: process.env.SITE_TIMEZONE?.trim() || "Asia/Dhaka",
 } as const;

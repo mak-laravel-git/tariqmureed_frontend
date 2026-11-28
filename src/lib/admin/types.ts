@@ -57,6 +57,23 @@ export interface AdminRecord {
   adsenseSlot?: string | null;
   startsAt?: string | null;
   endsAt?: string | null;
+  /** Staff accounts only: the role's identifier, e.g. "super-admin". */
+  role?: string;
+  /** What was done to this record, newest first. Missing for records that keep no history. */
+  history?: HistoryEntry[];
+}
+
+/** The staff editor's fields, named as the API expects them. */
+export interface StaffInput {
+  /** Full name. */
+  title: string;
+  /** Email address. */
+  subtitle: string;
+  /** Role identifier. */
+  owner: string;
+  /** Empty on an edit keeps the current password. */
+  password: string;
+  password_confirmation: string;
 }
 
 /** A place on the website where an advertisement can run. */

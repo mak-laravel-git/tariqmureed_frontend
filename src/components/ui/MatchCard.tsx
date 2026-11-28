@@ -2,9 +2,9 @@ import Link from "next/link";
 
 import type { Match, MatchSide, MatchState } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
-import { formatMatchDate, formatMatchTime } from "@/lib/format";
 
 import { LiveDot } from "./LiveDot";
+import { MatchTime } from "./MatchTime";
 import { ScoreText } from "./ScoreText";
 import { Tag } from "./Tag";
 import { TeamBadge } from "./TeamBadge";
@@ -35,10 +35,12 @@ function StateTag({ state }: { state: MatchState }) {
 function SideRow({
   side,
   showProgress,
+  startsAt,
   className,
 }: {
   side: MatchSide;
   showProgress: boolean;
+  startsAt: string;
   className?: string;
 }) {
   const subline = showProgress
@@ -79,7 +81,7 @@ function SideRow({
         </div>
       ) : side.startTime ? (
         <p className="shrink-0 text-[13px] leading-[19.5px] font-bold text-muted">
-          {side.startTime}
+          <MatchTime iso={startsAt} show="time" />
         </p>
       ) : null}
     </div>
@@ -124,8 +126,8 @@ export function MatchCard({ match, fill }: MatchCardProps) {
         </header>
 
         <div className={cn("flex flex-col gap-3 p-4", fill && "flex-1")}>
-          <SideRow side={match.home} showProgress={inPlay} className={rowClass} />
-          <SideRow side={match.away} showProgress={inPlay} className={rowClass} />
+          <SideRow side={match.home} showProgress={inPlay} startsAt={match.startsAt} className={rowClass} />
+          <SideRow side={match.away} showProgress={inPlay} startsAt={match.startsAt} className={rowClass} />
 
           <footer className={cn("flex flex-col gap-1.5 border-t border-line pt-[11px]", fill && "flex-1")}>
             {match.summary && (
@@ -139,9 +141,9 @@ export function MatchCard({ match, fill }: MatchCardProps) {
               </p>
             )}
             <p className={cn("flex items-center gap-2 text-xs leading-[18px] text-muted", fill && "mt-auto")}>
-              <span>{formatMatchDate(match.startsAt)}</span>
+              <MatchTime iso={match.startsAt} show="date" />
               <span aria-hidden="true">·</span>
-              <span>{formatMatchTime(match.startsAt)}</span>
+              <MatchTime iso={match.startsAt} show="timeZone" />
             </p>
           </footer>
         </div>

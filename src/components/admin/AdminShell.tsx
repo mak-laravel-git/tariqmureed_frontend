@@ -52,6 +52,11 @@ function describeRoute(pathname: string): { crumb: string; title: string } {
   if (resource && isResourceKey(resource)) {
     const config = resources[resource];
 
+    if (config.form === "staff" && (id === "new" || action === "edit")) {
+      const heading = id === "new" ? "Add Staff Member" : "Edit Staff Member";
+
+      return { crumb: `Dashboard / ${config.label}`, title: heading };
+    }
     if (id === "new") {
       return { crumb: `Dashboard / New ${config.singular}`, title: `Create New ${config.form === "article" ? "Article" : config.form === "advertisement" ? "Advertisement" : config.label}` };
     }

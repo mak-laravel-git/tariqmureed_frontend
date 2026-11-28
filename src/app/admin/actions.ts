@@ -1,7 +1,7 @@
 "use server";
 
 import { updateTag } from "next/cache";
-import { redirect } from "next/navigation";
+import { redirect, unstable_rethrow } from "next/navigation";
 
 import { ApiError, apiPost } from "@/lib/api/client";
 import { apiConfig } from "@/lib/api/config";
@@ -21,6 +21,7 @@ import {
   saveRecord,
   savePermissions,
   saveSettings,
+  saveStaff,
   updatePassword,
   updateProfile,
   uploadMedia,
@@ -192,13 +193,52 @@ export async function saveRecordAction(
   redirect(`/admin/${resource}?saved=1`);
 }
 
-export async function deleteRecordAction(resource: string, id: string): Promise<void> {
+/** Returns only when the record could not be deleted, with the reason; otherwise it goes back to the list. */
+export async function deleteRecordAction(resource: string, id: string): Promise<FormState> {
   if (isResourceKey(resource) && !resources[resource].readOnly) {
-    await deleteRecord(resource, id);
+    try {
+      await deleteRecord(resource, id);
+    } catch (error) {
+      // An expired session redirects to the sign-in page by throwing: let that through.
+      unstable_rethrow(error);
+
+      return failure(error, "This record could not be deleted. Please try again.");
+    }
+
     refreshPublicStories(resource);
   }
 
   redirect(`/admin/${resource}?deleted=1`);
+}
+
+/** Creates or updates a staff account. */
+export async function saveStaffAction(id: string | null, _previous: FormState, formData: FormData): Promise<FormState> {
+  const input = {
+    title: text(formData, "title"),
+    subtitle: text(formData, "subtitle"),
+    owner: text(formData, "owner"),
+    // Passwords are sent exactly as typed.
+    password: String(formData.get("password") ?? ""),
+    password_confirmation: String(formData.get("password_confirmation") ?? ""),
+  };
+
+  if (!input.title || !input.subtitle) {
+    return { status: "error", message: "Enter the name and the email address." };
+  }
+
+  if (input.password !== input.password_confirmation) {
+    return { status: "error", message: "The two passwords do not match." };
+  }
+
+  try {
+    await saveStaff(id, input);
+  } catch (error) {
+    unstable_rethrow(error);
+
+    return failure(error);
+  }
+
+  redirect("/admin/staff?saved=1");
 }
 
 export async function saveSettingsAction(_previous: FormState, formData: FormData): Promise<FormState> {

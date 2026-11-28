@@ -137,7 +137,10 @@ export function buildCookiePreferences(): LegalPage {
         paragraphs: [
           "These keep the site working and remember your choice. They cannot be switched off.",
         ],
-        bullets: ["tmn_consent: stores your cookie choice on this site for 180 days."],
+        bullets: [
+          "tmn_consent: stores your cookie choice on this site for 180 days.",
+          "tmn_tz: your device's time zone, so the schedule and live score pages show your own dates, kept for 1 year.",
+        ],
       },
       {
         heading: "Analytics cookies",
