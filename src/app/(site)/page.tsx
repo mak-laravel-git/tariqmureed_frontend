@@ -59,15 +59,15 @@ export default function HomePage(props: PageProps<"/">) {
       <Suspense fallback={null}>
         <SiteJsonLd />
       </Suspense>
+      <Suspense fallback={<SectionSkeleton tone="surface" height={632} label="Loading live matches" />}>
+        <LiveMatchCentre searchParams={props.searchParams} />
+      </Suspense>
+
       <div className="bg-white">
         <Container className="py-4">
           <AdSlot placement="home-top" className="py-4" />
         </Container>
       </div>
-
-      <Suspense fallback={<SectionSkeleton tone="surface" height={632} label="Loading live matches" />}>
-        <LiveMatchCentre searchParams={props.searchParams} />
-      </Suspense>
 
       <Suspense fallback={<SectionSkeleton height={807} />}>
         <FeaturedStories />
